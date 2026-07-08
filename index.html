@@ -542,6 +542,208 @@ body.dark .flag-icon .soft-stroke{stroke:rgba(228,236,255,.42)}
 .leaf{display:none}
 @media(max-width:760px){.cat-tile{min-height:94px}.country-bottom{gap:10px}.pill{min-height:76px;padding:12px 14px}}
 
+
+/* cobalt dark theme + flag readability */
+body.dark{
+  --bg:#08142f;
+  --bg2:#0d2461;
+  --bg3:#1641a3;
+  --paper:#ecf0f3;
+  --paper2:#f4f6f8;
+  --paper3:#eef2f6;
+  --ink:#17233d;
+  --muted:#66718a;
+  --icon:#24314f;
+  --line:rgba(255,255,255,.92);
+  --shadow:18px 18px 30px rgba(5,19,55,.28), -18px -18px 30px rgba(255,255,255,.38);
+  --softShadow:12px 12px 22px rgba(5,19,55,.22), -12px -12px 22px rgba(255,255,255,.42);
+  --pressed:inset 10px 10px 18px rgba(5,19,55,.24), inset -10px -10px 18px rgba(255,255,255,.50);
+  --inner:inset 1px 1px 0 rgba(255,255,255,.82), inset -1px -1px 0 rgba(76,100,145,.18);
+  --backdrop:rgba(12,32,82,.72);
+}
+body.dark{
+  background:linear-gradient(180deg,#030711 0%, #0a1e55 56%, #1641a3 100%) !important;
+  background-attachment:fixed;
+}
+body.dark .topbar{background:rgba(4,10,24,.42) !important;backdrop-filter:blur(18px);box-shadow:0 12px 32px rgba(0,0,0,.18) !important}
+body.dark .hero,body.dark .country-card,body.dark .tab-card,body.dark .cat-tile,body.dark .recipe-card,body.dark .panel,body.dark .dialog,body.dark .country-head,body.dark .custom-head,body.dark .stat,body.dark .my-item,body.dark .pill,body.dark .btn,body.dark .back-btn,body.dark .clear-filter,body.dark .theme-btn,body.dark .close,body.dark .input,body.dark .textarea,body.dark .select,body.dark .ingredients li,body.dark .ncard,body.dark .step,body.dark .tip,body.dark .swipe-close,body.dark .stepper button,body.dark .stepper input{
+  color:var(--ink) !important;
+  background:var(--paper) !important;
+  box-shadow:var(--shadow),var(--inner) !important;
+}
+body.dark .country-card,body.dark .recipe-card,body.dark .cat-tile,body.dark .panel,body.dark .hero,body.dark .country-head,body.dark .custom-head{
+  border:0 !important;
+}
+body.dark .theme-btn{box-shadow:var(--softShadow),var(--inner),0 0 24px rgba(95,139,255,.42) !important}
+body.dark .brand-title strong{color:#f5f7ff !important;text-shadow:0 2px 12px rgba(20,60,160,.28)}
+body.dark .brand{color:#f5f7ff !important}
+/* white flag backing and button-fit scale */
+.cemoji{
+  width:86px !important;
+  height:86px !important;
+  border-radius:30px !important;
+  padding:12px !important;
+}
+.flag-icon{
+  width:100% !important;
+  height:100% !important;
+  display:block;
+}
+body.dark .cemoji{
+  background:#f8fbff !important;
+  box-shadow:12px 12px 22px rgba(5,19,55,.22), -10px -10px 20px rgba(255,255,255,.36), inset 1px 1px 0 rgba(255,255,255,.9), inset -1px -1px 0 rgba(160,175,210,.20) !important;
+}
+body.dark .flag-icon .outline{stroke:rgba(40,54,90,.28) !important}
+body.dark .flag-icon .soft-stroke{stroke:rgba(36,49,79,.48) !important}
+/* leaf only inside recipe cards */
+.leaf{display:none !important}
+.recipe-card .leaf{
+  display:inline-grid !important;
+  place-items:center;
+  width:34px;height:34px;border-radius:18px;
+  background:var(--paper) !important;
+  color:#5fa077;
+  box-shadow:var(--softShadow),var(--inner) !important;
+}
+body.dark .recipe-card .leaf{background:var(--paper) !important;color:#5a8d6f !important}
+.recipe-card .leaf .line-icon{width:18px;height:18px}
+.country-meta .pill{min-width:190px}
+@media(max-width:760px){.cemoji{width:78px!important;height:78px!important;padding:11px!important}.country-meta .pill{min-width:140px}}
+
+
+/* final cobalt dark theme + hero ambient ornament */
+body.dark{
+  --bg:#061027;
+  --bg2:#0b1a43;
+  --bg3:#214ea8;
+  --paper:#10204d;
+  --paper2:#12265a;
+  --paper3:#17316f;
+  --ink:#eef4ff;
+  --muted:#bed0f2;
+  --line:rgba(141,179,255,.28);
+  --gold:#8cb2ff;
+  --gold2:#d6e4ff;
+  --gold-ring:rgba(114,159,255,.40);
+  --gold-ring-soft:rgba(114,159,255,.18);
+  --icon:#eef4ff;
+  --icon-soft:#a9c2ff;
+  --shadow:18px 18px 30px rgba(3,9,26,.54), -18px -18px 30px rgba(46,87,189,.20);
+  --softShadow:12px 12px 22px rgba(3,9,26,.42), -12px -12px 22px rgba(54,97,208,.16);
+  --pressed:inset 10px 10px 18px rgba(3,9,26,.56), inset -10px -10px 18px rgba(58,102,214,.18);
+  --inner:inset 1px 1px 0 rgba(255,255,255,.06), inset -1px -1px 0 rgba(3,9,26,.22);
+  --backdrop:rgba(9,18,45,.80);
+}
+body.dark{background:linear-gradient(180deg,var(--bg) 0%, var(--bg2) 56%, var(--bg3) 100%) !important;background-attachment:fixed}
+body.dark .hero, body.dark .country-card, body.dark .tab-card, body.dark .cat-tile, body.dark .recipe-card, body.dark .panel, body.dark .dialog, body.dark .country-head, body.dark .custom-head, body.dark .stat, body.dark .my-item, body.dark .pill, body.dark .btn, body.dark .back-btn, body.dark .clear-filter, body.dark .theme-btn, body.dark .close, body.dark .input, body.dark .textarea, body.dark .select, body.dark .ingredients li, body.dark .ncard, body.dark .step, body.dark .tip, body.dark .swipe-close, body.dark .stepper button, body.dark .stepper input{
+  background:linear-gradient(180deg, rgba(18,38,90,.98), rgba(16,32,77,.98)) !important;
+  color:var(--ink);
+}
+body.dark .hero:before{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01)) !important;box-shadow:inset 10px 10px 24px rgba(4,9,27,.34), inset -10px -10px 24px rgba(88,132,255,.10) !important}
+.hero{overflow:hidden}
+.hero:after{display:none !important}
+.hero-ambient{position:absolute;right:34px;top:34px;width:152px;height:152px;border-radius:42px;background:var(--paper);box-shadow:var(--pressed), inset 0 1px 0 rgba(255,255,255,.72), 0 18px 34px rgba(179,195,218,.18);display:grid;place-items:center;overflow:hidden;z-index:0;transform:rotate(8deg)}
+.hero-ambient:before{content:"";position:absolute;inset:14px;border-radius:34px;background:linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,0));box-shadow:inset 8px 8px 18px rgba(184,198,219,.18), inset -10px -10px 18px rgba(255,255,255,.58);pointer-events:none}
+.hero-ambient:after{content:"";position:absolute;inset:auto 20px 18px 20px;height:34px;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,.28), transparent 70%);filter:blur(8px);opacity:.55;pointer-events:none}
+body.dark .hero-ambient{background:linear-gradient(180deg, rgba(19,38,91,.98), rgba(14,31,77,.98));box-shadow:var(--pressed), inset 0 1px 0 rgba(255,255,255,.05), 0 18px 36px rgba(2,9,25,.26)}
+body.dark .hero-ambient:before{background:linear-gradient(145deg, rgba(255,255,255,.05), rgba(255,255,255,0));box-shadow:inset 10px 10px 18px rgba(4,9,27,.34), inset -10px -10px 20px rgba(88,132,255,.12)}
+body.dark .hero-ambient:after{background:radial-gradient(circle, rgba(136,173,255,.22), transparent 70%);opacity:.44}
+.ambient-svg{width:70px;height:70px;position:relative;z-index:1;filter:drop-shadow(0 2px 5px rgba(255,255,255,.18))}
+body.dark .ambient-svg{filter:drop-shadow(0 0 14px rgba(138,173,255,.24))}
+.hero > div:first-child{position:relative;z-index:1}
+body.dark .cemoji{background:#f9fbff !important;box-shadow:12px 12px 24px rgba(3,9,26,.38), -10px -10px 22px rgba(74,118,229,.08), inset 1px 1px 0 rgba(255,255,255,.98) !important}
+body.dark .cemoji .outline{stroke:rgba(68,80,108,.26) !important}
+.flag-icon{width:54px;height:54px;display:block}
+.cemoji{width:92px;height:92px;border-radius:30px;display:grid;place-items:center}
+body.dark .flag-icon{filter:none}
+
+
+/* compact hero ornament + no recipe/dish icons */
+.hero-ambient{width:86px !important;height:86px !important;border-radius:28px !important;right:26px !important;top:26px !important;opacity:.62 !important;transform:rotate(7deg) !important;pointer-events:none !important}
+.hero-ambient:before{inset:9px !important;border-radius:22px !important;box-shadow:inset 5px 5px 12px rgba(184,198,219,.16), inset -6px -6px 12px rgba(255,255,255,.45) !important}
+.hero-ambient:after{height:18px !important;left:16px !important;right:16px !important;bottom:10px !important;filter:blur(6px) !important;opacity:.36 !important}
+.ambient-svg{width:38px !important;height:38px !important;opacity:.62 !important}
+body.dark .ambient-svg{opacity:.70 !important;filter:drop-shadow(0 0 9px rgba(138,173,255,.16)) !important}
+.recipe-card{justify-content:center !important;gap:14px !important;min-height:150px !important;padding:18px 16px !important}
+.recipe-top,.dish-icon,.leaf{display:none !important}
+.recipe-badge{display:inline-flex;align-items:center;justify-content:center;align-self:center;padding:7px 12px;border-radius:999px;background:var(--paper);color:var(--muted);font-size:12px;font-weight:800;box-shadow:var(--pressed);margin-bottom:2px}
+.recipe-card h3{margin:0 0 4px !important}
+.tag .line-icon{display:none !important}
+@media(max-width:760px){.hero-ambient{width:68px !important;height:68px !important;right:18px !important;top:18px !important;border-radius:22px !important;opacity:.46 !important}.ambient-svg{width:30px !important;height:30px !important}.hero h1{max-width:72%}.lead{max-width:72%}}
+
+
+/* stronger ambient glow for sun/moon icon */
+.hero-ambient{opacity:.78 !important}
+.hero-ambient:after{height:24px !important;left:12px !important;right:12px !important;bottom:9px !important;filter:blur(12px) !important;opacity:.52 !important;background:radial-gradient(circle, rgba(255,214,144,.30), transparent 72%) !important}
+body.dark .hero-ambient:after{background:radial-gradient(circle, rgba(149,186,255,.32), transparent 72%) !important;opacity:.54 !important}
+.ambient-svg{width:44px !important;height:44px !important;opacity:1 !important;overflow:visible;filter:drop-shadow(0 0 10px rgba(255,210,125,.24)) drop-shadow(0 0 18px rgba(255,225,170,.16)) !important}
+body.dark .ambient-svg{width:44px !important;height:44px !important;opacity:1 !important;filter:drop-shadow(0 0 12px rgba(170,205,255,.26)) drop-shadow(0 0 20px rgba(132,174,255,.18)) !important}
+.ambient-sun{transform:translateY(1px)}
+.ambient-moon{transform:translateY(1px)}
+body.dark .ambient-moon{filter:drop-shadow(0 0 10px rgba(180,214,255,.38))}
+@media(max-width:760px){.ambient-svg{width:34px !important;height:34px !important}.hero-ambient{opacity:.7 !important}}
+
+
+/* local diffuse glow around sun / moon pictograms */
+.ambient-svg{width:46px !important;height:46px !important;opacity:1 !important;overflow:visible;filter:none !important}
+.ambient-sun{filter:drop-shadow(0 0 6px rgba(255,214,120,.55)) drop-shadow(0 0 12px rgba(255,214,120,.34)) drop-shadow(0 0 22px rgba(255,214,120,.18)) !important}
+.ambient-moon{filter:drop-shadow(0 0 6px rgba(188,219,255,.56)) drop-shadow(0 0 12px rgba(188,219,255,.34)) drop-shadow(0 0 22px rgba(188,219,255,.18)) !important}
+body.dark .ambient-moon{filter:drop-shadow(0 0 8px rgba(194,223,255,.62)) drop-shadow(0 0 16px rgba(160,198,255,.34)) drop-shadow(0 0 28px rgba(132,174,255,.18)) !important}
+.hero-ambient:after{opacity:.24 !important;filter:blur(10px) !important}
+body.dark .hero-ambient:after{opacity:.26 !important;filter:blur(10px) !important}
+@media(max-width:760px){.ambient-svg{width:36px !important;height:36px !important}}
+
+
+/* move ambient icon to theme button and center hero */
+.hero{display:flex !important;align-items:center !important;justify-content:center !important;min-height:260px !important;padding:36px 30px !important;text-align:center !important}
+.hero > div:first-child{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.hero h1{max-width:none !important;text-align:center !important;margin-left:auto !important;margin-right:auto !important}
+.hero .lead{max-width:680px !important;text-align:center !important;margin-left:auto !important;margin-right:auto !important}
+.hero .kicker{align-self:center;text-align:center}
+.hero .stats{justify-content:center !important}
+.hero:after,.hero-ambient{display:none !important}
+.theme-btn{width:56px !important;height:56px !important;border-radius:20px !important;overflow:visible !important;position:relative;isolation:isolate}
+.theme-btn:before{content:"";position:absolute;inset:4px auto auto 6px;width:58%;height:34%;border-radius:999px;background:linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,0));pointer-events:none;filter:blur(1px);opacity:.62;z-index:0}
+body.dark .theme-btn:before{background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0));opacity:.42}
+.theme-btn .ambient-svg{width:30px !important;height:30px !important;position:relative;z-index:1;overflow:visible;opacity:1 !important}
+.theme-btn .ambient-sun{filter:drop-shadow(0 0 7px rgba(255,214,120,.62)) drop-shadow(0 0 14px rgba(255,214,120,.38)) drop-shadow(0 0 24px rgba(255,214,120,.22)) !important}
+.theme-btn .ambient-moon{filter:drop-shadow(0 0 7px rgba(194,223,255,.64)) drop-shadow(0 0 14px rgba(194,223,255,.40)) drop-shadow(0 0 24px rgba(194,223,255,.22)) !important}
+body.dark .theme-btn .ambient-moon{filter:drop-shadow(0 0 9px rgba(201,228,255,.70)) drop-shadow(0 0 18px rgba(160,198,255,.42)) drop-shadow(0 0 28px rgba(132,174,255,.24)) !important}
+.theme-btn .ambient-sun circle:last-of-type,.theme-btn .ambient-moon path{vector-effect:non-scaling-stroke}
+@media(max-width:760px){.hero{padding:30px 20px !important}.theme-btn{width:50px !important;height:50px !important}.theme-btn .ambient-svg{width:26px !important;height:26px !important}}
+
+
+/* country cards centered and tidier */
+.country-grid{align-items:stretch;justify-items:stretch}
+.country-card{justify-content:center !important;align-items:center !important;text-align:center !important;gap:18px !important;padding:26px 22px !important;min-height:240px !important}
+.country-main{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;position:relative;z-index:1}
+.country-copy{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.country-card h3{width:100%;margin:0 !important;text-align:center !important;font-size:clamp(32px,4vw,48px) !important;line-height:1.02 !important;letter-spacing:-.045em !important;word-break:normal;hyphens:auto}
+.country-card p{width:100%;max-width:290px;margin:0 auto !important;text-align:center !important;font-size:15px !important;line-height:1.45 !important}
+.country-bottom{width:100%;display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;gap:12px !important;text-align:center !important;margin-top:2px !important}
+.country-bottom span:first-child{display:block;width:100%;text-align:center;font-size:14px;line-height:1.25;color:var(--muted)}
+.country-bottom .arrow{margin:0 auto !important;width:42px !important;height:42px !important;border-radius:18px !important}
+.cemoji{margin:0 auto !important;flex:0 0 auto}
+@media(max-width:760px){.country-card{min-height:230px !important;padding:24px 18px !important;gap:16px !important}.country-card h3{font-size:clamp(34px,9vw,48px) !important}.country-card p{font-size:15px !important}.country-bottom span:first-child{font-size:14px}}
+
+
+/* theme button sun/moon morph animation */
+.theme-btn{display:grid !important;place-items:center !important;overflow:visible !important}
+.theme-btn .ambient-svg{width:34px !important;height:34px !important;position:absolute !important;left:50% !important;top:50% !important;transform:translate(-50%,-50%) rotate(0deg) scale(1) !important;transform-origin:center !important;overflow:visible !important;opacity:1 !important}
+.theme-btn .ambient-sun,.theme-btn .ambient-moon{transform:translate(-50%,-50%) rotate(0deg) scale(1) !important}
+.theme-btn.theme-morph .ambient-svg{animation:themeIconMorph .44s cubic-bezier(.2,.85,.2,1) both}
+@keyframes themeIconMorph{0%{opacity:.18;transform:translate(-50%,-50%) rotate(-110deg) scale(.58)}52%{opacity:1;transform:translate(-50%,-50%) rotate(18deg) scale(1.18)}100%{opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(1)}}
+.theme-btn .ambient-sun{filter:drop-shadow(0 0 7px rgba(255,214,120,.62)) drop-shadow(0 0 14px rgba(255,214,120,.38)) drop-shadow(0 0 24px rgba(255,214,120,.22)) !important}
+.theme-btn .ambient-moon{filter:drop-shadow(0 0 7px rgba(194,223,255,.64)) drop-shadow(0 0 14px rgba(194,223,255,.40)) drop-shadow(0 0 24px rgba(194,223,255,.22)) !important}
+body.dark .theme-btn .ambient-moon{filter:drop-shadow(0 0 9px rgba(201,228,255,.70)) drop-shadow(0 0 18px rgba(160,198,255,.42)) drop-shadow(0 0 28px rgba(132,174,255,.24)) !important}
+@media(max-width:760px){.theme-btn .ambient-svg{width:30px !important;height:30px !important}}
+
+
+/* Mediterranean origin labels */
+.recipe-origin{font-size:12px;line-height:1.35;color:var(--muted);font-weight:800;text-align:center;margin:-2px 0 10px;letter-spacing:.01em}
+.dialog-title h2 small{display:block;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;line-height:1.35;font-weight:800;color:var(--muted);letter-spacing:0;margin-top:8px}
+.dialog-title h2 span{display:block}
+
 </style>
 </head>
 <body>
@@ -563,7 +765,7 @@ const recipes = [
   {
     "id": "it-bruschetta",
     "title": "Брускетта с томатами и базиликом",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Закуски",
     "time": "20 мин",
     "servings": 4,
@@ -585,12 +787,13 @@ const recipes = [
       "Горячие тосты слегка натрите разрезанным зубчиком чеснока.",
       "Выложите томатную смесь на хлеб прямо перед подачей, чтобы брускетта осталась хрустящей."
     ],
-    "tips": "Не перегружайте хлеб начинкой заранее: сок томатов быстро размягчает тосты."
+    "tips": "Не перегружайте хлеб начинкой заранее: сок томатов быстро размягчает тосты.",
+    "origin": "Италия"
   },
   {
     "id": "it-caprese",
     "title": "Капрезе",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Салаты",
     "time": "10 мин",
     "servings": 2,
@@ -612,12 +815,13 @@ const recipes = [
       "Подавайте при комнатной температуре, так вкус сыра и томатов раскрывается лучше."
     ],
     "tips": "Лучше использовать сладкие мясистые томаты и мягкую моцареллу в рассоле.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Италия"
   },
   {
     "id": "it-minestrone",
     "title": "Минестроне",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Супы",
     "time": "55 мин",
     "servings": 6,
@@ -646,12 +850,13 @@ const recipes = [
       "Дайте супу постоять 10 минут, подавайте с пармезаном и каплей оливкового масла."
     ],
     "tips": "Минестроне легко менять по сезону: добавляйте зелёный горошек, шпинат, капусту или тыкву.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Италия"
   },
   {
     "id": "it-carbonara",
     "title": "Паста карбонара",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "25 мин",
     "servings": 2,
@@ -673,12 +878,13 @@ const recipes = [
       "Доведите соус до кремовой консистенции без прямого огня, чтобы яйца не свернулись.",
       "Подавайте сразу, посыпав сыром и перцем."
     ],
-    "tips": "В классической карбонаре нет сливок: кремовость дают желтки, сыр и крахмалистая вода от пасты."
+    "tips": "В классической карбонаре нет сливок: кремовость дают желтки, сыр и крахмалистая вода от пасты.",
+    "origin": "Италия"
   },
   {
     "id": "it-lasagna",
     "title": "Лазанья болоньезе",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "2 ч",
     "servings": 6,
@@ -707,12 +913,13 @@ const recipes = [
       "Завершите бешамелем, моцареллой и пармезаном.",
       "Запекайте 35–40 минут при 180 °C, затем дайте постоять 15 минут перед нарезкой."
     ],
-    "tips": "Отдых после духовки обязателен: слои стабилизируются, и лазанья режется аккуратнее."
+    "tips": "Отдых после духовки обязателен: слои стабилизируются, и лазанья режется аккуратнее.",
+    "origin": "Италия"
   },
   {
     "id": "it-margherita",
     "title": "Пицца Маргарита",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Выпечка",
     "time": "1 ч 30 мин",
     "servings": 2,
@@ -736,12 +943,13 @@ const recipes = [
       "Нанесите тонкий слой томатного соуса, разложите моцареллу.",
       "Выпекайте 7–12 минут до румяных краёв, затем добавьте базилик."
     ],
-    "tips": "Чем горячее духовка, тем ближе результат к пиццерии."
+    "tips": "Чем горячее духовка, тем ближе результат к пиццерии.",
+    "origin": "Италия"
   },
   {
     "id": "it-risotto",
     "title": "Ризотто по-милански",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "35 мин",
     "servings": 3,
@@ -767,12 +975,13 @@ const recipes = [
       "Через 16–18 минут добавьте шафран, затем снимите с огня.",
       "Вмешайте масло и пармезан, накройте на 2 минуты и подавайте кремовым."
     ],
-    "tips": "Ризотто не должно быть сухим: правильная консистенция слегка текучая, “волной”."
+    "tips": "Ризотто не должно быть сухим: правильная консистенция слегка текучая, “волной”.",
+    "origin": "Италия"
   },
   {
     "id": "it-gnocchi",
     "title": "Ньокки с томатным соусом",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "1 ч 10 мин",
     "servings": 4,
@@ -796,12 +1005,13 @@ const recipes = [
       "Опустите ньокки в кипящую подсоленную воду и варите до всплытия.",
       "Переложите ньокки в соус, аккуратно перемешайте и подавайте с пармезаном."
     ],
-    "tips": "Не месите картофельное тесто долго: ньокки могут стать плотными."
+    "tips": "Не месите картофельное тесто долго: ньокки могут стать плотными.",
+    "origin": "Италия"
   },
   {
     "id": "it-tiramisu",
     "title": "Тирамису",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "30 мин + охлаждение",
     "servings": 6,
@@ -824,12 +1034,13 @@ const recipes = [
       "Покройте половиной крема, повторите слой печенья и крема.",
       "Охлаждайте минимум 6 часов, перед подачей густо посыпьте какао."
     ],
-    "tips": "Для безопасности можно использовать пастеризованные яйца."
+    "tips": "Для безопасности можно использовать пастеризованные яйца.",
+    "origin": "Италия"
   },
   {
     "id": "it-pannacotta",
     "title": "Панна-котта с ягодным соусом",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "25 мин + охлаждение",
     "servings": 4,
@@ -852,12 +1063,13 @@ const recipes = [
       "Для соуса прогрейте ягоды с сахаром и лимонным соком, слегка разомните.",
       "Подавайте панна-котту с охлаждённым ягодным соусом."
     ],
-    "tips": "Нежная текстура получается, если не переборщить с желатином."
+    "tips": "Нежная текстура получается, если не переборщить с желатином.",
+    "origin": "Италия"
   },
   {
     "id": "it-focaccia",
     "title": "Фокачча с розмарином",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Выпечка",
     "time": "2 ч",
     "servings": 6,
@@ -880,12 +1092,13 @@ const recipes = [
       "Посыпьте розмарином и крупной солью, сбрызните маслом.",
       "Выпекайте при 220 °C 20–25 минут до золотистой корочки."
     ],
-    "tips": "Фокачча особенно хороша тёплой, с оливковым маслом или как основа для сэндвичей."
+    "tips": "Фокачча особенно хороша тёплой, с оливковым маслом или как основа для сэндвичей.",
+    "origin": "Италия"
   },
   {
     "id": "it-osso-buco",
     "title": "Оссобуко",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "2 ч 30 мин",
     "servings": 4,
@@ -913,12 +1126,13 @@ const recipes = [
       "Смешайте рубленую петрушку, чеснок и лимонную цедру для гремолаты.",
       "Подавайте оссобуко с соусом и гремолатой, традиционно — с ризотто."
     ],
-    "tips": "Мясо готово, когда легко отделяется от кости, но сохраняет форму."
+    "tips": "Мясо готово, когда легко отделяется от кости, но сохраняет форму.",
+    "origin": "Италия"
   },
   {
     "id": "es-tortilla",
     "title": "Испанская тортилья с картофелем",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Завтраки",
     "time": "45 мин",
     "servings": 4,
@@ -939,12 +1153,13 @@ const recipes = [
       "Вылейте массу на сковороду и готовьте на слабом огне до схватывания краёв.",
       "Накройте тарелкой, переверните тортилью и доведите вторую сторону 3–5 минут."
     ],
-    "tips": "Середина может оставаться чуть кремовой — это классический вариант."
+    "tips": "Середина может оставаться чуть кремовой — это классический вариант.",
+    "origin": "Испания"
   },
   {
     "id": "es-gazpacho",
     "title": "Гаспачо",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Супы",
     "time": "20 мин + охлаждение",
     "servings": 4,
@@ -969,12 +1184,13 @@ const recipes = [
       "Охладите минимум 2 часа и подавайте с кубиками овощей или сухариками."
     ],
     "tips": "Чем спелее томаты, тем меньше уксуса нужно.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Испания"
   },
   {
     "id": "es-paella",
     "title": "Паэлья с курицей и морепродуктами",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "1 ч",
     "servings": 6,
@@ -1003,12 +1219,13 @@ const recipes = [
       "Доведите до готовности ещё 8–10 минут, пока рис впитает жидкость.",
       "Снимите с огня, накройте полотенцем и дайте постоять 10 минут."
     ],
-    "tips": "Хрустящая корочка на дне — сокаррат — считается достоинством паэльи."
+    "tips": "Хрустящая корочка на дне — сокаррат — считается достоинством паэльи.",
+    "origin": "Испания"
   },
   {
     "id": "es-bravas",
     "title": "Пататас бравас",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Закуски",
     "time": "45 мин",
     "servings": 4,
@@ -1033,12 +1250,13 @@ const recipes = [
       "Пробейте соус блендером до гладкости.",
       "Подавайте картофель горячим с бравас-соусом и айоли."
     ],
-    "tips": "Домашний запечённый вариант получается менее жирным, чем классический жареный."
+    "tips": "Домашний запечённый вариант получается менее жирным, чем классический жареный.",
+    "origin": "Испания"
   },
   {
     "id": "es-croquetas",
     "title": "Крокеты с хамоном",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Закуски",
     "time": "1 ч + охлаждение",
     "servings": 6,
@@ -1065,12 +1283,13 @@ const recipes = [
       "Сформируйте крокеты, обваляйте в муке, яйце и сухарях.",
       "Обжарьте до золотистости или запеките при 220 °C, сбрызнув маслом."
     ],
-    "tips": "Хорошо охлаждённая масса легче формуется и не расползается."
+    "tips": "Хорошо охлаждённая масса легче формуется и не расползается.",
+    "origin": "Испания"
   },
   {
     "id": "es-pan-tomate",
     "title": "Пан кон томате",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Закуски",
     "time": "10 мин",
     "servings": 2,
@@ -1091,12 +1310,13 @@ const recipes = [
       "Подавайте сразу как завтрак, тапас или основу для хамона."
     ],
     "tips": "Используйте тёрку, если томаты недостаточно мягкие для натирания о хлеб.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Испания"
   },
   {
     "id": "es-churros",
     "title": "Чуррос с шоколадом",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "45 мин",
     "servings": 4,
@@ -1122,12 +1342,13 @@ const recipes = [
       "Обваляйте чуррос в сахаре с корицей.",
       "Для соуса растопите шоколад в горячем молоке и размешайте до гладкости."
     ],
-    "tips": "Тесто должно быть плотным: слишком жидкое будет плохо держать форму."
+    "tips": "Тесто должно быть плотным: слишком жидкое будет плохо держать форму.",
+    "origin": "Испания"
   },
   {
     "id": "es-crema-catalana",
     "title": "Крема каталана",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "35 мин + охлаждение",
     "servings": 4,
@@ -1150,12 +1371,13 @@ const recipes = [
       "Перед подачей посыпьте сахаром и карамелизуйте горелкой или под грилем.",
       "Подавайте сразу, пока карамельная корочка хрустит."
     ],
-    "tips": "Не кипятите крем после добавления желтков, иначе он может расслоиться."
+    "tips": "Не кипятите крем после добавления желтков, иначе он может расслоиться.",
+    "origin": "Испания"
   },
   {
     "id": "es-gambas",
     "title": "Креветки аль ахильо",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "15 мин",
     "servings": 3,
@@ -1177,12 +1399,13 @@ const recipes = [
       "Посолите, добавьте лимонный сок и петрушку.",
       "Подавайте сразу в горячем масле с хлебом."
     ],
-    "tips": "Главное — не передержать креветки: они должны остаться сочными."
+    "tips": "Главное — не передержать креветки: они должны остаться сочными.",
+    "origin": "Испания"
   },
   {
     "id": "es-fabada",
     "title": "Фабада астуриана",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Супы",
     "time": "2 ч 30 мин",
     "servings": 6,
@@ -1207,12 +1430,13 @@ const recipes = [
       "Добавьте паприку и соль, когда фасоль почти готова.",
       "Дайте блюду настояться 15–20 минут перед подачей."
     ],
-    "tips": "Фабада становится вкуснее на следующий день после разогрева."
+    "tips": "Фабада становится вкуснее на следующий день после разогрева.",
+    "origin": "Испания"
   },
   {
     "id": "es-albondigas",
     "title": "Альбондигас в томатном соусе",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "55 мин",
     "servings": 4,
@@ -1237,7 +1461,8 @@ const recipes = [
       "Положите фрикадельки в соус и готовьте под крышкой 20 минут.",
       "Подавайте с хлебом, рисом или картофелем."
     ],
-    "tips": "Фрикадельки можно сделать заранее и заморозить порциями."
+    "tips": "Фрикадельки можно сделать заранее и заморозить порциями.",
+    "origin": "Испания"
   },
   {
     "id": "jp-miso",
@@ -2352,7 +2577,8 @@ const recipes = [
       "Слегка полейте сыр маслом и посыпьте орегано."
     ],
     "tips": "Фету лучше не крошить заранее, чтобы салат выглядел свежим.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Греция"
   },
   {
     "id": "med-hummus",
@@ -2382,7 +2608,8 @@ const recipes = [
       "Подавайте с питой, овощами или как соус к основным блюдам."
     ],
     "tips": "Для особенно нежного хумуса снимите кожицу с нута или используйте хорошо разваренный нут.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Левант"
   },
   {
     "id": "med-tzatziki",
@@ -2410,7 +2637,8 @@ const recipes = [
       "Подавайте к мясу, рыбе, овощам или лепёшкам."
     ],
     "tips": "Отжим огурца важен: иначе соус быстро станет водянистым.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Греция"
   },
   {
     "id": "med-falafel",
@@ -2441,7 +2669,8 @@ const recipes = [
       "Обжарьте во фритюре до румяности или запеките при 220 °C, смазав маслом.",
       "Подавайте с хумусом, дзадзики, салатом и питой."
     ],
-    "tips": "Масса должна лепиться, но оставаться зернистой — так фалафель будет воздушным."
+    "tips": "Масса должна лепиться, но оставаться зернистой — так фалафель будет воздушным.",
+    "origin": "Левант"
   },
   {
     "id": "med-shakshuka",
@@ -2473,7 +2702,8 @@ const recipes = [
       "Посыпьте фетой и зеленью, подавайте с хлебом."
     ],
     "tips": "Соус должен быть густым, чтобы яйца не утонули и красиво схватились.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Северная Африка"
   },
   {
     "id": "med-ratatouille",
@@ -2504,7 +2734,8 @@ const recipes = [
       "Запекайте при 180 °C 40–50 минут до мягкости овощей."
     ],
     "tips": "Рататуй можно подавать горячим, тёплым или холодным — вкус меняется, но остаётся ярким.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Франция"
   },
   {
     "id": "med-moussaka",
@@ -2539,7 +2770,8 @@ const recipes = [
       "Посыпьте сыром и запекайте 35–40 минут при 180 °C.",
       "Дайте постоять 15 минут перед нарезкой."
     ],
-    "tips": "Корица нужна совсем чуть-чуть: она даёт характерный тёплый фон, а не сладость."
+    "tips": "Корица нужна совсем чуть-чуть: она даёт характерный тёплый фон, а не сладость.",
+    "origin": "Греция"
   },
   {
     "id": "med-tabbouleh",
@@ -2570,7 +2802,8 @@ const recipes = [
       "Подавайте как свежий салат или гарнир."
     ],
     "tips": "В хорошем табуле зелени больше, чем крупы.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Ливан"
   },
   {
     "id": "med-dolma",
@@ -2601,7 +2834,8 @@ const recipes = [
       "Полейте маслом и лимонным соком, добавьте воды почти до уровня долмы.",
       "Прижмите тарелкой и тушите 45–60 минут на слабом огне."
     ],
-    "tips": "Не кладите слишком много начинки: рис увеличится при приготовлении."
+    "tips": "Не кладите слишком много начинки: рис увеличится при приготовлении.",
+    "origin": "Турция"
   },
   {
     "id": "med-couscous",
@@ -2633,7 +2867,8 @@ const recipes = [
       "Подавайте с петрушкой как гарнир или самостоятельное блюдо."
     ],
     "tips": "Кускус нельзя долго варить: он готовится запариванием и должен оставаться рассыпчатым.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Марокко"
   },
   {
     "id": "med-baklava",
@@ -2664,7 +2899,8 @@ const recipes = [
       "Пока печётся пахлава, сварите сироп из воды, сахара, мёда и лимона.",
       "Горячую пахлаву залейте тёплым сиропом и оставьте пропитываться."
     ],
-    "tips": "Фило быстро сохнет: держите неиспользованные листы под влажным полотенцем."
+    "tips": "Фило быстро сохнет: держите неиспользованные листы под влажным полотенцем.",
+    "origin": "Турция"
   },
   {
     "id": "med-fish",
@@ -2694,12 +2930,13 @@ const recipes = [
       "Подавайте с овощами, рисом или кускусом."
     ],
     "tips": "Рыба готова, когда легко разделяется вилкой на хлопья.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Средиземноморье"
   },
   {
     "id": "it-frittata",
     "title": "Фриттата с овощами и сыром",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Завтраки",
     "time": "30 мин",
     "servings": 4,
@@ -2724,12 +2961,13 @@ const recipes = [
       "Перед подачей посыпьте базиликом и нарежьте порционными кусками."
     ],
     "tips": "Фриттату удобно готовить из остатков запечённых овощей или зелени из холодильника.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Италия"
   },
   {
     "id": "es-churros-breakfast",
     "title": "Чуррос с сахаром и корицей",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Завтраки",
     "time": "35 мин",
     "servings": 4,
@@ -2753,7 +2991,8 @@ const recipes = [
       "Отсадите полоски в горячее масло и жарьте до золотистого цвета.",
       "Обсушите чуррос на бумаге и обваляйте в смеси сахара с корицей."
     ],
-    "tips": "Подавайте с густым горячим шоколадом или карамельным соусом."
+    "tips": "Подавайте с густым горячим шоколадом или карамельным соусом.",
+    "origin": "Испания"
   },
   {
     "id": "jp-miso-breakfast",
@@ -2870,12 +3109,13 @@ const recipes = [
       "Подавайте сразу с петрушкой и хлебом."
     ],
     "tips": "Менемен лучше оставлять слегка влажным: он не должен превращаться в сухой омлет.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Турция"
   },
   {
     "id": "it-arancini",
     "title": "Аранчини с сыром",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Закуски",
     "time": "1 ч",
     "servings": 6,
@@ -2898,12 +3138,13 @@ const recipes = [
       "Обжарьте аранчини до румяной корочки или запеките до золотистости.",
       "Подавайте горячими, чтобы сыр внутри тянулся."
     ],
-    "tips": "Лучше всего аранчини получаются из вчерашнего ризотто: охлаждённый рис плотнее и удобнее в работе."
+    "tips": "Лучше всего аранчини получаются из вчерашнего ризотто: охлаждённый рис плотнее и удобнее в работе.",
+    "origin": "Италия"
   },
   {
     "id": "es-padron",
     "title": "Пимиентос де Падрон",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Закуски",
     "time": "15 мин",
     "servings": 2,
@@ -2922,7 +3163,8 @@ const recipes = [
       "Подавайте горячими как тапас к основному столу."
     ],
     "tips": "Особенность этой закуски в том, что один из перцев может оказаться очень острым.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Испания"
   },
   {
     "id": "jp-edamame",
@@ -3031,12 +3273,13 @@ const recipes = [
       "Подавайте с питой, овощами или к мясу."
     ],
     "tips": "Чем лучше отжат огурец, тем гуще и вкуснее получится соус-закуска.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Греция"
   },
   {
     "id": "it-polenta",
     "title": "Полента с пармезаном",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Гарниры",
     "time": "35 мин",
     "servings": 4,
@@ -3056,12 +3299,13 @@ const recipes = [
       "Подавайте мягкой как гарнир или выложите в форму, остудите и затем нарежьте."
     ],
     "tips": "Если полента слишком густая, добавьте немного горячей воды или молока в конце варки.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Италия"
   },
   {
     "id": "es-papas-arrugadas",
     "title": "Папас арругадас",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Гарниры",
     "time": "35 мин",
     "servings": 4,
@@ -3081,7 +3325,8 @@ const recipes = [
       "Подавайте как гарнир с соусом мохо или к мясу и рыбе."
     ],
     "tips": "Лучше всего использовать очень мелкий молодой картофель одинакового размера.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Испания"
   },
   {
     "id": "jp-gohan",
@@ -3187,12 +3432,13 @@ const recipes = [
       "Когда картофель станет мягким и румяным, подавайте горячим."
     ],
     "tips": "В конце можно включить верхний нагрев на 5 минут для более хрустящих краёв.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Греция"
   },
   {
     "id": "it-parmigiana",
     "title": "Пармиджана из баклажанов",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "1 ч 20 мин",
     "servings": 6,
@@ -3217,12 +3463,13 @@ const recipes = [
       "Запекайте 30–35 минут при 180 °C до румяной корочки."
     ],
     "tips": "Пармиджана вкусна не только горячей, но и слегка остывшей — слои лучше держат форму.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Италия"
   },
   {
     "id": "es-pollo-ajillo",
     "title": "Курица по-испански с чесноком",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "45 мин",
     "servings": 4,
@@ -3247,7 +3494,8 @@ const recipes = [
       "Подавайте с петрушкой и картофелем или рисом."
     ],
     "tips": "Чеснок должен стать мягким и сладким, поэтому не давайте ему подгореть в начале.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Испания"
   },
   {
     "id": "jp-tonkatsu",
@@ -3364,12 +3612,13 @@ const recipes = [
       "Подавайте с питой, овощами и соусом цацики."
     ],
     "tips": "Не нанизывайте кусочки слишком плотно: так мясо подрумянится равномернее.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Греция"
   },
   {
     "id": "it-farro-salad",
     "title": "Салат с фарро, овощами и рукколой",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Салаты",
     "time": "30 мин",
     "servings": 4,
@@ -3392,12 +3641,13 @@ const recipes = [
       "Заправьте оливковым маслом, лимонным соком, солью и перцем.",
       "Подавайте как лёгкий ужин или гарнир к рыбе."
     ],
-    "tips": "Фарро даёт больше текстуры, а перловка — более доступная домашняя альтернатива."
+    "tips": "Фарро даёт больше текстуры, а перловка — более доступная домашняя альтернатива.",
+    "origin": "Италия"
   },
   {
     "id": "es-spinach-chickpeas",
     "title": "Шпинат с нутом по-испански",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Горячие блюда",
     "time": "25 мин",
     "servings": 3,
@@ -3420,12 +3670,13 @@ const recipes = [
       "Добавьте шпинат порциями и готовьте до его уменьшения в объёме.",
       "Посолите, поперчите и подавайте как самостоятельное блюдо или гарнир."
     ],
-    "tips": "Для более сытного варианта подавайте с кусочком цельнозернового хлеба."
+    "tips": "Для более сытного варианта подавайте с кусочком цельнозернового хлеба.",
+    "origin": "Испания"
   },
   {
     "id": "es-orange-salad",
     "title": "Испанский салат с апельсином и оливками",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Салаты",
     "time": "15 мин",
     "servings": 2,
@@ -3447,7 +3698,8 @@ const recipes = [
       "Смешайте масло, уксус, соль и перец.",
       "Полейте салат заправкой и подавайте сразу."
     ],
-    "tips": "Этот салат особенно хорош к запечённой рыбе или морепродуктам."
+    "tips": "Этот салат особенно хорош к запечённой рыбе или морепродуктам.",
+    "origin": "Испания"
   },
   {
     "id": "jp-soba-veg",
@@ -3641,7 +3893,8 @@ const recipes = [
       "Приправьте тимьяном, варите 25–30 минут до мягкости чечевицы.",
       "При желании часть супа пробейте блендером для более кремовой текстуры."
     ],
-    "tips": "Перед подачей можно добавить немного лимонного сока и петрушки."
+    "tips": "Перед подачей можно добавить немного лимонного сока и петрушки.",
+    "origin": "Средиземноморье"
   },
   {
     "id": "med-quinoa-tabbouleh",
@@ -3671,7 +3924,8 @@ const recipes = [
       "Заправьте оливковым маслом, лимонным соком, солью и перцем.",
       "Охладите 10–15 минут и подавайте."
     ],
-    "tips": "Это более белковая версия классического табуле с той же свежей цитрусовой подачей."
+    "tips": "Это более белковая версия классического табуле с той же свежей цитрусовой подачей.",
+    "origin": "Ливан"
   },
   {
     "id": "med-grilled-veg-plate",
@@ -3700,7 +3954,8 @@ const recipes = [
       "Сбрызните лимонным соком и посыпьте орегано.",
       "Подавайте как лёгкое горячее блюдо или тёплый салат."
     ],
-    "tips": "Можно дополнить тарелку нутом или кускусом для более сытного варианта."
+    "tips": "Можно дополнить тарелку нутом или кускусом для более сытного варианта.",
+    "origin": "Греция"
   },
   {
     "id": "jp-natto-gohan",
@@ -5476,7 +5731,7 @@ const recipes = [
   {
     "id": "it-panzanella",
     "title": "Панцанелла",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Салаты",
     "time": "20 мин",
     "servings": 4,
@@ -5498,12 +5753,13 @@ const recipes = [
       "Оставьте на 10 минут, чтобы хлеб впитал соки."
     ],
     "tips": "Лучший способ использовать вкусный вчерашний хлеб.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Италия"
   },
   {
     "id": "it-crostini-mushroom",
     "title": "Кростини с грибами",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Закуски",
     "time": "25 мин",
     "servings": 4,
@@ -5523,12 +5779,13 @@ const recipes = [
       "Выложите грибы на хлеб.",
       "Посыпьте пармезаном."
     ],
-    "tips": "Можно заменить грибы запечёнными овощами."
+    "tips": "Можно заменить грибы запечёнными овощами.",
+    "origin": "Италия"
   },
   {
     "id": "es-ensaladilla",
     "title": "Энсаладилья руса",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Салаты",
     "time": "45 мин",
     "servings": 4,
@@ -5549,7 +5806,8 @@ const recipes = [
       "Заправьте майонезом.",
       "Охладите перед подачей."
     ],
-    "tips": "Испанская тапас-версия салата с тунцом."
+    "tips": "Испанская тапас-версия салата с тунцом.",
+    "origin": "Испания"
   },
   {
     "id": "ru-herring-salad",
@@ -5603,7 +5861,8 @@ const recipes = [
       "Добавьте питу перед подачей."
     ],
     "tips": "Пита должна оставаться хрустящей.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Ливан"
   },
   {
     "id": "med-labneh",
@@ -5629,12 +5888,13 @@ const recipes = [
       "Подавайте с огурцом или питой."
     ],
     "tips": "Лёгкая закуска с высоким содержанием белка.",
-    "healthy": true
+    "healthy": true,
+    "origin": "Левант"
   },
   {
     "id": "tb-more-it-rosemary-potatoes",
     "title": "Картофель с розмарином",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Гарниры",
     "time": "45 мин",
     "servings": 4,
@@ -5652,12 +5912,13 @@ const recipes = [
       "Смешайте с маслом, розмарином, чесноком, солью и перцем.",
       "Запекайте при 200 °C 35–40 минут."
     ],
-    "tips": "Для мягкой середины сначала обдайте картофель кипятком 5 минут."
+    "tips": "Для мягкой середины сначала обдайте картофель кипятком 5 минут.",
+    "origin": "Италия"
   },
   {
     "id": "tb-more-it-caponata-side",
     "title": "Капоната из баклажанов",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Гарниры",
     "time": "40 мин",
     "servings": 4,
@@ -5676,12 +5937,13 @@ const recipes = [
       "Потушите сельдерей, томаты, оливки и каперсы.",
       "Добавьте баклажаны, уксус и щепотку сахара."
     ],
-    "tips": "Подавайте тёплой или холодной."
+    "tips": "Подавайте тёплой или холодной.",
+    "origin": "Италия"
   },
   {
     "id": "tb-more-it-ciabatta",
     "title": "Чиабатта",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Выпечка",
     "time": "3 ч",
     "servings": 6,
@@ -5699,12 +5961,13 @@ const recipes = [
       "Дайте тесту подняться 2 часа, периодически складывая его.",
       "Сформируйте 2 батона и выпекайте при 220 °C 25 минут."
     ],
-    "tips": "Тесто должно быть влажным."
+    "tips": "Тесто должно быть влажным.",
+    "origin": "Италия"
   },
   {
     "id": "tb-more-it-cannoli",
     "title": "Канноли с рикоттой",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "50 мин",
     "servings": 6,
@@ -5722,12 +5985,13 @@ const recipes = [
       "Добавьте шоколадную крошку и цедру.",
       "Наполните трубочки кремом перед подачей."
     ],
-    "tips": "Наполняйте в последний момент."
+    "tips": "Наполняйте в последний момент.",
+    "origin": "Италия"
   },
   {
     "id": "tb-more-it-torta-caprese",
     "title": "Торта Капрезе",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "55 мин",
     "servings": 8,
@@ -5745,12 +6009,13 @@ const recipes = [
       "Взбейте яйца с сахаром, вмешайте шоколад и миндальную муку.",
       "Выпекайте при 170 °C 35–40 минут."
     ],
-    "tips": "Пирог должен остаться слегка влажным."
+    "tips": "Пирог должен остаться слегка влажным.",
+    "origin": "Италия"
   },
   {
     "id": "tb-more-it-grissini",
     "title": "Гриссини с кунжутом",
-    "country": "Италия",
+    "country": "Средиземноморская",
     "category": "Выпечка",
     "time": "1 ч 20 мин",
     "servings": 8,
@@ -5769,12 +6034,13 @@ const recipes = [
       "Нарежьте полоски, скрутите палочки и посыпьте кунжутом.",
       "Выпекайте при 200 °C 15–18 минут."
     ],
-    "tips": "Храните в сухой банке."
+    "tips": "Храните в сухой банке.",
+    "origin": "Италия"
   },
   {
     "id": "tb-more-es-escalivada",
     "title": "Эскаливада",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Гарниры",
     "time": "55 мин",
     "servings": 4,
@@ -5793,12 +6059,13 @@ const recipes = [
       "Снимите кожицу с перца и баклажана.",
       "Нарежьте полосками, полейте маслом и посолите."
     ],
-    "tips": "Отлично подходит к рыбе и птице."
+    "tips": "Отлично подходит к рыбе и птице.",
+    "origin": "Испания"
   },
   {
     "id": "tb-more-es-rice-veg-side",
     "title": "Рис с овощами по-испански",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Гарниры",
     "time": "35 мин",
     "servings": 4,
@@ -5816,12 +6083,13 @@ const recipes = [
       "Добавьте рис и бульон.",
       "Готовьте под крышкой 18–20 минут."
     ],
-    "tips": "Дайте рису постоять 5 минут."
+    "tips": "Дайте рису постоять 5 минут.",
+    "origin": "Испания"
   },
   {
     "id": "tb-more-es-empanada-gallega",
     "title": "Эмпанада галега",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Выпечка",
     "time": "1 ч 25 мин",
     "servings": 8,
@@ -5840,12 +6108,13 @@ const recipes = [
       "Выложите начинку между двумя пластами теста.",
       "Смажьте яйцом и выпекайте при 190 °C 35–40 минут."
     ],
-    "tips": "Начинка должна быть густой."
+    "tips": "Начинка должна быть густой.",
+    "origin": "Испания"
   },
   {
     "id": "tb-more-es-ensaimada",
     "title": "Энсаймада",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Выпечка",
     "time": "3 ч",
     "servings": 8,
@@ -5864,12 +6133,13 @@ const recipes = [
       "Раскатайте тонко, смажьте маслом и сверните спиралью.",
       "Выпекайте при 180 °C 25–30 минут."
     ],
-    "tips": "После остывания посыпьте пудрой."
+    "tips": "После остывания посыпьте пудрой.",
+    "origin": "Испания"
   },
   {
     "id": "tb-more-es-crema-catalana-more",
     "title": "Крема каталана",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "35 мин + охлаждение",
     "servings": 4,
@@ -5888,12 +6158,13 @@ const recipes = [
       "Смешайте желтки, сахар и крахмал, введите молоко.",
       "Заварите крем, охладите и карамелизуйте сахар сверху."
     ],
-    "tips": "Карамель делайте перед подачей."
+    "tips": "Карамель делайте перед подачей.",
+    "origin": "Испания"
   },
   {
     "id": "tb-more-es-torrijas",
     "title": "Торрихас с корицей",
-    "country": "Испания",
+    "country": "Средиземноморская",
     "category": "Десерты",
     "time": "35 мин",
     "servings": 4,
@@ -5912,7 +6183,8 @@ const recipes = [
       "Обмакните в яйцо и запеките до румяности.",
       "Полейте мёдом и посыпьте сахаром."
     ],
-    "tips": "Можно запечь при 200 °C 12–15 минут."
+    "tips": "Можно запечь при 200 °C 12–15 минут.",
+    "origin": "Испания"
   },
   {
     "id": "tb-more-jp-takikomi-gohan",
@@ -6351,7 +6623,8 @@ const recipes = [
       "Разрыхлите вилкой.",
       "Смешайте с травами, лимоном и маслом."
     ],
-    "tips": "К рыбе, курице или овощам."
+    "tips": "К рыбе, курице или овощам.",
+    "origin": "Марокко"
   },
   {
     "id": "tb-more-med-baked-feta-tomatoes",
@@ -6374,7 +6647,8 @@ const recipes = [
       "Полейте маслом и посыпьте орегано.",
       "Запекайте при 190 °C 18–20 минут."
     ],
-    "tips": "Подавайте с питой."
+    "tips": "Подавайте с питой.",
+    "origin": "Греция"
   },
   {
     "id": "tb-more-med-pita",
@@ -6397,7 +6671,8 @@ const recipes = [
       "Разделите на лепёшки и раскатайте.",
       "Выпекайте при высокой температуре до вздутия."
     ],
-    "tips": "Пита хорошо замораживается."
+    "tips": "Пита хорошо замораживается.",
+    "origin": "Греция / Левант"
   },
   {
     "id": "tb-more-med-almond-cookies",
@@ -6420,7 +6695,8 @@ const recipes = [
       "Сформируйте шарики и обваляйте в пудре.",
       "Выпекайте при 170 °C 15–18 минут."
     ],
-    "tips": "Печенье должно остаться мягким."
+    "tips": "Печенье должно остаться мягким.",
+    "origin": "Средиземноморье"
   },
   {
     "id": "tb-more-med-kataifi",
@@ -6443,7 +6719,8 @@ const recipes = [
       "Смешайте орехи с корицей и заверните в тесто.",
       "Запеките и полейте тёплым мёдом."
     ],
-    "tips": "Дайте пропитаться 20 минут."
+    "tips": "Дайте пропитаться 20 минут.",
+    "origin": "Греция"
   },
   {
     "id": "tb-more-med-orange-yogurt-dessert",
@@ -6466,7 +6743,8 @@ const recipes = [
       "Добавьте апельсиновые дольки.",
       "Полейте мёдом и посыпьте фисташками."
     ],
-    "tips": "Лёгкий десерт без выпечки."
+    "tips": "Лёгкий десерт без выпечки.",
+    "origin": "Греция"
   },
   {
     "id": "tb-more-cn-garlic-greens",
@@ -6742,9 +7020,341 @@ const recipes = [
       "Готовьте до нежной середины и румяного края."
     ],
     "tips": "Можно использовать форму для мини-маффинов."
+  },
+  {
+    "id": "ru-hot-zharkoe-pots",
+    "title": "Жаркое по-домашнему в горшочках",
+    "country": "Россия",
+    "category": "Горячие блюда",
+    "time": "1 ч 20 мин",
+    "servings": 4,
+    "difficulty": "средне",
+    "ingredients": [
+      "говядина или свинина — 600 г",
+      "картофель — 700 г",
+      "морковь — 1 шт.",
+      "лук — 1 шт.",
+      "сметана — 120 г",
+      "бульон или вода — 300 мл",
+      "лавровый лист — 2 шт.",
+      "соль, перец, зелень"
+    ],
+    "steps": [
+      "Нарежьте мясо средними кусочками, картофель — крупными кубиками, морковь — полукружьями.",
+      "Разложите мясо и овощи по горшочкам слоями, слегка посолите каждый слой.",
+      "Добавьте лавровый лист, перец, сметану и немного бульона.",
+      "Накройте крышками и поставьте в холодную духовку.",
+      "Готовьте при 180 °C около 60–70 минут до мягкости мяса и картофеля.",
+      "Перед подачей посыпьте зеленью и дайте постоять 10 минут."
+    ],
+    "tips": "Если хотите более густой соус, добавьте в каждый горшочек по 1 ч. л. муки, разведённой в бульоне."
+  },
+  {
+    "id": "ru-hot-lazy-golubtsy",
+    "title": "Ленивые голубцы в томатно-сметанном соусе",
+    "country": "Россия",
+    "category": "Горячие блюда",
+    "time": "1 ч",
+    "servings": 5,
+    "difficulty": "средне",
+    "ingredients": [
+      "фарш говяжий или смешанный — 600 г",
+      "капуста белокочанная — 400 г",
+      "рис отварной — 180 г",
+      "лук — 1 шт.",
+      "яйцо — 1 шт.",
+      "томатная паста — 2 ст. л.",
+      "сметана — 150 г",
+      "вода — 300 мл",
+      "соль, перец"
+    ],
+    "steps": [
+      "Тонко нашинкуйте капусту и обдайте кипятком на 5 минут, затем отожмите.",
+      "Смешайте фарш, капусту, рис, лук, яйцо, соль и перец.",
+      "Сформируйте крупные котлетки и выложите в форму для запекания.",
+      "Смешайте воду, сметану и томатную пасту, залейте голубцы.",
+      "Запекайте под фольгой 35 минут при 180 °C.",
+      "Снимите фольгу и готовьте ещё 10–15 минут до лёгкой румяности."
+    ],
+    "tips": "Для более мягкой текстуры капусту можно предварительно потушить 7–10 минут."
+  },
+  {
+    "id": "ru-hot-chicken-smetana",
+    "title": "Курица в сметанном соусе",
+    "country": "Россия",
+    "category": "Горячие блюда",
+    "time": "45 мин",
+    "servings": 4,
+    "difficulty": "легко",
+    "ingredients": [
+      "куриные бёдра или филе — 700 г",
+      "сметана — 200 г",
+      "лук — 1 шт.",
+      "морковь — 1 шт.",
+      "чеснок — 1 зубчик",
+      "вода или бульон — 200 мл",
+      "укроп — 3 веточки",
+      "соль, перец"
+    ],
+    "steps": [
+      "Нарежьте курицу порционными кусками, лук — мелко, морковь — соломкой.",
+      "В сотейнике слегка припустите овощи с небольшим количеством воды или масла.",
+      "Добавьте курицу, соль, перец и бульон.",
+      "Тушите под крышкой 25 минут на слабом огне.",
+      "Вмешайте сметану и чеснок, прогрейте ещё 7–10 минут, не доводя до бурного кипения.",
+      "Посыпьте укропом и подавайте с гречкой, картофелем или перловкой."
+    ],
+    "tips": "Чтобы сметана не свернулась, добавляйте её в конце и прогревайте на слабом огне."
+  },
+  {
+    "id": "ru-hot-fish-meatballs",
+    "title": "Рыбные тефтели в томатном соусе",
+    "country": "Россия",
+    "category": "Горячие блюда",
+    "time": "50 мин",
+    "servings": 4,
+    "difficulty": "средне",
+    "healthy": true,
+    "ingredients": [
+      "филе белой рыбы — 600 г",
+      "рис отварной — 120 г",
+      "яйцо — 1 шт.",
+      "лук — 1/2 шт.",
+      "томатная пассата — 300 мл",
+      "морковь — 1 шт.",
+      "вода — 150 мл",
+      "соль, перец, лавровый лист"
+    ],
+    "steps": [
+      "Измельчите рыбное филе с луком, добавьте рис, яйцо, соль и перец.",
+      "Сформируйте небольшие тефтели и выложите в форму.",
+      "Смешайте пассату, тёртую морковь, воду и лавровый лист.",
+      "Залейте тефтели соусом, накройте фольгой.",
+      "Запекайте 30–35 минут при 180 °C.",
+      "Дайте постоять 5 минут, затем подавайте с гарниром."
+    ],
+    "tips": "Для нежной текстуры не измельчайте рыбу слишком долго."
+  },
+  {
+    "id": "ru-hot-beef-prunes",
+    "title": "Тушёная говядина с черносливом",
+    "country": "Россия",
+    "category": "Горячие блюда",
+    "time": "1 ч 40 мин",
+    "servings": 4,
+    "difficulty": "средне",
+    "ingredients": [
+      "говядина — 700 г",
+      "чернослив без косточек — 100 г",
+      "лук — 1 шт.",
+      "морковь — 1 шт.",
+      "томатная паста — 1 ст. л.",
+      "вода или бульон — 400 мл",
+      "лавровый лист — 1 шт.",
+      "соль, перец"
+    ],
+    "steps": [
+      "Нарежьте говядину крупными кубиками, овощи — мелко.",
+      "Сложите мясо и овощи в толстостенную кастрюлю, добавьте томатную пасту.",
+      "Влейте бульон, посолите и поперчите.",
+      "Тушите под крышкой на слабом огне около 1 часа.",
+      "Добавьте промытый чернослив и лавровый лист.",
+      "Готовьте ещё 25–30 минут, пока мясо не станет мягким."
+    ],
+    "tips": "Чернослив добавляйте ближе к концу, чтобы он сохранил форму и дал мягкую сладость."
+  },
+  {
+    "id": "ru-hot-liver-oladyi",
+    "title": "Печёночные оладьи с морковью",
+    "country": "Россия",
+    "category": "Горячие блюда",
+    "time": "40 мин",
+    "servings": 4,
+    "difficulty": "легко",
+    "ingredients": [
+      "говяжья или куриная печень — 500 г",
+      "морковь — 1 шт.",
+      "лук — 1 шт.",
+      "яйцо — 1 шт.",
+      "овсяная или пшеничная мука — 2 ст. л.",
+      "сметана — 2 ст. л.",
+      "соль, перец"
+    ],
+    "steps": [
+      "Очистите печень от плёнок и измельчите вместе с луком.",
+      "Добавьте тёртую морковь, яйцо, сметану, муку, соль и перец.",
+      "Перемешайте массу и дайте постоять 10 минут.",
+      "Выложите небольшими порциями на противень с пергаментом.",
+      "Запекайте при 180 °C около 18–22 минут до готовности.",
+      "Подавайте со сметаной и свежей зеленью."
+    ],
+    "tips": "Запекание делает блюдо мягче и легче, чем классическая жарка на сковороде."
+  },
+  {
+    "id": "ru-side-mashed-potatoes",
+    "title": "Картофельное пюре на молоке",
+    "country": "Россия",
+    "category": "Гарниры",
+    "time": "35 мин",
+    "servings": 4,
+    "difficulty": "легко",
+    "ingredients": [
+      "картофель — 800 г",
+      "молоко — 180 мл",
+      "сливочное масло — 30 г",
+      "соль — по вкусу",
+      "укроп — по желанию"
+    ],
+    "steps": [
+      "Очистите картофель и нарежьте одинаковыми кусками.",
+      "Залейте холодной водой, посолите и варите до мягкости.",
+      "Слейте воду и подсушите картофель в кастрюле 1 минуту.",
+      "Разомните картофель, постепенно добавляя горячее молоко.",
+      "Добавьте масло и перемешайте до гладкости.",
+      "Подавайте сразу, при желании добавьте укроп."
+    ],
+    "tips": "Молоко обязательно подогрейте, так пюре останется воздушным."
+  },
+  {
+    "id": "ru-side-stewed-cabbage",
+    "title": "Тушёная капуста с морковью",
+    "country": "Россия",
+    "category": "Гарниры",
+    "time": "45 мин",
+    "servings": 4,
+    "difficulty": "легко",
+    "healthy": true,
+    "ingredients": [
+      "капуста белокочанная — 700 г",
+      "морковь — 1 шт.",
+      "лук — 1 шт.",
+      "томатная паста — 1 ст. л.",
+      "вода — 120 мл",
+      "лавровый лист — 1 шт.",
+      "соль, перец"
+    ],
+    "steps": [
+      "Тонко нашинкуйте капусту, морковь натрите, лук нарежьте мелко.",
+      "Сложите овощи в сотейник, добавьте воду и соль.",
+      "Тушите под крышкой 20 минут, периодически перемешивая.",
+      "Добавьте томатную пасту, перец и лавровый лист.",
+      "Готовьте ещё 15–20 минут до мягкости.",
+      "Перед подачей удалите лавровый лист."
+    ],
+    "tips": "Если капуста сухая, добавьте ещё немного воды в процессе тушения."
+  },
+  {
+    "id": "ru-side-perlovka-veg",
+    "title": "Перловка с овощами",
+    "country": "Россия",
+    "category": "Гарниры",
+    "time": "1 ч",
+    "servings": 4,
+    "difficulty": "легко",
+    "healthy": true,
+    "ingredients": [
+      "перловая крупа — 250 г",
+      "морковь — 1 шт.",
+      "лук — 1 шт.",
+      "сельдерей — 1 стебель по желанию",
+      "вода — 650 мл",
+      "масло — 1 ст. л.",
+      "соль, перец"
+    ],
+    "steps": [
+      "Промойте перловку до прозрачной воды.",
+      "Нарежьте овощи мелким кубиком.",
+      "Сложите крупу и овощи в кастрюлю, добавьте воду и соль.",
+      "Варите под крышкой на слабом огне 45–50 минут.",
+      "Оставьте под крышкой ещё на 10 минут.",
+      "Перемешайте с маслом и подавайте как гарнир."
+    ],
+    "tips": "Если замочить перловку на ночь, она приготовится быстрее и будет мягче."
+  },
+  {
+    "id": "ru-side-vegetable-ragu",
+    "title": "Овощное рагу по-домашнему",
+    "country": "Россия",
+    "category": "Гарниры",
+    "time": "45 мин",
+    "servings": 4,
+    "difficulty": "легко",
+    "healthy": true,
+    "ingredients": [
+      "кабачок — 1 шт.",
+      "картофель — 3 шт.",
+      "морковь — 1 шт.",
+      "капуста — 250 г",
+      "томат — 2 шт.",
+      "вода — 150 мл",
+      "соль, перец, зелень"
+    ],
+    "steps": [
+      "Нарежьте все овощи крупными кубиками, капусту нашинкуйте.",
+      "Сложите картофель и морковь в сотейник, добавьте воду.",
+      "Тушите 10 минут, затем добавьте капусту и кабачок.",
+      "Через 10 минут добавьте томаты, соль и перец.",
+      "Готовьте до мягкости овощей ещё 15 минут.",
+      "Посыпьте зеленью перед подачей."
+    ],
+    "tips": "Рагу хорошо подходит как самостоятельное лёгкое блюдо или гарнир к рыбе."
+  },
+  {
+    "id": "ru-side-baked-beet",
+    "title": "Запечённая свёкла с чесночной заправкой",
+    "country": "Россия",
+    "category": "Гарниры",
+    "time": "1 ч 10 мин",
+    "servings": 4,
+    "difficulty": "легко",
+    "healthy": true,
+    "ingredients": [
+      "свёкла — 4 шт.",
+      "растительное масло — 1 ст. л.",
+      "чеснок — 1 зубчик",
+      "лимонный сок — 1 ст. л.",
+      "соль, перец",
+      "зелень — по желанию"
+    ],
+    "steps": [
+      "Вымойте свёклу, заверните каждую в фольгу.",
+      "Запекайте при 190 °C около 50–60 минут до мягкости.",
+      "Остудите, очистите и нарежьте дольками.",
+      "Смешайте масло, лимонный сок, чеснок, соль и перец.",
+      "Полейте свёклу заправкой и аккуратно перемешайте.",
+      "Подавайте тёплой или охлаждённой."
+    ],
+    "tips": "Запечённая свёкла получается слаще и насыщеннее, чем отварная."
+  },
+  {
+    "id": "ru-side-millet-carrot",
+    "title": "Пшено с морковью и зеленью",
+    "country": "Россия",
+    "category": "Гарниры",
+    "time": "35 мин",
+    "servings": 4,
+    "difficulty": "легко",
+    "healthy": true,
+    "ingredients": [
+      "пшено — 220 г",
+      "морковь — 1 шт.",
+      "вода — 550 мл",
+      "масло — 1 ст. л.",
+      "укроп — 3 веточки",
+      "соль — по вкусу"
+    ],
+    "steps": [
+      "Пшено тщательно промойте и обдайте кипятком, чтобы убрать горечь.",
+      "Морковь натрите на крупной тёрке.",
+      "Сложите пшено и морковь в кастрюлю, добавьте воду и соль.",
+      "Варите на слабом огне 20–25 минут до мягкости.",
+      "Оставьте под крышкой на 10 минут.",
+      "Добавьте масло и укроп, перемешайте."
+    ],
+    "tips": "Такой гарнир хорошо сочетается с курицей, рыбой и тушёными овощами."
   }
 ];
-const cuisineThemes={"Италия":{emoji:"italy",accent:"#2f7d56",bg:"linear-gradient(135deg,#2f7d56,#bb5f45)",note:"Паста, сыр, томаты."},"Испания":{emoji:"spain",accent:"#c87535",bg:"linear-gradient(135deg,#c87535,#8f352f)",note:"Тапас, паэлья, оливки."},"Япония":{emoji:"japan",accent:"#596ca8",bg:"linear-gradient(135deg,#596ca8,#b76586)",note:"Баланс, рис, лапша."},"Корея":{emoji:"korea",accent:"#b74b4b",bg:"linear-gradient(135deg,#b74b4b,#71375c)",note:"Кимчи, рис, супы."},"Россия":{emoji:"russia",accent:"#4d79a8",bg:"linear-gradient(135deg,#4d79a8,#4d8b75)",note:"Супы, каши, выпечка."},"Средиземноморская":{emoji:"med",accent:"#4d8b62",bg:"linear-gradient(135deg,#4d8b62,#3d78a8)",note:"Овощи, рыба, травы."},"Средиземноморская...":{emoji:"med",accent:"#4d8b62",bg:"linear-gradient(135deg,#4d8b62,#3d78a8)",note:"Овощи, рыба, травы."},"Китай":{emoji:"china",accent:"#9b473e",bg:"linear-gradient(135deg,#9b473e,#d38a58)",note:"Лапша, димсам, вок."},"Таиланд":{emoji:"thai",accent:"#4d8a5c",bg:"linear-gradient(135deg,#4d8a5c,#d38850)",note:"Карри, рис, свежесть."},"Мои рецепты":{emoji:"custom",accent:"#8d6b48",bg:"linear-gradient(135deg,#8d6b48,#b9975b)",note:"Ваши личные рецепты."}};
+const cuisineThemes={"Италия":{emoji:"italy",accent:"#2f7d56",bg:"linear-gradient(135deg,#2f7d56,#bb5f45)",note:"Паста, сыр, томаты."},"Испания":{emoji:"spain",accent:"#c87535",bg:"linear-gradient(135deg,#c87535,#8f352f)",note:"Тапас, паэлья, оливки."},"Япония":{emoji:"japan",accent:"#596ca8",bg:"linear-gradient(135deg,#596ca8,#b76586)",note:"Баланс, рис, лапша."},"Корея":{emoji:"korea",accent:"#b74b4b",bg:"linear-gradient(135deg,#b74b4b,#71375c)",note:"Кимчи, рис, супы."},"Россия":{emoji:"russia",accent:"#4d79a8",bg:"linear-gradient(135deg,#4d79a8,#4d8b75)",note:"Супы, каши, выпечка."},"Средиземноморская":{emoji:"med",accent:"#4d8b62",bg:"linear-gradient(135deg,#4d8b62,#3d78a8)",note:"Италия, Испания и блюда Средиземноморья."},"Средиземноморская...":{emoji:"med",accent:"#4d8b62",bg:"linear-gradient(135deg,#4d8b62,#3d78a8)",note:"Овощи, рыба, травы."},"Китай":{emoji:"china",accent:"#9b473e",bg:"linear-gradient(135deg,#9b473e,#d38a58)",note:"Лапша, димсам, вок."},"Таиланд":{emoji:"thai",accent:"#4d8a5c",bg:"linear-gradient(135deg,#4d8a5c,#d38850)",note:"Карри, рис, свежесть."},"Мои рецепты":{emoji:"custom",accent:"#8d6b48",bg:"linear-gradient(135deg,#8d6b48,#b9975b)",note:"Ваши личные рецепты."}};
 const typeVisuals={"Завтраки":{icon:"breakfast",bg:"linear-gradient(135deg,#d7ad58,#f0d18e)"},"Закуски":{icon:"snack",bg:"linear-gradient(135deg,#bc7048,#e8aa78)"},"Салаты":{icon:"salad",bg:"linear-gradient(135deg,#4f8d5f,#a5c985)"},"Супы":{icon:"soup",bg:"linear-gradient(135deg,#b8693d,#dfaa72)"},"Горячие блюда":{icon:"hot",bg:"linear-gradient(135deg,#6c5c8e,#b39ad5)"},"Гарниры":{icon:"side",bg:"linear-gradient(135deg,#778d4f,#c8d99a)"},"Выпечка":{icon:"bread",bg:"linear-gradient(135deg,#9d6b3b,#d3ad77)"},"Десерты":{icon:"dessert",bg:"linear-gradient(135deg,#ad6882,#edbed0)"},"Соусы":{icon:"sauce",bg:"linear-gradient(135deg,#8a6a4d,#c6ab83)"},"Морепродукты":{icon:"seafood",bg:"linear-gradient(135deg,#3e8da5,#95d4df)"}};
 const categoryOrder=["Завтраки","Закуски","Салаты","Супы","Горячие блюда","Гарниры","Выпечка","Десерты","Морепродукты","Соусы"];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -6755,6 +7365,11 @@ const iconPaths={
  breakfast:'<path d="M8 20h12a4 4 0 0 1 0 8H12a4 4 0 0 1-4-4v-4Z"/><path d="M20 21h2a3 3 0 0 1 0 6h-2"/><path d="M12 16c-2-3 1-4 0-7M17 16c-2-3 1-4 0-7"/>', snack:'<path d="M8 24h16"/><path d="M10 20h12"/><path d="M12 16h8"/><path d="M10 24l-2 3M22 24l2 3"/><path d="M16 10v10"/>', salad:'<path d="M8 22c0 3 3 5 8 5s8-2 8-5"/><path d="M8 22c0-2 3-4 8-4s8 2 8 4"/><path d="M13 18c1-3 3-5 6-6"/><path d="M18 17c2-1 4-1 6 0"/><path d="M12 19c-2-1-4-1-6 0"/>', soup:'<path d="M8 22c0 3 3 5 8 5s8-2 8-5"/><path d="M8 22h16"/><path d="M12 10c-2 2-2 4 0 6M17 8c-2 2-2 4 0 6M22 10c-2 2-2 4 0 6"/>', hot:'<path d="M8 22h16"/><path d="M10 22a6 6 0 0 1 12 0"/><path d="M11 16h10"/><path d="M16 8v6"/><path d="M14 11c-1-2 1-3 0-5M18 11c-1-2 1-3 0-5"/>', side:'<path d="M9 22c0 3 3 5 7 5s7-2 7-5"/><path d="M9 22c0-2 3-4 7-4s7 2 7 4"/><path d="M12 17c1-2 3-3 5-3s4 1 5 3"/>', bread:'<path d="M8 23c0-5 4-8 9-8 3 0 6 2 7 5 1 2 0 3-1 3H8Z"/><path d="M13 19h1M17 18h1M21 19h1"/>', dessert:'<path d="M8 24h16"/><path d="M10 24l2-10h8l2 10"/><path d="M11 18h10"/><path d="M16 11v3"/><circle cx="16" cy="9" r="1.4"/>', seafood:'<path d="M8 18c4-4 9-5 14-2-2 4-7 6-14 4l3-2-3-2Z"/><circle cx="20.2" cy="15" r=".9"/><path d="M22 18c2 1 3 3 3 5"/>', sauce:'<path d="M12 12h8"/><path d="M13 12v11h6V12"/><path d="M15 12V8h2v4"/><path d="M13 17h6"/>', healthy:'<path d="M8 20c8 0 13-5 15-13-8 0-13 5-15 13Z"/><path d="M8 20c4-1 8-4 12-9"/>', arrow:'<path d="M11 8l8 8-8 8"/>'
 };
 function iconSvg(name){return `<svg class="line-icon" viewBox="0 0 32 32" aria-hidden="true">${iconPaths[name]||iconPaths.book}</svg>`;}
+function ambientThemeIcon(theme){
+  if(theme==='dark') return `<svg class="ambient-svg ambient-moon" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="moonGlowOuter" cx="50%" cy="50%" r="58%"><stop offset="0%" stop-color="rgba(181,214,255,.92)"/><stop offset="34%" stop-color="rgba(181,214,255,.42)"/><stop offset="70%" stop-color="rgba(181,214,255,.10)"/><stop offset="100%" stop-color="rgba(181,214,255,0)"/></radialGradient><radialGradient id="moonGlowInner" cx="50%" cy="50%" r="40%"><stop offset="0%" stop-color="rgba(230,241,255,.52)"/><stop offset="100%" stop-color="rgba(230,241,255,0)"/></radialGradient></defs><circle cx="32" cy="32" r="19" fill="url(#moonGlowOuter)" opacity=".42"/><circle cx="32" cy="32" r="12.5" fill="url(#moonGlowInner)" opacity=".46"/><path d="M39.5 18.5A15 15 0 1 0 45 45.5a16 16 0 1 1-5.5-27Z" fill="none" stroke="rgba(239,246,255,.98)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  return `<svg class="ambient-svg ambient-sun" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="sunGlowOuter" cx="50%" cy="50%" r="58%"><stop offset="0%" stop-color="rgba(255,211,112,.98)"/><stop offset="30%" stop-color="rgba(255,211,112,.52)"/><stop offset="68%" stop-color="rgba(255,211,112,.12)"/><stop offset="100%" stop-color="rgba(255,211,112,0)"/></radialGradient><radialGradient id="sunGlowInner" cx="50%" cy="50%" r="42%"><stop offset="0%" stop-color="rgba(255,242,198,.58)"/><stop offset="100%" stop-color="rgba(255,242,198,0)"/></radialGradient><radialGradient id="sunCore" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="rgba(255,199,93,1)"/><stop offset="100%" stop-color="rgba(255,180,70,.95)"/></radialGradient></defs><circle cx="32" cy="32" r="18.8" fill="url(#sunGlowOuter)" opacity=".78"/><circle cx="32" cy="32" r="12.2" fill="url(#sunGlowInner)" opacity=".56"/><circle cx="32" cy="32" r="9.8" fill="url(#sunCore)"/><circle cx="32" cy="32" r="12.2" fill="none" stroke="rgba(255,214,120,.92)" stroke-width="1.85"/><path d="M32 11.5v6.2M32 46.3v6.2M11.5 32h6.2M46.3 32h6.2M17.8 17.8l4.4 4.4M41.8 41.8l4.4 4.4M17.8 46.2l4.4-4.4M41.8 22.2l4.4-4.4" fill="none" stroke="rgba(255,210,116,.94)" stroke-width="2.15" stroke-linecap="round"/></svg>`;
+}
+
 
 function countryFlagSvg(key){
   const maps={
@@ -6784,7 +7399,8 @@ function theme(name){return cuisineThemes[name]||{emoji:"book",accent:"#b99a5d",
 function visual(cat){return typeVisuals[cat]||{icon:"hot",bg:"linear-gradient(135deg,#8e714a,#d2b47d)"}}
 function uniqueCountries(){return [...new Set(recipes.map(r=>r.country))].sort((a,b)=>a.localeCompare(b,'ru'))}
 function orderedCategories(list){const set=[...new Set(list.map(r=>r.category))]; return [...categoryOrder.filter(c=>set.includes(c)), ...set.filter(c=>!categoryOrder.includes(c)).sort((a,b)=>a.localeCompare(b,'ru'))]}
-function setTheme(){document.body.classList.toggle('dark',state.theme==='dark'); $('#themeBtn').innerHTML=iconSvg(state.theme==='dark'?'sun':'moon');}
+function originLabel(r){return r&&r.country==='Средиземноморская'&&r.origin?`Происхождение: ${r.origin}`:''}
+function setTheme(){document.body.classList.toggle('dark',state.theme==='dark'); const tb=$('#themeBtn'); if(tb){tb.innerHTML=ambientThemeIcon(state.theme); tb.setAttribute('aria-label', state.theme==='dark'?'Светлая тема':'Тёмная тема'); tb.setAttribute('title', state.theme==='dark'?'Светлая тема':'Тёмная тема');}}
 function dishEmoji(r){return dishIconKey(r);}
 function nutritionOf(r){if(r.nutrition) return r.nutrition; const d={"Завтраки":{kcal:290,protein:13,fat:12,carbs:31},"Закуски":{kcal:220,protein:8,fat:10,carbs:24},"Салаты":{kcal:180,protein:6,fat:10,carbs:16},"Супы":{kcal:210,protein:11,fat:7,carbs:24},"Горячие блюда":{kcal:430,protein:24,fat:17,carbs:39},"Выпечка":{kcal:340,protein:8,fat:12,carbs:48},"Десерты":{kcal:360,protein:6,fat:15,carbs:49},"Морепродукты":{kcal:280,protein:25,fat:11,carbs:13},"Гарниры":{kcal:250,protein:5,fat:6,carbs:42},"Соусы":{kcal:95,protein:2,fat:7,carbs:6}}; return d[r.category]||{kcal:300,protein:10,fat:10,carbs:30};}
 recipes.forEach(r=>{r.dishEmoji=r.dishEmoji||dishEmoji(r); r.nutrition=nutritionOf(r);});
@@ -6793,10 +7409,10 @@ function plural(n,a){n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20)return a[2]
 function updateHomeMeta(){$('#myRecipesCount').textContent=`${myRecipes.length} ${plural(myRecipes.length,['запись','записи','записей'])}`; const m=$('#myMetaCount'); if(m) m.textContent=`${myRecipes.length} ${plural(myRecipes.length,['рецепт','рецепта','рецептов'])}`;}
 function updateStats(){$('#statRecipes').textContent=recipes.length+myRecipes.length; $('#statCountries').textContent=uniqueCountries().length; $('#statTypes').textContent=categoryOrder.slice(0,8).length; $('#statHealthy').textContent=recipes.filter(r=>r.healthy).length; updateHomeMeta();}
 function showView(id,anim='fade'){$$('.view').forEach(v=>{v.classList.remove('active','anim-in','page-enter','page-leave');v.style.display='';}); const target=$('#'+id); if(!target){console.warn('View not found',id);return;} target.style.display=''; target.classList.add('active'); if(anim==='page') target.classList.add('page-enter'); else target.classList.add('anim-in'); state.route=id; saveState(); window.scrollTo({top:0,behavior:'smooth'});}
-function renderCountries(){const g=$('#countryGrid'); g.innerHTML=''; uniqueCountries().forEach(c=>{const th=theme(c), list=recipes.filter(r=>r.country===c), cats=orderedCategories(list).length; const b=document.createElement('button'); b.className='country-card'; b.style.setProperty('--country-bg', th.bg); b.innerHTML=`<div><div class="cemoji">${countryFlagSvg(countryIconKey(c))}</div><h3>${c}</h3><p>${th.note}</p></div><div class="country-bottom"><span>${list.length} рецептов • ${cats} категорий</span><span class="arrow">${iconSvg('arrow')}</span></div>`; b.onclick=()=>showCountry(c); g.appendChild(b);});}
+function renderCountries(){const g=$('#countryGrid'); g.innerHTML=''; uniqueCountries().forEach(c=>{const th=theme(c), list=recipes.filter(r=>r.country===c), cats=orderedCategories(list).length; const b=document.createElement('button'); b.className='country-card'; b.style.setProperty('--country-bg', th.bg); b.innerHTML=`<div class="country-main"><div class="cemoji">${countryFlagSvg(countryIconKey(c))}</div><div class="country-copy"><h3>${c}</h3><p>${th.note}</p></div></div><div class="country-bottom"><span>${list.length} рецептов • ${cats} категорий</span><span class="arrow">${iconSvg('arrow')}</span></div>`; b.onclick=()=>showCountry(c); g.appendChild(b);});}
 function renderCategoryTiles(country){const list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.slice(0,8).forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); state.filterCat = state.filterCat===cat ? null : cat; saveState(); renderCountry(country); requestAnimationFrame(()=>$('#categoryChoice').scrollIntoView({behavior:'smooth',block:'start'}));}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
-function recipeCard(r){const v=visual(r.category); return `<button class="recipe-card" data-open="${r.id}" data-source="${r.source||'base'}"><div class="recipe-top"><div class="dish-icon soft"><span>${iconSvg(dishIconKey(r))}</span></div>${r.healthy?'<span class="leaf">'+iconSvg('healthy')+'</span>':''}</div><h3>${r.title}</h3><div class="recipe-meta"><span>${r.time||'—'}</span><span>${r.servings||1} порц.</span><span>${r.difficulty||'легко'}</span></div></button>`}
-function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span><span class="pill">${iconSvg('healthy')} ${list.filter(r=>r.healthy).length}</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); $$('[data-open]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.open,b.dataset.source)); showView('country');}
+function recipeCard(r){const badge=r.healthy?'<span class="recipe-badge">Полезный</span>':''; const origin=originLabel(r); return `<button class="recipe-card" data-open="${r.id}" data-source="${r.source||'base'}">${badge}<h3>${r.title}</h3>${origin?`<div class="recipe-origin">${origin}</div>`:''}<div class="recipe-meta"><span>${r.time||'—'}</span><span>${r.servings||1} порц.</span><span>${r.difficulty||'легко'}</span></div></button>`}
+function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); $$('[data-open]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.open,b.dataset.source)); showView('country');}
 function slug(s){return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'')}
 function showCountry(c){vibe(12); renderCountry(c);}
 function goHomeWithFlip(){const current=state.route==='myview'?$('#myview'):$('#country'); current.classList.remove('active'); current.style.display='block'; current.classList.add('page-leave'); const home=$('#home'); home.style.display='block'; home.classList.add('active','page-enter'); vibe(16); setTimeout(()=>{current.classList.remove('page-leave'); current.style.display='none'; home.classList.remove('page-enter'); showView('home');},560)}
@@ -6809,7 +7425,7 @@ function deleteMyRecipe(id){myRecipes=myRecipes.filter(x=>x.id!==id); saveMyReci
 function getCustomNutrition(){const weight=Number($('#myWeight').value)||0, servings=Number($('#myServings').value)||1; const n100={kcal:Number($('#myKcal100').value)||0,protein:Number($('#myProtein100').value)||0,fat:Number($('#myFat100').value)||0,carbs:Number($('#myCarbs100').value)||0}; const has=weight>0 && Object.values(n100).some(v=>v>0); if(!has) return {weight:0,nutrition100:null,nutrition:null,total:null}; const total={kcal:n100.kcal*weight/100,protein:n100.protein*weight/100,fat:n100.fat*weight/100,carbs:n100.carbs*weight/100}; return {weight,nutrition100:n100,total,nutrition:{kcal:total.kcal/servings,protein:total.protein/servings,fat:total.fat/servings,carbs:total.carbs/servings}};}
 function updateKbjuPreview(){const el=$('#myKbjuPreview'); if(!el) return; const data=getCustomNutrition(); if(!data.nutrition){el.textContent='КБЖУ рассчитается после ввода веса и значений на 100 г.'; return;} el.textContent=`На всё блюдо: ${fmt(data.total.kcal)} ккал • Б ${fmt(data.total.protein)} г • Ж ${fmt(data.total.fat)} г • У ${fmt(data.total.carbs)} г. На порцию: ${fmt(data.nutrition.kcal)} ккал • Б ${fmt(data.nutrition.protein)} г • Ж ${fmt(data.nutrition.fat)} г • У ${fmt(data.nutrition.carbs)} г`;}
 function saveCustomRecipe(){const title=$('#myTitle').value.trim(); const ingredients=$('#myIngredients').value.split('\n').map(x=>x.trim()).filter(Boolean); const steps=$('#mySteps').value.split('\n').map(x=>x.trim()).filter(Boolean); if(!title||!ingredients.length||!steps.length){alert('Заполните название, ингредиенты и шаги.'); return;} const calc=getCustomNutrition(); const fallback=nutritionOf({category:$('#myCategory').value,title}); const rec={id:state.editingId||('my-'+Date.now()), title, category:$('#myCategory').value, time:$('#myTime').value.trim()||'—', servings:Number($('#myServings').value)||1, difficulty:$('#myDifficulty').value, country:$('#myCountry').value.trim()||'Мои рецепты', ingredients, steps, tips:$('#myTips').value.trim(), healthy:false, source:'custom', weight:calc.weight||0, nutrition100:calc.nutrition100, nutritionTotal:calc.total, dishEmoji:dishEmoji({title,category:$('#myCategory').value}), nutrition:calc.nutrition||fallback}; const idx=myRecipes.findIndex(x=>x.id===rec.id); if(idx>-1) myRecipes[idx]=rec; else myRecipes.unshift(rec); saveMyRecipes(); renderMyRecipes(); resetMyForm(); vibe(14); alert('Рецепт сохранён.');}
-function openRecipe(id,source='base'){const r=source==='custom'?myRecipes.find(x=>x.id===id):recipes.find(x=>x.id===id); if(!r) return; const v=visual(r.category); $('#modalTags').innerHTML=`<span class="tag">${iconSvg(source==='custom'?'custom':countryIconKey(r.country))} ${r.country||'Мои рецепты'}</span><span class="tag">${iconSvg(categoryIconKey(r.category))} ${r.category}</span>${r.healthy?'<span class="tag green">'+iconSvg('healthy')+' Полезный</span>':''}`; $('#modalTitle').textContent=r.title; const nut=r.nutrition||nutritionOf(r); const ingredients=(list,m)=>list.map(x=>`<li><span>${x}</span>${m!==1?`<span class="scale">× ${fmt(m)}</span>`:''}</li>`).join(''); const nutritionHtml=(n,s)=>`<div class="nutrition"><div class="ncard"><strong>${fmt(n.kcal*s)}</strong><span>ккал</span></div><div class="ncard"><strong>${fmt(n.protein*s)} г</strong><span>белки</span></div><div class="ncard"><strong>${fmt(n.fat*s)} г</strong><span>жиры</span></div><div class="ncard"><strong>${fmt(n.carbs*s)} г</strong><span>углеводы</span></div></div><div class="nnote">На 1 порцию: ${fmt(n.kcal)} ккал • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</div>`; $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${r.servings||1}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${r.servings||1}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul><div id="nutritionBox">${nutritionHtml(nut,r.servings||1)}</div>${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${(r.steps||[]).map(step=>`<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${step}</span></label></div>`).join('')}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${r.tips}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>`; function rerender(){const raw=Number($('#portionInput').value); const s=Number.isFinite(raw)&&raw>0?raw:(r.servings||1); $('#portionInput').value=s; const mult=s/(r.servings||1); $('#ingredientsList').innerHTML=ingredients(r.ingredients,mult); $('#nutritionBox').innerHTML=nutritionHtml(nut,s);} function progress(){const cs=$$('[data-check]'); const done=cs.filter(c=>c.checked).length; $('#progressText').textContent=`Отмечено ${done} из ${cs.length}`; cs.forEach(c=>c.nextElementSibling.classList.toggle('done',c.checked));} $('#portionMinus').onclick=()=>{$('#portionInput').value=Math.max(1,Number($('#portionInput').value||(r.servings||1))-1); rerender();}; $('#portionPlus').onclick=()=>{$('#portionInput').value=Math.max(1,Number($('#portionInput').value||(r.servings||1))+1); rerender();}; $('#portionInput').oninput=rerender; $$('[data-check]').forEach(c=>c.onchange=()=>{progress(); vibe(8);}); progress(); openModal(); vibe(12);}
+function openRecipe(id,source='base'){const r=source==='custom'?myRecipes.find(x=>x.id===id):recipes.find(x=>x.id===id); if(!r) return; const v=visual(r.category); $('#modalTags').innerHTML=`<span class="tag">${r.country||'Мои рецепты'}</span><span class="tag">${r.category}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}`; $('#modalTitle').innerHTML=`<span>${r.title}</span>${originLabel(r)?`<small>${originLabel(r)}</small>`:''}`; const nut=r.nutrition||nutritionOf(r); const ingredients=(list,m)=>list.map(x=>`<li><span>${x}</span>${m!==1?`<span class="scale">× ${fmt(m)}</span>`:''}</li>`).join(''); const nutritionHtml=(n,s)=>`<div class="nutrition"><div class="ncard"><strong>${fmt(n.kcal*s)}</strong><span>ккал</span></div><div class="ncard"><strong>${fmt(n.protein*s)} г</strong><span>белки</span></div><div class="ncard"><strong>${fmt(n.fat*s)} г</strong><span>жиры</span></div><div class="ncard"><strong>${fmt(n.carbs*s)} г</strong><span>углеводы</span></div></div><div class="nnote">На 1 порцию: ${fmt(n.kcal)} ккал • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</div>`; $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${r.servings||1}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${r.servings||1}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul><div id="nutritionBox">${nutritionHtml(nut,r.servings||1)}</div>${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${(r.steps||[]).map(step=>`<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${step}</span></label></div>`).join('')}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${r.tips}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>`; function rerender(){const raw=Number($('#portionInput').value); const s=Number.isFinite(raw)&&raw>0?raw:(r.servings||1); $('#portionInput').value=s; const mult=s/(r.servings||1); $('#ingredientsList').innerHTML=ingredients(r.ingredients,mult); $('#nutritionBox').innerHTML=nutritionHtml(nut,s);} function progress(){const cs=$$('[data-check]'); const done=cs.filter(c=>c.checked).length; $('#progressText').textContent=`Отмечено ${done} из ${cs.length}`; cs.forEach(c=>c.nextElementSibling.classList.toggle('done',c.checked));} $('#portionMinus').onclick=()=>{$('#portionInput').value=Math.max(1,Number($('#portionInput').value||(r.servings||1))-1); rerender();}; $('#portionPlus').onclick=()=>{$('#portionInput').value=Math.max(1,Number($('#portionInput').value||(r.servings||1))+1); rerender();}; $('#portionInput').oninput=rerender; $$('[data-check]').forEach(c=>c.onchange=()=>{progress(); vibe(8);}); progress(); openModal(); vibe(12);}
 const modalEls={modal:$('#modal'),dialog:$('#dialog'),body:document.body};
 function resetDialogPosition(animate=true){const d=modalEls.dialog;if(animate)d.classList.remove('dragging','drag-ready');d.style.transform='translate3d(0,0,0) rotateX(0deg) scale(1)';modalEls.modal.style.background='rgba(70,46,33,.28)';}
 function openModal(){modalEls.modal.classList.add('open'); modalEls.body.classList.add('modal-open'); const d=modalEls.dialog; d.classList.remove('closing-up','dragging'); d.classList.add('drag-ready'); resetDialogPosition(false);}
@@ -6864,8 +7480,8 @@ function initDialogDrag(){
   d.addEventListener('pointerup',finish); d.addEventListener('pointercancel',finish); d.addEventListener('lostpointercapture',finish);
 }
 let touchX=0,touchY=0; function canSwipeBack(){return (state.route==='country' || state.route==='myview') && !$('#modal').classList.contains('open');} document.addEventListener('touchstart',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; touchX=t.clientX; touchY=t.clientY;},{passive:true}); document.addEventListener('touchmove',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); if(touchX<36 && dx>26 && dy<60) $('#swipeCue').classList.add('show'); else $('#swipeCue').classList.remove('show');},{passive:true}); document.addEventListener('touchend',e=>{if(!canSwipeBack()) return; const t=e.changedTouches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); $('#swipeCue').classList.remove('show'); if(touchX<36 && dx>88 && dy<70) goHomeWithFlip(); touchX=touchY=0;},{passive:true});
-$('#themeBtn').onclick=()=>{const b=$('#themeBtn'); b.classList.add('tapped'); setTimeout(()=>b.classList.remove('tapped'),180); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]);}; $('#homeBrand').onclick=()=>{if(state.route!=='home') goHomeWithFlip();}; $('#backBtn').onclick=goHomeWithFlip; $('#myBackBtn').onclick=goHomeWithFlip; $('#clearCat').onclick=()=>{state.filterCat=null; saveState(); renderCountry(state.country);}; $('#myRecipesCard').onclick=()=>{showView('myview'); renderMyRecipes(); vibe(12);}; $('#saveMyRecipe').onclick=saveCustomRecipe; $('#resetMyRecipe').onclick=resetMyForm; $('#closeModal').onclick=closeModalUp; $('#modal').onclick=e=>{if(e.target.id==='modal') closeModalInstant();}; document.addEventListener('keydown',e=>{if(e.key==='Escape') closeModalInstant();});
-function boot(){$('#brandMark').innerHTML=iconSvg('book'); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); fillMyCategory(); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); initDialogDrag(); if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview') showView('myview'); else showView('home'); if(state.editingId) editMyRecipe(state.editingId);} 
+$('#themeBtn').onclick=()=>{const b=$('#themeBtn'); b.classList.remove('tapped','theme-morph'); void b.offsetWidth; b.classList.add('tapped','theme-morph'); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]); setTimeout(()=>b.classList.remove('tapped'),180); setTimeout(()=>b.classList.remove('theme-morph'),460);}; $('#homeBrand').onclick=()=>{if(state.route!=='home') goHomeWithFlip();}; $('#backBtn').onclick=goHomeWithFlip; $('#myBackBtn').onclick=goHomeWithFlip; $('#clearCat').onclick=()=>{state.filterCat=null; saveState(); renderCountry(state.country);}; $('#myRecipesCard').onclick=()=>{showView('myview'); renderMyRecipes(); vibe(12);}; $('#saveMyRecipe').onclick=saveCustomRecipe; $('#resetMyRecipe').onclick=resetMyForm; $('#closeModal').onclick=closeModalUp; $('#modal').onclick=e=>{if(e.target.id==='modal') closeModalInstant();}; document.addEventListener('keydown',e=>{if(e.key==='Escape') closeModalInstant();});
+function boot(){$('#brandMark').innerHTML=iconSvg('book'); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); fillMyCategory(); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview') showView('myview'); else showView('home'); if(state.editingId) editMyRecipe(state.editingId);} 
 boot();
 </script>
 </body>
