@@ -744,6 +744,23 @@ body.dark .theme-btn .ambient-moon{filter:drop-shadow(0 0 9px rgba(201,228,255,.
 .dialog-title h2 small{display:block;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;line-height:1.35;font-weight:800;color:var(--muted);letter-spacing:0;margin-top:8px}
 .dialog-title h2 span{display:block}
 
+
+/* local saving / backup controls */
+.backup-box{margin-top:18px;padding:16px;border-radius:26px;background:var(--paper);box-shadow:var(--softShadow),var(--inner);text-align:center}
+.backup-box h4{margin:0 0 6px;font:400 20px/1.15 Georgia,"Times New Roman",serif;letter-spacing:-.02em}
+.backup-box p{margin:0 auto 12px;color:var(--muted);font-size:13px;line-height:1.45;max-width:520px}
+.backup-actions{justify-content:center;margin-top:8px}
+.backup-note{margin-top:10px;color:var(--muted);font-size:12px;font-weight:800}
+body.dark .backup-box{background:linear-gradient(180deg, rgba(18,38,90,.98), rgba(16,32,77,.98)) !important}
+
+
+/* Supabase cloud sync */
+.cloud-box{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.cloud-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 2px}
+.cloud-box h4{margin-top:0}
+.cloud-box .btn:disabled{opacity:.45;cursor:not-allowed;filter:saturate(.55)}
+@media(max-width:760px){.cloud-fields{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -756,10 +773,11 @@ body.dark .theme-btn .ambient-moon{filter:drop-shadow(0 0 9px rgba(201,228,255,.
 <div class="country-grid" id="countryGrid" style="margin-top:14px"></div></section>
 <section id="country" class="view"><section class="country-head" id="countryHead"><div><button class="back-btn" id="backBtn">← Назад</button><h1 id="countryTitle"></h1><p id="countryNote"></p></div><div class="country-meta" id="countryMeta"></div></section><div class="section-title"><div><h2>Меню</h2><p>Выберите тип блюда.</p></div></div><div class="category-choice" id="categoryChoice"></div><div class="cat-control" id="catControl" hidden><button class="clear-filter" id="clearCat">Показать всё</button></div><div id="countryRecipes"></div></section>
 <section id="myview" class="view"><section class="custom-head"><div><button class="back-btn" id="myBackBtn">← Назад</button><h1>Мои рецепты</h1><p>Сохраняйте собственные рецепты и заметки.</p></div><div class="country-meta"><span class="pill" id="myMetaCount">0 рецептов</span></div></section>
-<div class="form-layout"><section class="panel"><h3 id="formTitle">Новый рецепт</h3><div class="field-grid"><input class="input" id="myTitle" placeholder="Название"><select class="select" id="myCategory"></select><input class="input" id="myTime" placeholder="Время, например 20 мин"><input class="input" id="myServings" type="number" min="1" step="1" placeholder="Порции"><input class="input" id="myCountry" placeholder="Страна / стиль"><select class="select" id="myDifficulty"><option value="легко">легко</option><option value="средне">средне</option><option value="сложно">сложно</option></select></div><div class="kbju-grid"><input class="input" id="myWeight" type="number" min="0" step="1" placeholder="Вес блюда, г"><input class="input" id="myKcal100" type="number" min="0" step="1" placeholder="ккал / 100 г"><input class="input" id="myProtein100" type="number" min="0" step="0.1" placeholder="Б / 100 г"><input class="input" id="myFat100" type="number" min="0" step="0.1" placeholder="Ж / 100 г"><input class="input" id="myCarbs100" type="number" min="0" step="0.1" placeholder="У / 100 г"></div><div class="kbju-preview" id="myKbjuPreview">КБЖУ рассчитается после ввода веса и значений на 100 г.</div><div style="margin-top:10px"><textarea class="textarea" id="myIngredients" placeholder="Ингредиенты — каждый с новой строки"></textarea></div><div style="margin-top:10px"><textarea class="textarea" id="mySteps" placeholder="Шаги приготовления — каждый с новой строки"></textarea></div><div style="margin-top:10px"><textarea class="textarea" id="myTips" placeholder="Заметки, советы, температура, замены"></textarea></div><div class="actions"><button class="btn primary" id="saveMyRecipe">Сохранить</button><button class="btn ghost" id="resetMyRecipe">Очистить</button></div></section><section class="panel"><h3>Список</h3><div id="myRecipesList" class="my-list"></div><div id="myEmpty" class="empty-box" hidden>Здесь появятся ваши рецепты.</div></section></div></section>
+<div class="form-layout"><section class="panel"><h3 id="formTitle">Новый рецепт</h3><div class="field-grid"><input class="input" id="myTitle" placeholder="Название"><select class="select" id="myCategory"></select><input class="input" id="myTime" placeholder="Время, например 20 мин"><input class="input" id="myServings" type="number" min="1" step="1" placeholder="Порции"><input class="input" id="myCountry" placeholder="Страна / стиль"><select class="select" id="myDifficulty"><option value="легко">легко</option><option value="средне">средне</option><option value="сложно">сложно</option></select></div><div class="kbju-grid"><input class="input" id="myWeight" type="number" min="0" step="1" placeholder="Вес блюда, г"><input class="input" id="myKcal100" type="number" min="0" step="1" placeholder="ккал / 100 г"><input class="input" id="myProtein100" type="number" min="0" step="0.1" placeholder="Б / 100 г"><input class="input" id="myFat100" type="number" min="0" step="0.1" placeholder="Ж / 100 г"><input class="input" id="myCarbs100" type="number" min="0" step="0.1" placeholder="У / 100 г"></div><div class="kbju-preview" id="myKbjuPreview">КБЖУ рассчитается после ввода веса и значений на 100 г.</div><div style="margin-top:10px"><textarea class="textarea" id="myIngredients" placeholder="Ингредиенты — каждый с новой строки"></textarea></div><div style="margin-top:10px"><textarea class="textarea" id="mySteps" placeholder="Шаги приготовления — каждый с новой строки"></textarea></div><div style="margin-top:10px"><textarea class="textarea" id="myTips" placeholder="Заметки, советы, температура, замены"></textarea></div><div class="actions"><button class="btn primary" id="saveMyRecipe">Сохранить</button><button class="btn ghost" id="resetMyRecipe">Очистить</button></div></section><section class="panel"><h3>Список</h3><div id="myRecipesList" class="my-list"></div><div id="myEmpty" class="empty-box" hidden>Здесь появятся ваши рецепты.</div><div class="backup-box"><h4>Сохранение данных</h4><p>Рецепты и настройки сохраняются в этом браузере автоматически. Для переноса или обновления файла сделайте резервную копию.</p><div class="actions backup-actions"><button class="btn" id="exportData" type="button">Скачать резервную копию</button><button class="btn ghost" id="importData" type="button">Загрузить копию</button><input id="backupFile" type="file" accept="application/json,.json" hidden></div><div class="backup-note" id="backupStatus">Автосохранение включено.</div><div class="cloud-box"><h4>Облачная синхронизация</h4><p>Войдите по email и паролю, чтобы сохранять рецепты и настройки в Supabase и открывать их на другом устройстве.</p><div class="cloud-fields"><input class="input" id="cloudEmail" type="email" autocomplete="email" placeholder="Email"><input class="input" id="cloudPassword" type="password" autocomplete="current-password" placeholder="Пароль"></div><div class="actions backup-actions"><button class="btn primary" id="cloudSignIn" type="button">Войти</button><button class="btn" id="cloudSignUp" type="button">Регистрация</button><button class="btn ghost" id="cloudSignOut" type="button" hidden>Выйти</button></div><div class="actions backup-actions"><button class="btn" id="cloudSave" type="button" disabled>Сохранить в облако</button><button class="btn ghost" id="cloudLoad" type="button" disabled>Загрузить из облака</button></div><div class="backup-note" id="cloudStatus">Облако не подключено.</div></div></div></section></div></section>
 </main></div>
 <div class="swipe-cue" id="swipeCue"><span>↩</span><b>Главная</b></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true"><article class="dialog" id="dialog"><header class="dialog-head" id="dialogHead"><div class="dialog-title"><div><div class="tags" id="modalTags"></div><h2 id="modalTitle"></h2></div><button class="close" id="closeModal">×</button></div></header><div class="dialog-body" id="modalBody"></div></article></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const recipes = [
   {
@@ -7390,10 +7408,22 @@ function countryIconKey(country){const m={"Италия":"italy","Испания
 function categoryIconKey(cat){const m={"Завтраки":"breakfast","Закуски":"snack","Салаты":"salad","Супы":"soup","Горячие блюда":"hot","Гарниры":"side","Выпечка":"bread","Десерты":"dessert","Морепродукты":"seafood","Соусы":"sauce"};return m[cat]||'hot';}
 function dishIconKey(recipe){const t=(recipe.title+' '+recipe.category).toLowerCase(); if(/салат|табуле|капрезе|оливье|винегрет|суномоно/.test(t))return 'salad'; if(/суп|борщ|щи|рамен|мисо|окрошка|чигэ|ччигэ|миёк|чечевич/.test(t))return 'soup'; if(/рыба|лосос|кревет|морепр|темпур|дорадо/.test(t))return 'seafood'; if(/тирамису|панна|медовик|дораяки|хотток|чуррос|пахлава|крем/.test(t))return 'dessert'; if(/фокачч|пирожк|хлеб|булоч|выпеч/.test(t))return 'bread'; if(/рис|гречк|картофель|гарнир|гохан|полент/.test(t))return 'side'; if(/омлет|завтрак|каша|блин|сырник|фриттат|менемен|шакшук|тортиль/.test(t))return 'breakfast'; if(/соус|хумус|цацики/.test(t))return 'sauce'; if(/бутерброд|закуск|брускет|сэндвич|тапас|эдмаме/.test(t))return 'snack'; return categoryIconKey(recipe.category);}
 
-const state=Object.assign({theme:"light",route:"home",country:null,filterCat:null,editingId:null},JSON.parse(localStorage.getItem("tableBookState")||localStorage.getItem("maisonState")||"{}"));
-let myRecipes=JSON.parse(localStorage.getItem("maisonMyRecipes")||"[]");
-function saveState(){localStorage.setItem("tableBookState",JSON.stringify(state));}
-function saveMyRecipes(){localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes)); updateHomeMeta();}
+const STORAGE_STATE_KEY="tableBookState";
+const STORAGE_RECIPES_KEY="tableBookUserRecipes";
+const STORAGE_BACKUP_KEY="tableBookBackup";
+const SUPABASE_URL="https://qshwxcxhxkchpdjaecdk.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaHd4Y3hoeGtjaHBkamFlY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjM3NTYsImV4cCI6MjA5OTA5OTc1Nn0.aQM03By8cL4VkFsI4NiVugWtSKU1bcZkHfErK_4PMB4";
+const CLOUD_TABLE="user_app_state";
+const cloud=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+let cloudUser=null, cloudSaveTimer=null, cloudBusy=false;
+function safeJson(value,fallback){try{return value?JSON.parse(value):fallback}catch(e){return fallback}}
+const state=Object.assign({theme:"light",route:"home",country:null,filterCat:null,editingId:null},safeJson(localStorage.getItem(STORAGE_STATE_KEY)||localStorage.getItem("maisonState"),{}));
+let myRecipes=safeJson(localStorage.getItem(STORAGE_RECIPES_KEY)||localStorage.getItem("maisonMyRecipes"),[]);
+function tableBookSnapshot(){return {app:"Table book",version:2,savedAt:new Date().toISOString(),state:Object.assign({},state),myRecipes:myRecipes};}
+function persistBackup(){try{localStorage.setItem(STORAGE_BACKUP_KEY,JSON.stringify(tableBookSnapshot()))}catch(e){console.warn("Backup save failed",e)}}
+function updateBackupStatus(text){const el=$("#backupStatus"); if(el) el.textContent=text;}
+function saveState(){try{localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));persistBackup();queueCloudSave()}catch(e){console.warn("State save failed",e)}}
+function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
 function vibe(ms=12){try{if(navigator.vibrate) navigator.vibrate(ms)}catch(e){}}
 function theme(name){return cuisineThemes[name]||{emoji:"book",accent:"#b99a5d",bg:"linear-gradient(135deg,#8e714a,#b99a5d)",note:"Коллекция рецептов."}}
 function visual(cat){return typeVisuals[cat]||{icon:"hot",bg:"linear-gradient(135deg,#8e714a,#d2b47d)"}}
@@ -7416,6 +7446,162 @@ function renderCountry(country){state.country=country; saveState(); const th=the
 function slug(s){return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'')}
 function showCountry(c){vibe(12); renderCountry(c);}
 function goHomeWithFlip(){const current=state.route==='myview'?$('#myview'):$('#country'); current.classList.remove('active'); current.style.display='block'; current.classList.add('page-leave'); const home=$('#home'); home.style.display='block'; home.classList.add('active','page-enter'); vibe(16); setTimeout(()=>{current.classList.remove('page-leave'); current.style.display='none'; home.classList.remove('page-enter'); showView('home');},560)}
+
+function exportUserData(){
+  const data=tableBookSnapshot();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  const date=new Date().toISOString().slice(0,10);
+  a.href=URL.createObjectURL(blob);
+  a.download=`table-book-backup-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1200);
+  updateBackupStatus(`Резервная копия создана: ${date}.`);
+  vibe(12);
+}
+function importUserData(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      if(!data || !Array.isArray(data.myRecipes)) throw new Error('bad backup');
+      const count=data.myRecipes.length;
+      const ok=confirm(`Загрузить резервную копию? Текущие пользовательские рецепты будут заменены. В файле: ${count} ${plural(count,['рецепт','рецепта','рецептов'])}.`);
+      if(!ok) return;
+      myRecipes=data.myRecipes;
+      if(data.state && typeof data.state==='object'){
+        Object.assign(state,data.state);
+        state.route='myview';
+        state.editingId=null;
+      }
+      saveState();
+      saveMyRecipes();
+      setTheme();
+      updateStats();
+      renderCountries();
+      renderMyRecipes();
+      resetMyForm();
+      showView('myview');
+      updateBackupStatus('Резервная копия загружена и сохранена в браузере.');
+      alert('Данные восстановлены.');
+      vibe(16);
+    }catch(e){
+      console.warn(e);
+      updateBackupStatus('Не удалось загрузить файл резервной копии.');
+      alert('Не удалось загрузить файл. Проверьте, что это JSON-резервная копия Table book.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function cloudStatus(text){const el=$('#cloudStatus'); if(el) el.textContent=text;}
+function renderCloudUi(){
+  const signed=!!cloudUser;
+  ['cloudSave','cloudLoad'].forEach(id=>{const el=$('#'+id); if(el) el.disabled=!signed||cloudBusy;});
+  const signIn=$('#cloudSignIn'), signUp=$('#cloudSignUp'), signOut=$('#cloudSignOut');
+  const email=$('#cloudEmail'), pass=$('#cloudPassword');
+  if(signIn) signIn.hidden=signed;
+  if(signUp) signUp.hidden=signed;
+  if(signOut) signOut.hidden=!signed;
+  if(email) email.disabled=signed||cloudBusy;
+  if(pass) pass.disabled=signed||cloudBusy;
+  if(signed) cloudStatus(`Вход выполнен: ${cloudUser.email||'аккаунт'}. Можно сохранять и загружать облачные данные.`);
+  else cloudStatus(cloud?'Войдите или зарегистрируйтесь для синхронизации.':'Supabase SDK не загрузился. Проверьте интернет-соединение.');
+}
+function setCloudBusy(on,text){cloudBusy=on; renderCloudUi(); if(text) cloudStatus(text);}
+function cloudCredentials(){
+  const email=($('#cloudEmail')?.value||'').trim();
+  const password=$('#cloudPassword')?.value||'';
+  if(!email || !password){alert('Введите email и пароль.'); return null;}
+  if(password.length<6){alert('Пароль должен быть не короче 6 символов.'); return null;}
+  return {email,password};
+}
+function cloudErrorMessage(error){
+  const msg=(error?.message||'').toLowerCase();
+  if(msg.includes('relation') || msg.includes('does not exist')) return 'Таблица user_app_state ещё не создана в Supabase. Выполните SQL из инструкции ниже.';
+  if(msg.includes('row-level') || msg.includes('policy') || msg.includes('permission')) return 'Нет доступа к таблице. Проверьте RLS-политики user_app_state.';
+  if(msg.includes('invalid login')) return 'Неверный email или пароль.';
+  if(msg.includes('email not confirmed')) return 'Email ещё не подтверждён. Откройте письмо от Supabase и подтвердите регистрацию.';
+  return error?.message||'Неизвестная ошибка Supabase.';
+}
+function cloudSnapshot(){const s=tableBookSnapshot(); s.state=Object.assign({},s.state,{editingId:null}); return s;}
+async function saveCloudData({silent=false}={}){
+  if(!cloud || !cloudUser){if(!silent) cloudStatus('Сначала войдите в аккаунт.'); return false;}
+  try{
+    if(!silent) setCloudBusy(true,'Сохраняю данные в облако...');
+    const snap=cloudSnapshot();
+    const {error}=await cloud.from(CLOUD_TABLE).upsert({user_id:cloudUser.id,app_state:snap.state,my_recipes:snap.myRecipes,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    if(error) throw error;
+    if(!silent) cloudStatus(`Сохранено в облако: ${new Date().toLocaleString('ru-RU')}.`);
+    return true;
+  }catch(error){console.warn(error); cloudStatus('Не удалось сохранить в облако: '+cloudErrorMessage(error)); return false;}
+  finally{if(!silent) setCloudBusy(false); else renderCloudUi();}
+}
+async function loadCloudData({silent=false}={}){
+  if(!cloud || !cloudUser){if(!silent) cloudStatus('Сначала войдите в аккаунт.'); return false;}
+  try{
+    if(!silent) setCloudBusy(true,'Загружаю данные из облака...');
+    const {data,error}=await cloud.from(CLOUD_TABLE).select('app_state,my_recipes,updated_at').eq('user_id',cloudUser.id).maybeSingle();
+    if(error) throw error;
+    if(!data){cloudStatus('В облаке пока нет сохранённых данных. Нажмите «Сохранить в облако».'); return false;}
+    const count=Array.isArray(data.my_recipes)?data.my_recipes.length:0;
+    if(!silent){
+      const when=data.updated_at?new Date(data.updated_at).toLocaleString('ru-RU'):'без даты';
+      const ok=confirm(`Загрузить данные из облака? Текущие пользовательские рецепты на этом устройстве будут заменены. В облаке: ${count} ${plural(count,['рецепт','рецепта','рецептов'])}. Обновлено: ${when}.`);
+      if(!ok){cloudStatus('Загрузка из облака отменена.'); return false;}
+    }
+    myRecipes=Array.isArray(data.my_recipes)?data.my_recipes:[];
+    if(data.app_state && typeof data.app_state==='object'){
+      Object.assign(state,data.app_state);
+      if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская';
+      state.route='myview';
+      state.editingId=null;
+    }
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
+    localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
+    localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
+    persistBackup();
+    setTheme(); updateStats(); renderCountries(); renderMyRecipes(); resetMyForm(); showView('myview');
+    cloudStatus('Данные загружены из облака и сохранены на этом устройстве.');
+    vibe(16);
+    return true;
+  }catch(error){console.warn(error); cloudStatus('Не удалось загрузить из облака: '+cloudErrorMessage(error)); return false;}
+  finally{if(!silent) setCloudBusy(false); else renderCloudUi();}
+}
+function queueCloudSave(){
+  if(!cloudUser || !cloud) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(()=>saveCloudData({silent:true}),1400);
+}
+async function cloudSignUp(){
+  if(!cloud){cloudStatus('Supabase SDK не загрузился.'); return;}
+  const cred=cloudCredentials(); if(!cred) return;
+  try{setCloudBusy(true,'Создаю аккаунт...'); const {data,error}=await cloud.auth.signUp({email:cred.email,password:cred.password}); if(error) throw error; cloudUser=data.user||null; renderCloudUi(); if(data.session){await saveCloudData({silent:true}); cloudStatus('Аккаунт создан. Текущие рецепты сохранены в облако.');} else cloudStatus('Аккаунт создан. Проверьте почту и подтвердите email, затем войдите.');}
+  catch(error){console.warn(error); cloudStatus('Не удалось зарегистрироваться: '+cloudErrorMessage(error));}
+  finally{setCloudBusy(false);}
+}
+async function cloudSignIn(){
+  if(!cloud){cloudStatus('Supabase SDK не загрузился.'); return;}
+  const cred=cloudCredentials(); if(!cred) return;
+  try{setCloudBusy(true,'Выполняю вход...'); const {data,error}=await cloud.auth.signInWithPassword({email:cred.email,password:cred.password}); if(error) throw error; cloudUser=data.user||null; renderCloudUi(); cloudStatus('Вход выполнен. Нажмите «Загрузить из облака» или «Сохранить в облако».');}
+  catch(error){console.warn(error); cloudStatus('Не удалось войти: '+cloudErrorMessage(error));}
+  finally{setCloudBusy(false);}
+}
+async function cloudSignOut(){
+  if(!cloud) return;
+  try{setCloudBusy(true,'Выхожу из аккаунта...'); const {error}=await cloud.auth.signOut(); if(error) throw error; cloudUser=null; renderCloudUi(); cloudStatus('Вы вышли из аккаунта. Локальные данные остались на устройстве.');}
+  catch(error){console.warn(error); cloudStatus('Не удалось выйти: '+cloudErrorMessage(error));}
+  finally{setCloudBusy(false);}
+}
+async function initCloudAuth(){
+  if(!cloud){renderCloudUi(); return;}
+  try{const {data,error}=await cloud.auth.getSession(); if(error) throw error; cloudUser=data.session?.user||null; renderCloudUi(); cloud.auth.onAuthStateChange((_event,session)=>{cloudUser=session?.user||null; renderCloudUi();});}
+  catch(error){console.warn(error); cloudStatus('Не удалось проверить вход Supabase: '+cloudErrorMessage(error)); renderCloudUi();}
+}
+
 function fillMyCategory(){const sel=$('#myCategory'); sel.innerHTML=categoryOrder.map(c=>`<option value="${c}">${c}</option>`).join('')}
 function resetMyForm(){state.editingId=null; $('#formTitle').textContent='Новый рецепт'; $('#myTitle').value=''; $('#myCategory').value='Горячие блюда'; $('#myTime').value=''; $('#myServings').value=''; $('#myCountry').value=''; $('#myDifficulty').value='легко'; $('#myWeight').value=''; $('#myKcal100').value=''; $('#myProtein100').value=''; $('#myFat100').value=''; $('#myCarbs100').value=''; $('#myIngredients').value=''; $('#mySteps').value=''; $('#myTips').value=''; updateKbjuPreview(); saveState();}
 function renderMyRecipes(){const box=$('#myRecipesList'), empty=$('#myEmpty'); if(!myRecipes.length){box.innerHTML=''; empty.hidden=false; updateHomeMeta(); return;} empty.hidden=true; box.innerHTML=myRecipes.map(r=>`<div class="my-item"><div class="my-item-top"><div><h4>${r.title}</h4><div class="mini-meta"><span>${r.category}</span><span>${r.time||'—'}</span><span>${r.servings||1} порц.</span><span>${r.country||'Мои'}</span>${r.nutrition100?`<span>КБЖУ / 100 г</span>`:''}${r.weight?`<span>${r.weight} г</span>`:''}</div></div><div class="row-actions"><button class="btn" data-open-custom="${r.id}">Открыть</button><button class="btn" data-edit-custom="${r.id}">Изменить</button><button class="btn ghost" data-del-custom="${r.id}">Удалить</button></div></div></div>`).join(''); $$('[data-open-custom]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.openCustom,'custom')); $$('[data-edit-custom]').forEach(b=>b.onclick=()=>editMyRecipe(b.dataset.editCustom)); $$('[data-del-custom]').forEach(b=>b.onclick=()=>deleteMyRecipe(b.dataset.delCustom)); updateHomeMeta();}
@@ -7480,8 +7666,8 @@ function initDialogDrag(){
   d.addEventListener('pointerup',finish); d.addEventListener('pointercancel',finish); d.addEventListener('lostpointercapture',finish);
 }
 let touchX=0,touchY=0; function canSwipeBack(){return (state.route==='country' || state.route==='myview') && !$('#modal').classList.contains('open');} document.addEventListener('touchstart',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; touchX=t.clientX; touchY=t.clientY;},{passive:true}); document.addEventListener('touchmove',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); if(touchX<36 && dx>26 && dy<60) $('#swipeCue').classList.add('show'); else $('#swipeCue').classList.remove('show');},{passive:true}); document.addEventListener('touchend',e=>{if(!canSwipeBack()) return; const t=e.changedTouches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); $('#swipeCue').classList.remove('show'); if(touchX<36 && dx>88 && dy<70) goHomeWithFlip(); touchX=touchY=0;},{passive:true});
-$('#themeBtn').onclick=()=>{const b=$('#themeBtn'); b.classList.remove('tapped','theme-morph'); void b.offsetWidth; b.classList.add('tapped','theme-morph'); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]); setTimeout(()=>b.classList.remove('tapped'),180); setTimeout(()=>b.classList.remove('theme-morph'),460);}; $('#homeBrand').onclick=()=>{if(state.route!=='home') goHomeWithFlip();}; $('#backBtn').onclick=goHomeWithFlip; $('#myBackBtn').onclick=goHomeWithFlip; $('#clearCat').onclick=()=>{state.filterCat=null; saveState(); renderCountry(state.country);}; $('#myRecipesCard').onclick=()=>{showView('myview'); renderMyRecipes(); vibe(12);}; $('#saveMyRecipe').onclick=saveCustomRecipe; $('#resetMyRecipe').onclick=resetMyForm; $('#closeModal').onclick=closeModalUp; $('#modal').onclick=e=>{if(e.target.id==='modal') closeModalInstant();}; document.addEventListener('keydown',e=>{if(e.key==='Escape') closeModalInstant();});
-function boot(){$('#brandMark').innerHTML=iconSvg('book'); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); fillMyCategory(); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview') showView('myview'); else showView('home'); if(state.editingId) editMyRecipe(state.editingId);} 
+$('#themeBtn').onclick=()=>{const b=$('#themeBtn'); b.classList.remove('tapped','theme-morph'); void b.offsetWidth; b.classList.add('tapped','theme-morph'); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]); setTimeout(()=>b.classList.remove('tapped'),180); setTimeout(()=>b.classList.remove('theme-morph'),460);}; $('#homeBrand').onclick=()=>{if(state.route!=='home') goHomeWithFlip();}; $('#backBtn').onclick=goHomeWithFlip; $('#myBackBtn').onclick=goHomeWithFlip; $('#clearCat').onclick=()=>{state.filterCat=null; saveState(); renderCountry(state.country);}; $('#myRecipesCard').onclick=()=>{showView('myview'); renderMyRecipes(); vibe(12);}; $('#saveMyRecipe').onclick=saveCustomRecipe; $('#resetMyRecipe').onclick=resetMyForm; $('#closeModal').onclick=closeModalUp; $('#modal').onclick=e=>{if(e.target.id==='modal') closeModalInstant();}; const exportBtn=$('#exportData'), importBtn=$('#importData'), backupFile=$('#backupFile'); if(exportBtn) exportBtn.onclick=exportUserData; if(importBtn&&backupFile) importBtn.onclick=()=>backupFile.click(); if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); backupFile.value='';}; const cloudSignInBtn=$('#cloudSignIn'), cloudSignUpBtn=$('#cloudSignUp'), cloudSignOutBtn=$('#cloudSignOut'), cloudSaveBtn=$('#cloudSave'), cloudLoadBtn=$('#cloudLoad'); if(cloudSignInBtn) cloudSignInBtn.onclick=cloudSignIn; if(cloudSignUpBtn) cloudSignUpBtn.onclick=cloudSignUp; if(cloudSignOutBtn) cloudSignOutBtn.onclick=cloudSignOut; if(cloudSaveBtn) cloudSaveBtn.onclick=()=>saveCloudData(); if(cloudLoadBtn) cloudLoadBtn.onclick=()=>loadCloudData(); document.addEventListener('keydown',e=>{if(e.key==='Escape') closeModalInstant();});
+function boot(){$('#brandMark').innerHTML=iconSvg('book'); persistBackup(); initCloudAuth(); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); fillMyCategory(); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview') showView('myview'); else showView('home'); if(state.editingId) editMyRecipe(state.editingId);} 
 boot();
 </script>
 </body>
