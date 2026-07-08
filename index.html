@@ -879,11 +879,20 @@ body.dark .account-settings-card{background:linear-gradient(180deg, rgba(18,38,9
 #topAuthPanel[data-mode="register"] #topPanelSignIn{display:none !important}
 #topAuthPanel[data-mode="register"] #topCloudNickname{display:block !important}
 
+
+/* auth error plaques */
+.auth-inline-alert{margin-top:10px;padding:10px 12px;border-radius:18px;background:rgba(214,70,70,.10);color:#a83d3d;font-size:12.5px;line-height:1.35;font-weight:850;box-shadow:var(--pressed);text-align:center;animation:authAlertIn .22s ease}
+.auth-inline-alert[hidden]{display:none !important}
+.auth-inline-alert.success{background:rgba(91,151,105,.12);color:#4e8b63}
+body.dark .auth-inline-alert{background:rgba(255,119,119,.13);color:#ffc5c5;box-shadow:inset 7px 7px 14px rgba(0,0,0,.28), inset -7px -7px 14px rgba(67,107,220,.10)}
+body.dark .auth-inline-alert.success{background:rgba(119,210,157,.13);color:#c9f5d8}
+@keyframes authAlertIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
 </style>
 </head>
 <body>
 <div class="shell">
-<header class="topbar"><div class="topbar-inner"><button class="brand" id="homeBrand" type="button" aria-label="Главная"><span class="brand-mark" id="brandMark"></span><span class="brand-title"><strong>Table book</strong></span></button><div class="topbar-actions"><div class="top-auth" id="topAuth"><button class="top-auth-status" id="topAuthStatus" type="button" hidden>Вы</button><button class="auth-chip" id="topLoginBtn" type="button">Войти</button><button class="auth-chip auth-chip-primary" id="topRegisterBtn" type="button">Регистрация</button><div class="auth-popover" id="topAuthPanel" hidden><div class="auth-popover-head"><strong id="topAuthTitle">Вход</strong><button class="auth-close" id="topAuthClose" type="button" aria-label="Закрыть">×</button></div><div id="topAuthForm" class="auth-form-clean"><input class="input" id="topCloudNickname" type="text" autocomplete="nickname" maxlength="32" placeholder="Никнейм" hidden><input class="input" id="topCloudEmail" type="email" autocomplete="email" placeholder="Email"><input class="input" id="topCloudPassword" type="password" autocomplete="current-password" placeholder="Пароль"><div class="auth-popover-actions auth-single-action"><button class="btn primary" id="topPanelSignIn" type="button">Войти</button><button class="btn primary" id="topPanelSignUp" type="button" hidden>Создать аккаунт</button></div></div><div id="topCabinet" class="account-panel" hidden><div id="cabinetHome"><button class="account-settings-card" id="cabinetSettingsBtn" type="button"><span>Настройки</span><b id="cabinetDisplayName">Вы</b><small id="cabinetEmailMini">—</small></button><div class="account-actions account-actions-main"><button class="btn ghost" id="cloudCheck" type="button">Проверить связь</button><button class="btn primary" id="cloudSave" type="button" disabled>Сохранить в облако</button><button class="btn ghost" id="cloudLoad" type="button" disabled>Загрузить из облака</button><button class="btn ghost account-wide" id="cabinetSignOut" type="button">Выйти</button></div><div class="backup-note" id="cloudStatus">Проверяю соединение...</div></div><div id="accountSettings" class="account-settings" hidden><p class="account-hint">Информация о пользователе</p><div class="account-info"><span>Зарегистрированная почта</span><b id="settingsEmail">—</b></div><label class="account-label" for="settingsNickname">Никнейм</label><input class="input" id="settingsNickname" type="text" maxlength="32" autocomplete="nickname" placeholder="Вы"><div class="account-actions"><button class="btn ghost" id="accountBackBtn" type="button">Назад</button><button class="btn primary" id="accountSaveNickname" type="button">Сохранить</button></div><div class="backup-note" id="settingsStatus">Никнейм будет отображаться сверху.</div></div></div></div></div><button class="theme-btn" id="themeBtn" title="Тема"></button></div></div></header>
+<header class="topbar"><div class="topbar-inner"><button class="brand" id="homeBrand" type="button" aria-label="Главная"><span class="brand-mark" id="brandMark"></span><span class="brand-title"><strong>Table book</strong></span></button><div class="topbar-actions"><div class="top-auth" id="topAuth"><button class="top-auth-status" id="topAuthStatus" type="button" hidden>Вы</button><button class="auth-chip" id="topLoginBtn" type="button">Войти</button><button class="auth-chip auth-chip-primary" id="topRegisterBtn" type="button">Регистрация</button><div class="auth-popover" id="topAuthPanel" hidden><div class="auth-popover-head"><strong id="topAuthTitle">Вход</strong><button class="auth-close" id="topAuthClose" type="button" aria-label="Закрыть">×</button></div><div id="topAuthForm" class="auth-form-clean"><input class="input" id="topCloudNickname" type="text" autocomplete="nickname" maxlength="32" placeholder="Никнейм" hidden><input class="input" id="topCloudEmail" type="email" autocomplete="email" placeholder="Email"><input class="input" id="topCloudPassword" type="password" autocomplete="current-password" placeholder="Пароль"><div class="auth-popover-actions auth-single-action"><button class="btn primary" id="topPanelSignIn" type="button">Войти</button><button class="btn primary" id="topPanelSignUp" type="button" hidden>Создать аккаунт</button></div><div class="auth-inline-alert" id="topAuthMessage" hidden></div></div><div id="topCabinet" class="account-panel" hidden><div id="cabinetHome"><button class="account-settings-card" id="cabinetSettingsBtn" type="button"><span>Настройки</span><b id="cabinetDisplayName">Вы</b><small id="cabinetEmailMini">—</small></button><div class="account-actions account-actions-main"><button class="btn ghost" id="cloudCheck" type="button">Проверить связь</button><button class="btn primary" id="cloudSave" type="button" disabled>Сохранить в облако</button><button class="btn ghost" id="cloudLoad" type="button" disabled>Загрузить из облака</button><button class="btn ghost account-wide" id="cabinetSignOut" type="button">Выйти</button></div><div class="backup-note" id="cloudStatus">Проверяю соединение...</div></div><div id="accountSettings" class="account-settings" hidden><p class="account-hint">Информация о пользователе</p><div class="account-info"><span>Зарегистрированная почта</span><b id="settingsEmail">—</b></div><label class="account-label" for="settingsNickname">Никнейм</label><input class="input" id="settingsNickname" type="text" maxlength="32" autocomplete="nickname" placeholder="Вы"><div class="account-actions"><button class="btn ghost" id="accountBackBtn" type="button">Назад</button><button class="btn primary" id="accountSaveNickname" type="button">Сохранить</button></div><div class="backup-note" id="settingsStatus">Никнейм будет отображаться сверху.</div></div></div></div></div><button class="theme-btn" id="themeBtn" title="Тема"></button></div></div></header>
 <main class="page">
 <section id="home" class="view active"><section class="hero"><div><div class="kicker">Table book</div><h1>Книга рецептов</h1><p class="lead">Выберите кухню или откройте свои рецепты.</p><div class="stats"><div class="stat"><b id="statRecipes">0</b><span>рецептов</span></div><div class="stat"><b id="statCountries">0</b><span>кухонь</span></div><div class="stat"><b id="statTypes">0</b><span>категорий</span></div><div class="stat"><b id="statHealthy">0</b><span>полезных</span></div></div></div></section>
 <div class="section-title"><div><h2>Кухни</h2><p>Страны и ваши записи.</p></div></div>
@@ -7533,8 +7542,9 @@ const SUPABASE_URL="https://qshwxcxhxkchpdjaecdk.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaHd4Y3hoeGtjaHBkamFlY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjM3NTYsImV4cCI6MjA5OTA5OTc1Nn0.aQM03By8cL4VkFsI4NiVugWtSKU1bcZkHfErK_4PMB4";
 const CLOUD_TABLE="user_app_state";
 const CLOUD_SESSION_KEY="tableBookSupabaseSession";
+const CLOUD_PROFILE_KEY_PREFIX="tableBookCloudProfile:";
 const cloud=createCloudClient();
-let cloudUser=null, cloudSaveTimer=null, cloudBusy=false;
+let cloudUser=null, cloudProfile={}, cloudSaveTimer=null, cloudBusy=false;
 function createCloudClient(){
   if(window.supabase && typeof window.supabase.createClient==='function'){
     try{return window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,flowType:'implicit'}})}catch(e){console.warn('Supabase SDK init failed, using REST fallback',e)}
@@ -7680,7 +7690,30 @@ function importUserData(file){
 function cloudStatus(text){
   const el=$('#cloudStatus'); if(el) el.textContent=text;
 }
-function userNickname(){return (cloudUser?.user_metadata?.nickname||cloudUser?.user_metadata?.name||'').trim();}
+function cloudProfileKey(user=cloudUser){return user?.id?CLOUD_PROFILE_KEY_PREFIX+user.id:null;}
+function syncCloudProfileFromUser(){
+  if(!cloudUser){cloudProfile={}; return;}
+  const key=cloudProfileKey();
+  const cached=safeJson(key?localStorage.getItem(key):null,{});
+  const meta=cloudUser.user_metadata||{};
+  cloudProfile=Object.assign({},cached,{email:cloudUser.email||cached.email||''});
+  if(!Object.prototype.hasOwnProperty.call(cloudProfile,'nickname')){
+    const metaNick=(meta.nickname||meta.name||'').trim();
+    if(metaNick) cloudProfile.nickname=metaNick;
+  }
+  if(key){try{localStorage.setItem(key,JSON.stringify(cloudProfile));}catch(e){console.warn('Profile cache save failed',e)}}
+}
+function setCloudUser(user){cloudUser=user||null; syncCloudProfileFromUser();}
+function rememberCloudProfile(next={}){
+  if(!cloudUser) return;
+  cloudProfile=Object.assign({},cloudProfile,next,{email:cloudUser.email||next.email||cloudProfile.email||''});
+  const key=cloudProfileKey();
+  if(key){try{localStorage.setItem(key,JSON.stringify(cloudProfile));}catch(e){console.warn('Profile cache save failed',e)}}
+}
+function userNickname(){
+  if(Object.prototype.hasOwnProperty.call(cloudProfile,'nickname')) return String(cloudProfile.nickname||'').trim();
+  return (cloudUser?.user_metadata?.nickname||cloudUser?.user_metadata?.name||'').trim();
+}
 function userDisplayName(){return userNickname()||'Вы';}
 function updateCabinetInfo(){
   const display=userDisplayName();
@@ -7731,23 +7764,64 @@ function openTopAuth(mode='login'){
   if(pass){pass.placeholder='Пароль'; pass.setAttribute('autocomplete',isRegister?'new-password':'current-password');}
   if(signIn){signIn.hidden=isRegister; signIn.textContent='Войти';}
   if(signUp){signUp.hidden=!isRegister; signUp.textContent='Создать аккаунт';}
+  clearAuthPlaque();
   setTimeout(()=>isRegister?$('#topCloudNickname')?.focus():$('#topCloudEmail')?.focus(),30);
 }
 async function saveNickname(){
   if(!cloud || !cloudUser){const st=$('#settingsStatus'); if(st) st.textContent='Сначала войдите в аккаунт.'; return;}
   const nickname=($('#settingsNickname')?.value||'').trim().slice(0,32);
   const st=$('#settingsStatus'); if(st) st.textContent='Сохраняю никнейм...';
+  rememberCloudProfile({nickname});
+  renderCloudUi();
+  updateCabinetInfo();
+  let authOk=false, cloudOk=false;
   try{
     const {data,error}=await cloud.auth.updateUser({data:{nickname}});
     if(error) throw error;
-    cloudUser=data.user||Object.assign({},cloudUser,{user_metadata:Object.assign({},cloudUser.user_metadata,{nickname})});
-    renderCloudUi();
-    updateCabinetInfo();
-    if(st) st.textContent=nickname?'Никнейм сохранён.':'Никнейм очищен. Сверху будет отображаться «Вы».';
-    cloudStatus('Настройки аккаунта обновлены.');
-    vibe(12);
-  }catch(error){console.warn(error); if(st) st.textContent='Не удалось сохранить никнейм: '+cloudErrorMessage(error);}
+    if(data?.user) setCloudUser(data.user);
+    rememberCloudProfile({nickname});
+    authOk=true;
+  }catch(error){console.warn('Auth nickname update failed',error);}
+  try{
+    cloudOk=await saveCloudData({silent:true});
+  }catch(error){console.warn('Cloud nickname save failed',error);}
+  renderCloudUi();
+  updateCabinetInfo();
+  if(st){
+    if(authOk || cloudOk) st.textContent=nickname?'Никнейм сохранён и будет синхронизирован.':'Никнейм очищен. Сверху будет отображаться «Вы».';
+    else st.textContent='Никнейм сохранён на устройстве, но облако не ответило. Нажмите «Проверить связь».';
+  }
+  cloudStatus((authOk||cloudOk)?'Настройки аккаунта обновлены.':'Никнейм сохранён локально, облачная синхронизация не подтвердилась.');
+  vibe(12);
 }
+
+function setAuthPlaque(message,type='error'){
+  const el=$('#topAuthMessage');
+  if(!el) return;
+  el.textContent=message||'';
+  el.classList.toggle('success',type==='success');
+  el.hidden=!message;
+  if(message){el.animate?.([{opacity:0,transform:'translateY(-5px)'},{opacity:1,transform:'translateY(0)'}],{duration:220,easing:'ease-out'});}
+}
+function clearAuthPlaque(){setAuthPlaque('');}
+function authErrorForMode(error,mode){
+  const raw=(error?.message||String(error||'')).trim();
+  const msg=raw.toLowerCase();
+  if(mode==='register'){
+    if(msg.includes('already') || msg.includes('registered') || msg.includes('exists') || msg.includes('duplicate')) return 'Эта почта уже зарегистрирована. Откройте «Вход» и войдите в аккаунт.';
+    if(msg.includes('signup disabled')) return 'Регистрация отключена в Supabase. Включите Email Signups в Authentication → Providers.';
+    if(msg.includes('password')) return 'Пароль должен быть не короче 6 символов.';
+    if(msg.includes('email')) return 'Проверьте правильность email.';
+    return 'Не удалось создать аккаунт: '+cloudErrorMessage(error);
+  }
+  if(msg.includes('invalid login') || msg.includes('invalid credentials') || msg.includes('not found') || msg.includes('user not found') || msg.includes('email not confirmed')){
+    if(msg.includes('email not confirmed')) return 'Email ещё не подтверждён. Откройте письмо от Supabase и подтвердите регистрацию.';
+    return 'Аккаунт с такой почтой не зарегистрирован или пароль введён неверно.';
+  }
+  if(msg.includes('failed to fetch') || msg.includes('network')) return cloudErrorMessage(error);
+  return 'Не удалось войти: '+cloudErrorMessage(error);
+}
+
 function clearAuthPasswordFields(){const pass=$('#topCloudPassword'); if(pass) pass.value=''; const oldPass=$('#cloudPassword'); if(oldPass) oldPass.value='';}
 function closeTopAuth(){const panel=$('#topAuthPanel'); if(panel) panel.hidden=true;}
 async function topCloudSignIn(){await cloudSignIn(); if(cloudUser) openTopAuth('cabinet');}
@@ -7791,8 +7865,8 @@ function cloudCredentials(){
   const email=(emailEl?.value||'').trim();
   const password=passEl?.value||'';
   const nickname=(nickEl?.value||'').trim().slice(0,32);
-  if(!email || !password){alert('Введите email и пароль.'); return null;}
-  if(password.length<6){alert('Пароль должен быть не короче 6 символов.'); return null;}
+  if(!email || !password){setAuthPlaque('Введите email и пароль.'); return null;}
+  if(password.length<6){setAuthPlaque('Пароль должен быть не короче 6 символов.'); return null;}
   const otherEmail=useTop?$('#cloudEmail'):$('#topCloudEmail');
   const otherPass=useTop?$('#cloudPassword'):$('#topCloudPassword');
   if(otherEmail && !otherEmail.value) otherEmail.value=email;
@@ -7810,7 +7884,24 @@ function cloudErrorMessage(error){
   if(msg.includes('signup disabled')) return 'Регистрация отключена в Supabase Authentication → Providers → Email.';
   return raw||'Неизвестная ошибка Supabase.';
 }
-function cloudSnapshot(){const s=tableBookSnapshot(); s.state=Object.assign({},s.state,{editingId:null,profile:{email:cloudUser?.email||'',nickname:userNickname()}}); return s;}
+function cloudSnapshot(){const s=tableBookSnapshot(); s.state=Object.assign({},s.state,{editingId:null,profile:{email:cloudUser?.email||cloudProfile.email||'',nickname:userNickname()}}); return s;}
+async function fetchCloudProfile({silent=true}={}){
+  if(!cloud || !cloudUser) return false;
+  try{
+    const {data,error}=await cloud.from(CLOUD_TABLE).select('app_state,updated_at').eq('user_id',cloudUser.id).maybeSingle();
+    if(error) throw error;
+    const profile=data?.app_state?.profile;
+    if(profile && typeof profile==='object'){
+      rememberCloudProfile({email:profile.email||cloudUser.email||'',nickname:profile.nickname||''});
+      renderCloudUi();
+      updateCabinetInfo();
+      if(!silent) cloudStatus('Профиль и никнейм загружены из облака.');
+      return true;
+    }
+    if(!silent) cloudStatus('Соединение есть. Облачный профиль пока пуст — сохраните данные в облако.');
+    return false;
+  }catch(error){console.warn(error); if(!silent) cloudStatus('Не удалось загрузить профиль: '+cloudErrorMessage(error)); return false;}
+}
 async function ensureCloudRow(){
   if(!cloud || !cloudUser) return false;
   const snap=cloudSnapshot();
@@ -7826,10 +7917,11 @@ async function checkCloudConnection(){
     const {data:sessionData,error:sessionError}=await cloud.auth.getSession();
     if(sessionError) throw sessionError;
     const activeUser=sessionData?.session?.user||cloudUser||null;
-    if(activeUser) cloudUser=activeUser;
+    if(activeUser) setCloudUser(activeUser);
     const {error:tableError}=await cloud.from(CLOUD_TABLE).select('user_id',{head:true,count:'exact'}).limit(1);
     if(tableError) throw tableError;
-    cloudStatus(activeUser?'Соединение есть. Авторизация работает, таблица user_app_state доступна. Данные будут сохраняться за этим пользователем.':'Соединение есть. Таблица user_app_state доступна. Войдите, чтобы проверить пользовательскую запись.');
+    if(activeUser) await fetchCloudProfile({silent:true});
+    cloudStatus(activeUser?'Соединение есть. Авторизация и таблица user_app_state доступны. Никнейм: '+userDisplayName()+'.':'Соединение есть. Таблица user_app_state доступна. Войдите, чтобы проверить пользовательскую запись.');
     renderCloudUi();
     return true;
   }catch(error){console.warn(error); cloudStatus('Проверка Supabase: '+cloudErrorMessage(error)); return false;}
@@ -7863,6 +7955,7 @@ async function loadCloudData({silent=false}={}){
     myRecipes=Array.isArray(data.my_recipes)?data.my_recipes:[];
     if(data.app_state && typeof data.app_state==='object'){
       Object.assign(state,data.app_state);
+      if(data.app_state.profile && typeof data.app_state.profile==='object') rememberCloudProfile(data.app_state.profile);
       if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская';
       state.route='myview';
       state.editingId=null;
@@ -7891,17 +7984,27 @@ async function cloudSignUp(){
     const options={data:{nickname:cred.nickname||''}};
     const {data,error}=await cloud.auth.signUp({email:cred.email,password:cred.password,options});
     if(error) throw error;
-    cloudUser=data.session?.user||data.user||null;
-    renderCloudUi();
-    if(data.session && cloudUser){
-      await ensureCloudRow();
-      cloudStatus(`Аккаунт создан${cred.nickname?' для '+cred.nickname:''}. Рецепты и настройки сохранены за этим пользователем.`);
+    const duplicateByIdentities=data?.user && Array.isArray(data.user.identities) && data.user.identities.length===0;
+    if(duplicateByIdentities){
+      setAuthPlaque('Эта почта уже зарегистрирована. Откройте «Вход» и войдите в аккаунт.');
+      cloudStatus('Регистрация не выполнена: почта уже зарегистрирована.');
+      return;
+    }
+    if(data.session?.user){
+      setCloudUser(data.session.user);
+      rememberCloudProfile({nickname:cred.nickname||'',email:cred.email});
+      renderCloudUi();
       clearAuthPasswordFields();
+      setAuthPlaque('Аккаунт создан. Вход выполнен.', 'success');
+      cloudStatus(`Аккаунт создан${cred.nickname?' для '+cred.nickname:''}. Вход выполнен, данные можно сохранить в облако.`);
+      saveCloudData({silent:true}).catch(e=>console.warn('Initial cloud save failed',e));
+      fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));
     }else{
-      cloudStatus('Аккаунт создан в Supabase Auth. Если включено подтверждение email, откройте письмо от Supabase и затем войдите.');
+      setAuthPlaque('Аккаунт создан. Подтвердите email в письме и затем войдите.', 'success');
+      cloudStatus('Аккаунт создан. Если включено подтверждение email, откройте письмо от Supabase и затем войдите.');
     }
   }
-  catch(error){console.warn(error); cloudStatus('Не удалось зарегистрироваться: '+cloudErrorMessage(error));}
+  catch(error){console.warn(error); setAuthPlaque(authErrorForMode(error,'register')); cloudStatus('Не удалось зарегистрироваться: '+cloudErrorMessage(error));}
   finally{setCloudBusy(false);}
 }
 async function cloudSignIn(){
@@ -7911,20 +8014,23 @@ async function cloudSignIn(){
     setCloudBusy(true,'Выполняю вход...');
     const {data,error}=await cloud.auth.signInWithPassword({email:cred.email,password:cred.password});
     if(error) throw error;
-    cloudUser=data.user||data.session?.user||null;
-    if(!cloudUser) throw new Error('Supabase не вернул данные пользователя. Проверьте настройки Email Auth.');
-    await ensureCloudRow();
+    const nextUser=data.user||data.session?.user||null;
+    if(!nextUser) throw new Error('Supabase не вернул данные пользователя. Проверьте настройки Email Auth.');
+    setCloudUser(nextUser);
+    rememberCloudProfile({email:nextUser.email||cred.email});
     renderCloudUi();
-    cloudStatus('Вход выполнен. Рецепты и настройки будут сохраняться за этим пользователем.');
+    setAuthPlaque('', 'success');
+    cloudStatus('Вход выполнен. Профиль загружается в фоне — можно продолжать работу.');
     clearAuthPasswordFields();
     vibe([12,24,12]);
+    fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));
   }
-  catch(error){console.warn(error); cloudStatus('Не удалось войти: '+cloudErrorMessage(error));}
+  catch(error){console.warn(error); setAuthPlaque(authErrorForMode(error,'login')); cloudStatus('Не удалось войти: '+cloudErrorMessage(error));}
   finally{setCloudBusy(false);}
 }
 async function cloudSignOut(){
   if(!cloud) return;
-  try{setCloudBusy(true,'Выхожу из аккаунта...'); const {error}=await cloud.auth.signOut(); if(error) throw error; cloudUser=null; renderCloudUi(); cloudStatus('Вы вышли из аккаунта. Локальные данные остались на устройстве.'); closeTopAuth();}
+  try{setCloudBusy(true,'Выхожу из аккаунта...'); const {error}=await cloud.auth.signOut(); if(error) throw error; setCloudUser(null); renderCloudUi(); cloudStatus('Вы вышли из аккаунта. Локальные данные остались на устройстве.'); closeTopAuth();}
   catch(error){console.warn(error); cloudStatus('Не удалось выйти: '+cloudErrorMessage(error));}
   finally{setCloudBusy(false);}
 }
@@ -7932,10 +8038,10 @@ async function initCloudAuth(){
   if(!cloud){renderCloudUi(); return;}
   try{
     const {data,error}=await cloud.auth.getSession(); if(error) throw error;
-    cloudUser=data.session?.user||null;
+    setCloudUser(data.session?.user||null);
     renderCloudUi();
-    if(cloudUser){try{await ensureCloudRow();}catch(e){console.warn('Initial cloud row check failed',e); cloudStatus('Вход найден, но запись user_app_state недоступна: '+cloudErrorMessage(e));}}
-    cloud.auth.onAuthStateChange((_event,session)=>{cloudUser=session?.user||null; renderCloudUi(); if(cloudUser) ensureCloudRow().catch(e=>cloudStatus('Ошибка записи профиля: '+cloudErrorMessage(e)));});
+    if(cloudUser) fetchCloudProfile({silent:true}).catch(e=>console.warn('Initial profile load failed',e));
+    cloud.auth.onAuthStateChange((_event,session)=>{setCloudUser(session?.user||null); renderCloudUi(); if(cloudUser) fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));});
   }
   catch(error){console.warn(error); cloudStatus('Не удалось проверить вход Supabase: '+cloudErrorMessage(error)); renderCloudUi();}
 }
