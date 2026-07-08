@@ -849,11 +849,30 @@ body.dark .account-info{background:linear-gradient(180deg, rgba(18,38,90,.98), r
 .top-auth-status{max-width:170px;text-decoration:none}
 @media(max-width:560px){.top-auth-status{max-width:96px}.account-info b{font-size:12px}.account-actions .account-wide{grid-column:auto}}
 
+
+/* cleaner auth / cabinet layout */
+.auth-form-clean{display:grid;gap:10px}
+.auth-form-clean[hidden]{display:none !important}
+.auth-mini-hint[hidden]{display:none !important}
+.auth-popover-actions.auth-single-action{grid-template-columns:1fr !important;margin-top:4px}
+.auth-popover-actions.auth-single-action .btn{width:100%}
+.account-settings-card{width:100%;border:0;border-radius:22px;padding:14px 16px;background:var(--paper);box-shadow:var(--pressed);color:var(--ink);display:grid;gap:4px;text-align:left;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease}
+.account-settings-card span{color:var(--muted);font-size:12px;font-weight:850;letter-spacing:.01em}
+.account-settings-card b{font-size:16px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.account-settings-card small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.account-settings-card:active{box-shadow:var(--pressed);transform:translateY(1px) scale(.99)}
+body.dark .account-settings-card{background:linear-gradient(180deg, rgba(18,38,90,.98), rgba(16,32,77,.98)) !important;color:var(--ink)}
+.account-actions-main{grid-template-columns:1fr !important}
+.account-actions-main .btn{min-height:42px}
+#cabinetHome{display:grid;gap:12px}
+#topAuthForm .input{margin-bottom:0 !important}
+@media(max-width:560px){.auth-popover{right:-54px}.account-settings-card b{font-size:15px}}
+
 </style>
 </head>
 <body>
 <div class="shell">
-<header class="topbar"><div class="topbar-inner"><button class="brand" id="homeBrand" type="button" aria-label="Главная"><span class="brand-mark" id="brandMark"></span><span class="brand-title"><strong>Table book</strong></span></button><div class="topbar-actions"><div class="top-auth" id="topAuth"><button class="top-auth-status" id="topAuthStatus" type="button" hidden>Вы</button><button class="auth-chip" id="topLoginBtn" type="button">Войти</button><button class="auth-chip auth-chip-primary" id="topRegisterBtn" type="button">Регистрация</button><div class="auth-popover" id="topAuthPanel" hidden><div class="auth-popover-head"><strong id="topAuthTitle">Вход</strong><button class="auth-close" id="topAuthClose" type="button" aria-label="Закрыть">×</button></div><div id="topAuthForm"><p id="topAuthHint">Введите email и пароль для входа.</p><input class="input" id="topCloudNickname" type="text" autocomplete="nickname" maxlength="32" placeholder="Никнейм"><input class="input" id="topCloudEmail" type="email" autocomplete="email" placeholder="Email"><input class="input" id="topCloudPassword" type="password" autocomplete="current-password" placeholder="Пароль"><div class="auth-popover-actions"><button class="btn primary" id="topPanelSignIn" type="button">Войти</button><button class="btn" id="topPanelSignUp" type="button">Регистрация</button></div></div><div id="topCabinet" class="account-panel" hidden><div id="cabinetHome"><p class="account-hint">Личные рецепты, тема и настройки синхронизируются через Supabase.</p><button class="account-email" id="cabinetUserEmail" type="button">Вы</button><div class="account-actions"><button class="btn" id="cabinetSettingsBtn" type="button">Настройки</button><button class="btn" id="cloudCheck" type="button">Проверить связь</button><button class="btn primary" id="cloudSave" type="button" disabled>Сохранить в облако</button><button class="btn ghost" id="cloudLoad" type="button" disabled>Загрузить из облака</button><button class="btn ghost account-wide" id="cabinetSignOut" type="button">Выйти</button></div><div class="backup-note" id="cloudStatus">Проверяю соединение...</div></div><div id="accountSettings" class="account-settings" hidden><p class="account-hint">Настройки аккаунта</p><div class="account-info"><span>Зарегистрированная почта</span><b id="settingsEmail">—</b></div><label class="account-label" for="settingsNickname">Никнейм</label><input class="input" id="settingsNickname" type="text" maxlength="32" autocomplete="nickname" placeholder="Вы"><div class="account-actions"><button class="btn ghost" id="accountBackBtn" type="button">Назад</button><button class="btn primary" id="accountSaveNickname" type="button">Сохранить никнейм</button></div><div class="backup-note" id="settingsStatus">Никнейм будет отображаться сверху.</div></div></div></div></div><button class="theme-btn" id="themeBtn" title="Тема"></button></div></div></header>
+<header class="topbar"><div class="topbar-inner"><button class="brand" id="homeBrand" type="button" aria-label="Главная"><span class="brand-mark" id="brandMark"></span><span class="brand-title"><strong>Table book</strong></span></button><div class="topbar-actions"><div class="top-auth" id="topAuth"><button class="top-auth-status" id="topAuthStatus" type="button" hidden>Вы</button><button class="auth-chip" id="topLoginBtn" type="button">Войти</button><button class="auth-chip auth-chip-primary" id="topRegisterBtn" type="button">Регистрация</button><div class="auth-popover" id="topAuthPanel" hidden><div class="auth-popover-head"><strong id="topAuthTitle">Вход</strong><button class="auth-close" id="topAuthClose" type="button" aria-label="Закрыть">×</button></div><div id="topAuthForm" class="auth-form-clean"><p id="topAuthHint" class="auth-mini-hint" hidden></p><input class="input" id="topCloudNickname" type="text" autocomplete="nickname" maxlength="32" placeholder="Никнейм" hidden><input class="input" id="topCloudEmail" type="email" autocomplete="email" placeholder="Email"><input class="input" id="topCloudPassword" type="password" autocomplete="current-password" placeholder="Пароль"><div class="auth-popover-actions auth-single-action"><button class="btn primary" id="topPanelSignIn" type="button">Войти</button><button class="btn primary" id="topPanelSignUp" type="button" hidden>Создать аккаунт</button></div></div><div id="topCabinet" class="account-panel" hidden><div id="cabinetHome"><button class="account-settings-card" id="cabinetSettingsBtn" type="button"><span>Настройки профиля</span><b id="cabinetDisplayName">Вы</b><small id="cabinetEmailMini">—</small></button><div class="account-actions account-actions-main"><button class="btn primary" id="cloudSave" type="button" disabled>Сохранить в облако</button><button class="btn ghost" id="cloudLoad" type="button" disabled>Загрузить из облака</button><button class="btn ghost account-wide" id="cabinetSignOut" type="button">Выйти</button></div><div class="backup-note" id="cloudStatus">Проверяю соединение...</div></div><div id="accountSettings" class="account-settings" hidden><p class="account-hint">Информация о пользователе</p><div class="account-info"><span>Зарегистрированная почта</span><b id="settingsEmail">—</b></div><label class="account-label" for="settingsNickname">Никнейм</label><input class="input" id="settingsNickname" type="text" maxlength="32" autocomplete="nickname" placeholder="Вы"><div class="account-actions"><button class="btn ghost" id="accountBackBtn" type="button">Назад</button><button class="btn primary" id="accountSaveNickname" type="button">Сохранить</button></div><div class="backup-note" id="settingsStatus">Никнейм будет отображаться сверху.</div></div></div></div></div><button class="theme-btn" id="themeBtn" title="Тема"></button></div></div></header>
 <main class="page">
 <section id="home" class="view active"><section class="hero"><div><div class="kicker">Table book</div><h1>Книга рецептов</h1><p class="lead">Выберите кухню или откройте свои рецепты.</p><div class="stats"><div class="stat"><b id="statRecipes">0</b><span>рецептов</span></div><div class="stat"><b id="statCountries">0</b><span>кухонь</span></div><div class="stat"><b id="statTypes">0</b><span>категорий</span></div><div class="stat"><b id="statHealthy">0</b><span>полезных</span></div></div></div></section>
 <div class="section-title"><div><h2>Кухни</h2><p>Страны и ваши записи.</p></div></div>
@@ -7594,6 +7613,8 @@ function updateCabinetInfo(){
   const display=userDisplayName();
   const email=cloudUser?.email||'—';
   const e=$('#cabinetUserEmail'); if(e){e.textContent=display; e.title='Открыть настройки аккаунта';}
+  const dn=$('#cabinetDisplayName'); if(dn) dn.textContent=display;
+  const em=$('#cabinetEmailMini'); if(em) em.textContent=email;
   const se=$('#settingsEmail'); if(se) se.textContent=email;
   const sn=$('#settingsNickname'); if(sn && document.activeElement!==sn) sn.value=userNickname();
   const title=$('#topAuthTitle'); if(title && cloudUser) title.textContent=$('#accountSettings')?.hidden===false?'Настройки':'Личный кабинет';
@@ -7621,7 +7642,7 @@ function openTopAuth(mode='login'){
   panel.hidden=false;
   panel.dataset.mode=mode;
   const title=$('#topAuthTitle'), hint=$('#topAuthHint'), signIn=$('#topPanelSignIn'), signUp=$('#topPanelSignUp');
-  const form=$('#topAuthForm'), cabinet=$('#topCabinet'), nick=$('#topCloudNickname');
+  const form=$('#topAuthForm'), cabinet=$('#topCabinet'), nick=$('#topCloudNickname'), pass=$('#topCloudPassword');
   const showCabinet=mode==='cabinet' || !!cloudUser;
   if(form) form.hidden=showCabinet;
   if(cabinet) cabinet.hidden=!showCabinet;
@@ -7632,10 +7653,11 @@ function openTopAuth(mode='login'){
   }
   const isRegister=mode==='register';
   if(title) title.textContent=isRegister?'Регистрация':'Вход';
-  if(hint) hint.textContent=isRegister?'Создайте аккаунт по email и паролю. Никнейм можно изменить позже в настройках.':'Введите email и пароль для входа и облачной синхронизации.';
-  if(nick) nick.hidden=!isRegister;
-  if(signIn){signIn.classList.toggle('ghost',isRegister); signIn.classList.toggle('primary',!isRegister);}
-  if(signUp){signUp.classList.toggle('primary',isRegister); signUp.textContent=isRegister?'Создать аккаунт':'Регистрация';}
+  if(hint){hint.hidden=true; hint.textContent='';}
+  if(nick){nick.hidden=!isRegister; if(!isRegister) nick.value='';}
+  if(pass) pass.setAttribute('autocomplete',isRegister?'new-password':'current-password');
+  if(signIn){signIn.hidden=isRegister; signIn.classList.add('primary'); signIn.classList.remove('ghost'); signIn.textContent='Войти';}
+  if(signUp){signUp.hidden=!isRegister; signUp.classList.add('primary'); signUp.classList.remove('ghost'); signUp.textContent='Создать аккаунт';}
   setTimeout(()=>isRegister?$('#topCloudNickname')?.focus():$('#topCloudEmail')?.focus(),30);
 }
 async function saveNickname(){
@@ -7655,7 +7677,7 @@ async function saveNickname(){
 }
 function closeTopAuth(){const panel=$('#topAuthPanel'); if(panel) panel.hidden=true;}
 async function topCloudSignIn(){await cloudSignIn(); if(cloudUser) openTopAuth('cabinet');}
-async function topCloudSignUp(){const panel=$('#topAuthPanel'); if(panel && panel.dataset.mode!=='register' && !cloudUser){openTopAuth('register'); return;} await cloudSignUp(); if(cloudUser) openTopAuth('cabinet');}
+async function topCloudSignUp(){await cloudSignUp(); if(cloudUser) openTopAuth('cabinet');}
 function renderCloudUi(){
   const signed=!!cloudUser;
   ['cloudSave','cloudLoad'].forEach(id=>{const el=$('#'+id); if(el) el.disabled=!signed||cloudBusy;});
