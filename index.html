@@ -7543,6 +7543,17 @@ const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const CLOUD_TABLE="user_app_state";
 const CLOUD_SESSION_KEY="tableBookSupabaseSession";
 const CLOUD_PROFILE_KEY_PREFIX="tableBookCloudProfile:";
+function getAuthRedirectUrl(){
+  try{
+    const u=new URL(window.location.href);
+    u.hash='';
+    u.search='';
+    u.pathname=u.pathname.replace(/index\.html$/,'');
+    let out=u.toString();
+    if(!out.endsWith('/')) out+='/';
+    return out;
+  }catch(e){return window.location.origin+window.location.pathname.replace(/index\.html$/,'');}
+}
 const cloud=createCloudClient();
 let cloudUser=null, cloudProfile={}, cloudSaveTimer=null, cloudBusy=false;
 function createCloudClient(){
@@ -7598,7 +7609,7 @@ function createRestCloudClient(){
     auth:{
       async getSession(){try{await refreshSession();return {data:{session:session},error:null}}catch(error){saveSession(null);return {data:{session:null},error}}},
       async signInWithPassword({email,password}){try{const payload=await request('/auth/v1/token?grant_type=password',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password})}); const next=normalizeSession(payload); saveSession(next); return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
-      async signUp({email,password,options={}}){try{const payload=await request('/auth/v1/signup',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password,data:options.data||{}})}); const next=payload.access_token?normalizeSession(payload):null; if(next) saveSession(next); return {data:{session:next,user:next?.user||payload.user||payload},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async signUp({email,password,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const path='/auth/v1/signup?redirect_to='+encodeURIComponent(redirect); const payload=await request(path,{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password,data:options.data||{},redirect_to:redirect,email_redirect_to:redirect})}); const next=payload.access_token?normalizeSession(payload):null; if(next) saveSession(next); return {data:{session:next,user:next?.user||payload.user||payload},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async signOut(){try{if(session?.access_token) await request('/auth/v1/logout',{method:'POST',token:session.access_token,body:'{}'})}catch(e){} saveSession(null); return {error:null}},
       async updateUser(payload){try{await refreshSession(); const data=await request('/auth/v1/user',{method:'PUT',token:session?.access_token,body:JSON.stringify(payload)}); if(session){session.user=data; saveSession(session)} return {data:{user:data},error:null}}catch(error){return {data:{user:null},error}}},
       onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}}
@@ -7981,7 +7992,8 @@ async function cloudSignUp(){
   const cred=cloudCredentials(); if(!cred) return;
   try{
     setCloudBusy(true,'Создаю аккаунт...');
-    const options={data:{nickname:cred.nickname||''}};
+    const redirectUrl=getAuthRedirectUrl();
+    const options={data:{nickname:cred.nickname||''},emailRedirectTo:redirectUrl,redirectTo:redirectUrl};
     const {data,error}=await cloud.auth.signUp({email:cred.email,password:cred.password,options});
     if(error) throw error;
     const duplicateByIdentities=data?.user && Array.isArray(data.user.identities) && data.user.identities.length===0;
@@ -8000,7 +8012,7 @@ async function cloudSignUp(){
       saveCloudData({silent:true}).catch(e=>console.warn('Initial cloud save failed',e));
       fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));
     }else{
-      setAuthPlaque('Аккаунт создан. Подтвердите email в письме и затем войдите.', 'success');
+      setAuthPlaque('Аккаунт создан. Подтвердите email в письме — после подтверждения вас вернёт в приложение.', 'success');
       cloudStatus('Аккаунт создан. Если включено подтверждение email, откройте письмо от Supabase и затем войдите.');
     }
   }
