@@ -7550,6 +7550,7 @@ const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const CLOUD_TABLE="user_app_state";
 const CLOUD_SESSION_KEY="tableBookSupabaseSession";
 const CLOUD_PROFILE_KEY_PREFIX="tableBookCloudProfile:";
+const CLOUD_PENDING_CONFIRM_KEY="tableBookPendingConfirmEmail";
 function getAuthRedirectUrl(){
   try{
     const u=new URL(window.location.href);
@@ -7560,6 +7561,80 @@ function getAuthRedirectUrl(){
     if(!out.endsWith('/')) out+='/';
     return out;
   }catch(e){return window.location.origin+window.location.pathname.replace(/index\.html$/,'');}
+}
+
+function authUrlParams(){
+  const hashRaw=(window.location.hash||'').replace(/^#/, '');
+  const queryRaw=(window.location.search||'').replace(/^\?/, '');
+  const hash=new URLSearchParams(hashRaw);
+  const query=new URLSearchParams(queryRaw);
+  return {hash,query,hasHash:!!hashRaw,hasQuery:!!queryRaw};
+}
+function hasAuthRedirectParams(){
+  const {hash,query}=authUrlParams();
+  return !!(hash.get('access_token')||hash.get('refresh_token')||hash.get('error')||hash.get('error_description')||hash.get('type')||query.get('code')||query.get('error')||query.get('error_description')||query.get('type')||query.get('token_hash'));
+}
+function cleanAuthUrl(){
+  try{
+    const u=new URL(window.location.href);
+    u.hash='';
+    ['code','error','error_description','error_code','type','token_hash'].forEach(k=>u.searchParams.delete(k));
+    history.replaceState(null,document.title,u.toString());
+  }catch(e){}
+}
+function authRedirectErrorMessage(){
+  const {hash,query}=authUrlParams();
+  const err=hash.get('error_description')||query.get('error_description')||hash.get('error')||query.get('error')||'';
+  if(!err) return '';
+  const low=err.toLowerCase();
+  if(low.includes('expired')) return 'Ссылка подтверждения устарела. Нажмите «Отправить письмо ещё раз» и подтвердите новое письмо.';
+  if(low.includes('invalid')) return 'Ссылка подтверждения недействительна. Запросите письмо подтверждения ещё раз.';
+  return 'Ошибка подтверждения email: '+err;
+}
+async function processAuthRedirect(){
+  if(!cloud || !hasAuthRedirectParams()) return false;
+  const redirectError=authRedirectErrorMessage();
+  if(redirectError){
+    cloudStatus(redirectError);
+    setAuthPlaque(redirectError,'error',{showResend:true});
+    cleanAuthUrl();
+    return false;
+  }
+  const {hash,query}=authUrlParams();
+  const accessToken=hash.get('access_token')||query.get('access_token');
+  const refreshToken=hash.get('refresh_token')||query.get('refresh_token');
+  const code=query.get('code');
+  try{
+    if(accessToken && refreshToken && cloud.auth?.setSession){
+      const {data,error}=await cloud.auth.setSession({access_token:accessToken,refresh_token:refreshToken});
+      if(error) throw error;
+      if(data?.user || data?.session?.user) setCloudUser(data.user||data.session.user);
+      localStorage.removeItem(CLOUD_PENDING_CONFIRM_KEY);
+      cleanAuthUrl();
+      cloudStatus('Email подтверждён. Вход выполнен, профиль загружается.');
+      return true;
+    }
+    if(code && cloud.auth?.exchangeCodeForSession){
+      const {data,error}=await cloud.auth.exchangeCodeForSession(code);
+      if(error) throw error;
+      if(data?.user || data?.session?.user) setCloudUser(data.user||data.session.user);
+      localStorage.removeItem(CLOUD_PENDING_CONFIRM_KEY);
+      cleanAuthUrl();
+      cloudStatus('Email подтверждён. Вход выполнен, профиль загружается.');
+      return true;
+    }
+    if(accessToken && refreshToken){
+      // REST fallback processes tokens inside getSession().
+      cleanAuthUrl();
+      return true;
+    }
+  }catch(error){
+    console.warn('Auth redirect processing failed',error);
+    cloudStatus('Email мог быть подтверждён, но сессия не сохранилась в браузере: '+cloudErrorMessage(error));
+    cleanAuthUrl();
+    return false;
+  }
+  return false;
 }
 const cloud=createCloudClient();
 let cloudUser=null, cloudProfile={}, cloudSaveTimer=null, cloudBusy=false;
@@ -7578,6 +7653,18 @@ function createRestCloudClient(){
     if(!payload) return null;
     const expiresAt=payload.expires_at || (payload.expires_in?now()+Number(payload.expires_in):null);
     return {access_token:payload.access_token,refresh_token:payload.refresh_token,expires_at:expiresAt,token_type:payload.token_type||'bearer',user:payload.user||payload};
+  }
+  function readUrlSession(){
+    const {hash,query}=authUrlParams();
+    const accessToken=hash.get('access_token')||query.get('access_token');
+    const refreshToken=hash.get('refresh_token')||query.get('refresh_token');
+    if(!accessToken || !refreshToken) return null;
+    const payload={access_token:accessToken,refresh_token:refreshToken,token_type:hash.get('token_type')||query.get('token_type')||'bearer',expires_in:Number(hash.get('expires_in')||query.get('expires_in')||3600)};
+    const next=normalizeSession(payload);
+    saveSession(next);
+    cleanAuthUrl();
+    localStorage.removeItem(CLOUD_PENDING_CONFIRM_KEY);
+    return next;
   }
   function headers(token=session?.access_token,extra={}){return Object.assign({'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+(token||SUPABASE_ANON_KEY),'Content-Type':'application/json'},extra)}
   async function request(path,options={}){
@@ -7614,12 +7701,14 @@ function createRestCloudClient(){
   }
   return {
     auth:{
-      async getSession(){try{await refreshSession();return {data:{session:session},error:null}}catch(error){saveSession(null);return {data:{session:null},error}}},
-      async signInWithPassword({email,password}){try{const payload=await request('/auth/v1/token?grant_type=password',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password})}); const next=normalizeSession(payload); saveSession(next); return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async getSession(){try{readUrlSession();await refreshSession();if(session?.access_token && (!session.user || !session.user.id)){try{const user=await request('/auth/v1/user',{method:'GET',token:session.access_token});session.user=user;saveSession(session);}catch(e){console.warn('REST user fetch failed',e)}}return {data:{session:session},error:null}}catch(error){saveSession(null);return {data:{session:null},error}}},
+      async signInWithPassword({email,password}){try{const payload=await request('/auth/v1/token?grant_type=password',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password})}); const next=normalizeSession(payload); saveSession(next); if(next?.access_token && (!next.user || !next.user.id)){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});saveSession(next);}catch(e){console.warn('REST login user fetch failed',e)}} return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async signUp({email,password,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const path='/auth/v1/signup?redirect_to='+encodeURIComponent(redirect); const payload=await request(path,{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password,data:options.data||{},options:{email_redirect_to:redirect}})}); const next=payload.access_token?normalizeSession(payload):null; if(next) saveSession(next); return {data:{session:next,user:next?.user||payload.user||payload},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async resend({type,email,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const payload=await request('/auth/v1/resend',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({type,email,options:{email_redirect_to:redirect}})}); return {data:payload,error:null}}catch(error){return {data:null,error}}},
       async signOut(){try{if(session?.access_token) await request('/auth/v1/logout',{method:'POST',token:session.access_token,body:'{}'})}catch(e){} saveSession(null); return {error:null}},
       async updateUser(payload){try{await refreshSession(); const data=await request('/auth/v1/user',{method:'PUT',token:session?.access_token,body:JSON.stringify(payload)}); if(session){session.user=data; saveSession(session)} return {data:{user:data},error:null}}catch(error){return {data:{user:null},error}}},
+      async setSession(tokens){try{const next=normalizeSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token,expires_in:tokens.expires_in||3600,token_type:'bearer'}); saveSession(next); if(next?.access_token){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});saveSession(next);}catch(e){console.warn('REST setSession user fetch failed',e)}} return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async exchangeCodeForSession(){return {data:{session:null,user:null},error:new Error('Для ссылки с code нужен Supabase SDK. Перезагрузите страницу с интернетом или запросите новое письмо подтверждения.')}} ,
       onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}}
     },
     from:restFrom
@@ -7827,7 +7916,7 @@ function setAuthPlaque(message,type='error',opts={}){
 function clearAuthPlaque(){setAuthPlaque('');}
 async function resendConfirmationEmail(){
   if(!cloud){setAuthPlaque('Supabase не инициализирован. Проверьте интернет и перезагрузите страницу.'); return;}
-  const email=normalizeEmailInput($('#topCloudEmail')?.value||$('#cloudEmail')?.value||'');
+  const email=normalizeEmailInput($('#topCloudEmail')?.value||$('#cloudEmail')?.value||localStorage.getItem(CLOUD_PENDING_CONFIRM_KEY)||'');
   if(!email){setAuthPlaque('Введите email, на который нужно отправить письмо подтверждения.', 'error', {showResend:true}); return;} if(!isEmailLikelyValid(email)){setAuthPlaque('Email выглядит некорректно. Проверьте, что нет пробелов или лишних символов.', 'error', {showResend:true}); return;}
   try{
     setCloudBusy(true,'Отправляю письмо подтверждения...');
@@ -8056,11 +8145,13 @@ async function cloudSignUp(){
       rememberCloudProfile({nickname:cred.nickname||'',email:cred.email});
       renderCloudUi();
       clearAuthPasswordFields();
+      localStorage.removeItem(CLOUD_PENDING_CONFIRM_KEY);
       setAuthPlaque('Аккаунт создан. Вход выполнен.', 'success');
       cloudStatus(`Аккаунт создан${cred.nickname?' для '+cred.nickname:''}. Вход выполнен, данные можно сохранить в облако.`);
       saveCloudData({silent:true}).catch(e=>console.warn('Initial cloud save failed',e));
       fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));
     }else{
+      localStorage.setItem(CLOUD_PENDING_CONFIRM_KEY,cred.email);
       setAuthPlaque('Аккаунт создан. Подтвердите email в письме — после подтверждения вас вернёт в приложение.', 'success', {showResend:true});
       cloudStatus('Аккаунт создан. Если включено подтверждение email, откройте письмо от Supabase и затем войдите. Если письма нет, нажмите «Отправить письмо ещё раз».');
     }
@@ -8098,10 +8189,16 @@ async function cloudSignOut(){
 async function initCloudAuth(){
   if(!cloud){renderCloudUi(); return;}
   try{
+    await processAuthRedirect();
     const {data,error}=await cloud.auth.getSession(); if(error) throw error;
     setCloudUser(data.session?.user||null);
     renderCloudUi();
-    if(cloudUser) fetchCloudProfile({silent:true}).catch(e=>console.warn('Initial profile load failed',e));
+    if(cloudUser){
+      cloudStatus('Email подтверждён. Вы вошли в аккаунт: '+userDisplayName()+'.');
+      fetchCloudProfile({silent:true}).catch(e=>console.warn('Initial profile load failed',e));
+    }else if(hasAuthRedirectParams()){
+      cloudStatus('Подтверждение обработано, но сессия не сохранилась. Нажмите «Войти» и войдите с email и паролем.');
+    }
     cloud.auth.onAuthStateChange((_event,session)=>{setCloudUser(session?.user||null); renderCloudUi(); if(cloudUser) fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));});
   }
   catch(error){console.warn(error); cloudStatus('Не удалось проверить вход Supabase: '+cloudErrorMessage(error)); renderCloudUi();}
