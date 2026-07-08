@@ -883,7 +883,7 @@ body.dark .account-settings-card{background:linear-gradient(180deg, rgba(18,38,9
 </head>
 <body>
 <div class="shell">
-<header class="topbar"><div class="topbar-inner"><button class="brand" id="homeBrand" type="button" aria-label="Главная"><span class="brand-mark" id="brandMark"></span><span class="brand-title"><strong>Table book</strong></span></button><div class="topbar-actions"><div class="top-auth" id="topAuth"><button class="top-auth-status" id="topAuthStatus" type="button" hidden>Вы</button><button class="auth-chip" id="topLoginBtn" type="button">Войти</button><button class="auth-chip auth-chip-primary" id="topRegisterBtn" type="button">Регистрация</button><div class="auth-popover" id="topAuthPanel" hidden><div class="auth-popover-head"><strong id="topAuthTitle">Вход</strong><button class="auth-close" id="topAuthClose" type="button" aria-label="Закрыть">×</button></div><div id="topAuthForm" class="auth-form-clean"><input class="input" id="topCloudNickname" type="text" autocomplete="nickname" maxlength="32" placeholder="Никнейм" hidden><input class="input" id="topCloudEmail" type="email" autocomplete="email" placeholder="Email"><input class="input" id="topCloudPassword" type="password" autocomplete="current-password" placeholder="Пароль"><div class="auth-popover-actions auth-single-action"><button class="btn primary" id="topPanelSignIn" type="button">Войти</button><button class="btn primary" id="topPanelSignUp" type="button" hidden>Создать аккаунт</button></div></div><div id="topCabinet" class="account-panel" hidden><div id="cabinetHome"><button class="account-settings-card" id="cabinetSettingsBtn" type="button"><span>Настройки</span><b id="cabinetDisplayName">Вы</b><small id="cabinetEmailMini">—</small></button><div class="account-actions account-actions-main"><button class="btn primary" id="cloudSave" type="button" disabled>Сохранить в облако</button><button class="btn ghost" id="cloudLoad" type="button" disabled>Загрузить из облака</button><button class="btn ghost account-wide" id="cabinetSignOut" type="button">Выйти</button></div><div class="backup-note" id="cloudStatus">Проверяю соединение...</div></div><div id="accountSettings" class="account-settings" hidden><p class="account-hint">Информация о пользователе</p><div class="account-info"><span>Зарегистрированная почта</span><b id="settingsEmail">—</b></div><label class="account-label" for="settingsNickname">Никнейм</label><input class="input" id="settingsNickname" type="text" maxlength="32" autocomplete="nickname" placeholder="Вы"><div class="account-actions"><button class="btn ghost" id="accountBackBtn" type="button">Назад</button><button class="btn primary" id="accountSaveNickname" type="button">Сохранить</button></div><div class="backup-note" id="settingsStatus">Никнейм будет отображаться сверху.</div></div></div></div></div><button class="theme-btn" id="themeBtn" title="Тема"></button></div></div></header>
+<header class="topbar"><div class="topbar-inner"><button class="brand" id="homeBrand" type="button" aria-label="Главная"><span class="brand-mark" id="brandMark"></span><span class="brand-title"><strong>Table book</strong></span></button><div class="topbar-actions"><div class="top-auth" id="topAuth"><button class="top-auth-status" id="topAuthStatus" type="button" hidden>Вы</button><button class="auth-chip" id="topLoginBtn" type="button">Войти</button><button class="auth-chip auth-chip-primary" id="topRegisterBtn" type="button">Регистрация</button><div class="auth-popover" id="topAuthPanel" hidden><div class="auth-popover-head"><strong id="topAuthTitle">Вход</strong><button class="auth-close" id="topAuthClose" type="button" aria-label="Закрыть">×</button></div><div id="topAuthForm" class="auth-form-clean"><input class="input" id="topCloudNickname" type="text" autocomplete="nickname" maxlength="32" placeholder="Никнейм" hidden><input class="input" id="topCloudEmail" type="email" autocomplete="email" placeholder="Email"><input class="input" id="topCloudPassword" type="password" autocomplete="current-password" placeholder="Пароль"><div class="auth-popover-actions auth-single-action"><button class="btn primary" id="topPanelSignIn" type="button">Войти</button><button class="btn primary" id="topPanelSignUp" type="button" hidden>Создать аккаунт</button></div></div><div id="topCabinet" class="account-panel" hidden><div id="cabinetHome"><button class="account-settings-card" id="cabinetSettingsBtn" type="button"><span>Настройки</span><b id="cabinetDisplayName">Вы</b><small id="cabinetEmailMini">—</small></button><div class="account-actions account-actions-main"><button class="btn ghost" id="cloudCheck" type="button">Проверить связь</button><button class="btn primary" id="cloudSave" type="button" disabled>Сохранить в облако</button><button class="btn ghost" id="cloudLoad" type="button" disabled>Загрузить из облака</button><button class="btn ghost account-wide" id="cabinetSignOut" type="button">Выйти</button></div><div class="backup-note" id="cloudStatus">Проверяю соединение...</div></div><div id="accountSettings" class="account-settings" hidden><p class="account-hint">Информация о пользователе</p><div class="account-info"><span>Зарегистрированная почта</span><b id="settingsEmail">—</b></div><label class="account-label" for="settingsNickname">Никнейм</label><input class="input" id="settingsNickname" type="text" maxlength="32" autocomplete="nickname" placeholder="Вы"><div class="account-actions"><button class="btn ghost" id="accountBackBtn" type="button">Назад</button><button class="btn primary" id="accountSaveNickname" type="button">Сохранить</button></div><div class="backup-note" id="settingsStatus">Никнейм будет отображаться сверху.</div></div></div></div></div><button class="theme-btn" id="themeBtn" title="Тема"></button></div></div></header>
 <main class="page">
 <section id="home" class="view active"><section class="hero"><div><div class="kicker">Table book</div><h1>Книга рецептов</h1><p class="lead">Выберите кухню или откройте свои рецепты.</p><div class="stats"><div class="stat"><b id="statRecipes">0</b><span>рецептов</span></div><div class="stat"><b id="statCountries">0</b><span>кухонь</span></div><div class="stat"><b id="statTypes">0</b><span>категорий</span></div><div class="stat"><b id="statHealthy">0</b><span>полезных</span></div></div></div></section>
 <div class="section-title"><div><h2>Кухни</h2><p>Страны и ваши записи.</p></div></div>
@@ -7532,8 +7532,70 @@ const STORAGE_BACKUP_KEY="tableBookBackup";
 const SUPABASE_URL="https://qshwxcxhxkchpdjaecdk.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaHd4Y3hoeGtjaHBkamFlY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjM3NTYsImV4cCI6MjA5OTA5OTc1Nn0.aQM03By8cL4VkFsI4NiVugWtSKU1bcZkHfErK_4PMB4";
 const CLOUD_TABLE="user_app_state";
-const cloud=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}}):null;
+const CLOUD_SESSION_KEY="tableBookSupabaseSession";
+const cloud=createCloudClient();
 let cloudUser=null, cloudSaveTimer=null, cloudBusy=false;
+function createCloudClient(){
+  if(window.supabase && typeof window.supabase.createClient==='function'){
+    try{return window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,flowType:'implicit'}})}catch(e){console.warn('Supabase SDK init failed, using REST fallback',e)}
+  }
+  return createRestCloudClient();
+}
+function createRestCloudClient(){
+  let session=safeJson(localStorage.getItem(CLOUD_SESSION_KEY),null);
+  const base=SUPABASE_URL.replace(/\/+$/,'');
+  function now(){return Math.floor(Date.now()/1000)}
+  function saveSession(next){session=next||null; try{session?localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(session)):localStorage.removeItem(CLOUD_SESSION_KEY)}catch(e){console.warn('Session save failed',e)}}
+  function normalizeSession(payload){
+    if(!payload) return null;
+    const expiresAt=payload.expires_at || (payload.expires_in?now()+Number(payload.expires_in):null);
+    return {access_token:payload.access_token,refresh_token:payload.refresh_token,expires_at:expiresAt,token_type:payload.token_type||'bearer',user:payload.user||payload};
+  }
+  function headers(token=session?.access_token,extra={}){return Object.assign({'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+(token||SUPABASE_ANON_KEY),'Content-Type':'application/json'},extra)}
+  async function request(path,options={}){
+    const res=await fetch(base+path,Object.assign({},options,{headers:Object.assign(headers(options.token),options.headers||{})}));
+    let body=null; const txt=await res.text(); if(txt){try{body=JSON.parse(txt)}catch(e){body=txt}}
+    if(!res.ok){const err=new Error((body&&body.message)||body?.msg||body?.error_description||body?.error||res.statusText); err.status=res.status; err.details=body; throw err;}
+    return body;
+  }
+  async function refreshSession(){
+    if(!session?.refresh_token) return session;
+    if(session.expires_at && session.expires_at-now()>45) return session;
+    const payload=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({refresh_token:session.refresh_token})});
+    const next=normalizeSession(payload); saveSession(next); return next;
+  }
+  function restFrom(table){
+    const query={selectCols:null,head:false,count:null,filters:[],limitN:null};
+    const api={
+      select(cols,opts={}){query.selectCols=cols||'*';query.head=!!opts.head;query.count=opts.count||null;return api;},
+      eq(col,val){query.filters.push([col,'eq',val]);return api;},
+      limit(n){query.limitN=n;return executeSelect();},
+      maybeSingle(){return executeSelect(true);},
+      async upsert(row,opts={}){await refreshSession(); const onConflict=opts.onConflict?`?on_conflict=${encodeURIComponent(opts.onConflict)}`:''; try{const data=await request(`/rest/v1/${encodeURIComponent(table)}${onConflict}`,{method:'POST',headers:Object.assign(headers(session?.access_token),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(row)}); return {data,error:null}}catch(error){return {data:null,error}}}
+    };
+    async function executeSelect(single=false){
+      await refreshSession();
+      const params=new URLSearchParams();
+      params.set('select',query.selectCols||'*');
+      for(const [c,op,v] of query.filters) params.set(c,`${op}.${v}`);
+      if(query.limitN!=null) params.set('limit',String(query.limitN));
+      const extra={}; if(query.head) extra['Prefer']=query.count?`count=${query.count}`:'';
+      try{const data=await request(`/rest/v1/${encodeURIComponent(table)}?${params.toString()}`,{method:query.head?'HEAD':'GET',headers:Object.assign(headers(session?.access_token),extra)}); return {data:single?(Array.isArray(data)?(data[0]||null):data):data,error:null}}catch(error){return {data:null,error}}
+    }
+    return api;
+  }
+  return {
+    auth:{
+      async getSession(){try{await refreshSession();return {data:{session:session},error:null}}catch(error){saveSession(null);return {data:{session:null},error}}},
+      async signInWithPassword({email,password}){try{const payload=await request('/auth/v1/token?grant_type=password',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password})}); const next=normalizeSession(payload); saveSession(next); return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async signUp({email,password,options={}}){try{const payload=await request('/auth/v1/signup',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password,data:options.data||{}})}); const next=payload.access_token?normalizeSession(payload):null; if(next) saveSession(next); return {data:{session:next,user:next?.user||payload.user||payload},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async signOut(){try{if(session?.access_token) await request('/auth/v1/logout',{method:'POST',token:session.access_token,body:'{}'})}catch(e){} saveSession(null); return {error:null}},
+      async updateUser(payload){try{await refreshSession(); const data=await request('/auth/v1/user',{method:'PUT',token:session?.access_token,body:JSON.stringify(payload)}); if(session){session.user=data; saveSession(session)} return {data:{user:data},error:null}}catch(error){return {data:{user:null},error}}},
+      onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}}
+    },
+    from:restFrom
+  };
+}
 function safeJson(value,fallback){try{return value?JSON.parse(value):fallback}catch(e){return fallback}}
 const state=Object.assign({theme:"light",route:"home",country:null,filterCat:null,editingId:null},safeJson(localStorage.getItem(STORAGE_STATE_KEY)||localStorage.getItem("maisonState"),{}));
 let myRecipes=safeJson(localStorage.getItem(STORAGE_RECIPES_KEY)||localStorage.getItem("maisonMyRecipes"),[]);
@@ -7686,6 +7748,7 @@ async function saveNickname(){
     vibe(12);
   }catch(error){console.warn(error); if(st) st.textContent='Не удалось сохранить никнейм: '+cloudErrorMessage(error);}
 }
+function clearAuthPasswordFields(){const pass=$('#topCloudPassword'); if(pass) pass.value=''; const oldPass=$('#cloudPassword'); if(oldPass) oldPass.value='';}
 function closeTopAuth(){const panel=$('#topAuthPanel'); if(panel) panel.hidden=true;}
 async function topCloudSignIn(){await cloudSignIn(); if(cloudUser) openTopAuth('cabinet');}
 async function topCloudSignUp(){await cloudSignUp(); if(cloudUser) openTopAuth('cabinet');}
@@ -7747,16 +7810,27 @@ function cloudErrorMessage(error){
   if(msg.includes('signup disabled')) return 'Регистрация отключена в Supabase Authentication → Providers → Email.';
   return raw||'Неизвестная ошибка Supabase.';
 }
-function cloudSnapshot(){const s=tableBookSnapshot(); s.state=Object.assign({},s.state,{editingId:null}); return s;}
+function cloudSnapshot(){const s=tableBookSnapshot(); s.state=Object.assign({},s.state,{editingId:null,profile:{email:cloudUser?.email||'',nickname:userNickname()}}); return s;}
+async function ensureCloudRow(){
+  if(!cloud || !cloudUser) return false;
+  const snap=cloudSnapshot();
+  const row={user_id:cloudUser.id,app_state:snap.state,my_recipes:snap.myRecipes,updated_at:new Date().toISOString()};
+  const {error}=await cloud.from(CLOUD_TABLE).upsert(row,{onConflict:'user_id'});
+  if(error) throw error;
+  return true;
+}
 async function checkCloudConnection(){
-  if(!cloud){cloudStatus('Supabase SDK не загрузился. Проверьте интернет-соединение и доступ к cdn.jsdelivr.net.'); return false;}
+  if(!cloud){cloudStatus('Supabase SDK или REST-клиент не инициализирован. Проверьте интернет-соединение.'); return false;}
   try{
     setCloudBusy(true,'Проверяю соединение с Supabase...');
-    const {error:sessionError}=await cloud.auth.getSession();
+    const {data:sessionData,error:sessionError}=await cloud.auth.getSession();
     if(sessionError) throw sessionError;
+    const activeUser=sessionData?.session?.user||cloudUser||null;
+    if(activeUser) cloudUser=activeUser;
     const {error:tableError}=await cloud.from(CLOUD_TABLE).select('user_id',{head:true,count:'exact'}).limit(1);
     if(tableError) throw tableError;
-    cloudStatus(cloudUser?'Соединение есть. Таблица user_app_state доступна, аккаунт активен.':'Соединение есть. Supabase и таблица доступны, войдите для синхронизации.');
+    cloudStatus(activeUser?'Соединение есть. Авторизация работает, таблица user_app_state доступна. Данные будут сохраняться за этим пользователем.':'Соединение есть. Таблица user_app_state доступна. Войдите, чтобы проверить пользовательскую запись.');
+    renderCloudUi();
     return true;
   }catch(error){console.warn(error); cloudStatus('Проверка Supabase: '+cloudErrorMessage(error)); return false;}
   finally{setCloudBusy(false);}
@@ -7810,31 +7884,39 @@ function queueCloudSave(){
   cloudSaveTimer=setTimeout(()=>saveCloudData({silent:true}),1400);
 }
 async function cloudSignUp(){
-  if(!cloud){cloudStatus('Supabase SDK не загрузился.'); return;}
+  if(!cloud){cloudStatus('Supabase не инициализирован. Проверьте интернет и доступ к проекту.'); return;}
   const cred=cloudCredentials(); if(!cred) return;
   try{
     setCloudBusy(true,'Создаю аккаунт...');
-    const options=cred.nickname?{data:{nickname:cred.nickname}}:{data:{}};
+    const options={data:{nickname:cred.nickname||''}};
     const {data,error}=await cloud.auth.signUp({email:cred.email,password:cred.password,options});
     if(error) throw error;
-    cloudUser=data.session?.user||null;
+    cloudUser=data.session?.user||data.user||null;
     renderCloudUi();
-    if(data.session){await saveCloudData({silent:true}); cloudStatus(`Аккаунт создан${cred.nickname?' для '+cred.nickname:''}. Текущие рецепты сохранены в облако.`);}
-    else cloudStatus('Аккаунт создан. Подтвердите email в письме от Supabase, затем войдите в аккаунт.');
+    if(data.session && cloudUser){
+      await ensureCloudRow();
+      cloudStatus(`Аккаунт создан${cred.nickname?' для '+cred.nickname:''}. Рецепты и настройки сохранены за этим пользователем.`);
+      clearAuthPasswordFields();
+    }else{
+      cloudStatus('Аккаунт создан в Supabase Auth. Если включено подтверждение email, откройте письмо от Supabase и затем войдите.');
+    }
   }
   catch(error){console.warn(error); cloudStatus('Не удалось зарегистрироваться: '+cloudErrorMessage(error));}
   finally{setCloudBusy(false);}
 }
 async function cloudSignIn(){
-  if(!cloud){cloudStatus('Supabase SDK не загрузился.'); return;}
+  if(!cloud){cloudStatus('Supabase не инициализирован. Проверьте интернет и доступ к проекту.'); return;}
   const cred=cloudCredentials(); if(!cred) return;
   try{
     setCloudBusy(true,'Выполняю вход...');
     const {data,error}=await cloud.auth.signInWithPassword({email:cred.email,password:cred.password});
     if(error) throw error;
-    cloudUser=data.user||null;
+    cloudUser=data.user||data.session?.user||null;
+    if(!cloudUser) throw new Error('Supabase не вернул данные пользователя. Проверьте настройки Email Auth.');
+    await ensureCloudRow();
     renderCloudUi();
-    cloudStatus('Вход выполнен. Откройте личный кабинет, чтобы сохранить или загрузить облачные данные.');
+    cloudStatus('Вход выполнен. Рецепты и настройки будут сохраняться за этим пользователем.');
+    clearAuthPasswordFields();
     vibe([12,24,12]);
   }
   catch(error){console.warn(error); cloudStatus('Не удалось войти: '+cloudErrorMessage(error));}
@@ -7852,7 +7934,8 @@ async function initCloudAuth(){
     const {data,error}=await cloud.auth.getSession(); if(error) throw error;
     cloudUser=data.session?.user||null;
     renderCloudUi();
-    cloud.auth.onAuthStateChange((_event,session)=>{cloudUser=session?.user||null; renderCloudUi();});
+    if(cloudUser){try{await ensureCloudRow();}catch(e){console.warn('Initial cloud row check failed',e); cloudStatus('Вход найден, но запись user_app_state недоступна: '+cloudErrorMessage(e));}}
+    cloud.auth.onAuthStateChange((_event,session)=>{cloudUser=session?.user||null; renderCloudUi(); if(cloudUser) ensureCloudRow().catch(e=>cloudStatus('Ошибка записи профиля: '+cloudErrorMessage(e)));});
   }
   catch(error){console.warn(error); cloudStatus('Не удалось проверить вход Supabase: '+cloudErrorMessage(error)); renderCloudUi();}
 }
@@ -8126,7 +8209,7 @@ function initDialogDrag(){
   d.addEventListener('pointerup',finish); d.addEventListener('pointercancel',finish); d.addEventListener('lostpointercapture',finish);
 }
 let touchX=0,touchY=0; function canSwipeBack(){return (state.route==='country' || state.route==='myview') && !$('#modal').classList.contains('open');} document.addEventListener('touchstart',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; touchX=t.clientX; touchY=t.clientY;},{passive:true}); document.addEventListener('touchmove',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); if(touchX<36 && dx>26 && dy<60) $('#swipeCue').classList.add('show'); else $('#swipeCue').classList.remove('show');},{passive:true}); document.addEventListener('touchend',e=>{if(!canSwipeBack()) return; const t=e.changedTouches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); $('#swipeCue').classList.remove('show'); if(touchX<36 && dx>88 && dy<70) goHomeWithFlip(); touchX=touchY=0;},{passive:true});
-$('#themeBtn').onclick=()=>{const b=$('#themeBtn'); b.classList.remove('tapped','theme-morph'); void b.offsetWidth; b.classList.add('tapped','theme-morph'); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]); setTimeout(()=>b.classList.remove('tapped'),180); setTimeout(()=>b.classList.remove('theme-morph'),460);}; $('#homeBrand').onclick=()=>{if(state.route!=='home') goHomeWithFlip();}; $('#backBtn').onclick=goHomeWithFlip; $('#myBackBtn').onclick=goHomeWithFlip; $('#clearCat').onclick=()=>{state.filterCat=null; saveState(); renderCountry(state.country);}; $('#myRecipesCard').onclick=()=>{showView('myview'); renderMyRecipes(); vibe(12);}; $('#saveMyRecipe').onclick=saveCustomRecipe; $('#resetMyRecipe').onclick=resetMyForm; $('#closeModal').onclick=closeModalUp; $('#modal').onclick=e=>{if(e.target.id==='modal') closeModalInstant();}; const exportBtn=$('#exportData'), importBtn=$('#importData'), backupFile=$('#backupFile'); if(exportBtn) exportBtn.onclick=exportUserData; if(importBtn&&backupFile) importBtn.onclick=()=>backupFile.click(); if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); backupFile.value='';}; const cloudSignInBtn=$('#cloudSignIn'), cloudSignUpBtn=$('#cloudSignUp'), cloudSignOutBtn=$('#cloudSignOut'), cloudSaveBtn=$('#cloudSave'), cloudLoadBtn=$('#cloudLoad'); if(cloudSignInBtn) cloudSignInBtn.onclick=cloudSignIn; if(cloudSignUpBtn) cloudSignUpBtn.onclick=cloudSignUp; if(cloudSignOutBtn) cloudSignOutBtn.onclick=cloudSignOut; if(cloudSaveBtn) cloudSaveBtn.onclick=()=>saveCloudData(); if(cloudLoadBtn) cloudLoadBtn.onclick=()=>loadCloudData(); const topLoginBtn=$('#topLoginBtn'), topRegisterBtn=$('#topRegisterBtn'), topLogoutBtn=$('#topLogoutBtn'), topAuthClose=$('#topAuthClose'), topPanelSignIn=$('#topPanelSignIn'), topPanelSignUp=$('#topPanelSignUp'), topAuthStatus=$('#topAuthStatus'), cloudCheckBtn=$('#cloudCheck'), cabinetSignOutBtn=$('#cabinetSignOut'), cabinetSettingsBtn=$('#cabinetSettingsBtn'), cabinetUserEmailBtn=$('#cabinetUserEmail'), accountBackBtn=$('#accountBackBtn'), accountSaveNicknameBtn=$('#accountSaveNickname'); if(topLoginBtn) topLoginBtn.onclick=()=>openTopAuth('login'); if(topRegisterBtn) topRegisterBtn.onclick=()=>openTopAuth('register'); if(topLogoutBtn) topLogoutBtn.onclick=cloudSignOut; if(topAuthStatus){topAuthStatus.onclick=()=>openTopAuth('cabinet'); topAuthStatus.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopAuth('cabinet');}};} if(topAuthClose) topAuthClose.onclick=closeTopAuth; if(topPanelSignIn) topPanelSignIn.onclick=topCloudSignIn; if(topPanelSignUp) topPanelSignUp.onclick=topCloudSignUp; if(cloudCheckBtn) cloudCheckBtn.onclick=checkCloudConnection; if(cabinetSignOutBtn) cabinetSignOutBtn.onclick=cloudSignOut; if(cabinetSettingsBtn) cabinetSettingsBtn.onclick=openAccountSettings; if(cabinetUserEmailBtn) cabinetUserEmailBtn.onclick=openAccountSettings; if(accountBackBtn) accountBackBtn.onclick=openCabinetHome; if(accountSaveNicknameBtn) accountSaveNicknameBtn.onclick=saveNickname; document.addEventListener('click',e=>{const panel=$('#topAuthPanel'), wrap=$('#topAuth'); if(panel && wrap && !panel.hidden && !wrap.contains(e.target)) closeTopAuth();}); document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTopAuth(); closeModalInstant();}});
+$('#themeBtn').onclick=()=>{const b=$('#themeBtn'); b.classList.remove('tapped','theme-morph'); void b.offsetWidth; b.classList.add('tapped','theme-morph'); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]); setTimeout(()=>b.classList.remove('tapped'),180); setTimeout(()=>b.classList.remove('theme-morph'),460);}; $('#homeBrand').onclick=()=>{if(state.route!=='home') goHomeWithFlip();}; $('#backBtn').onclick=goHomeWithFlip; $('#myBackBtn').onclick=goHomeWithFlip; $('#clearCat').onclick=()=>{state.filterCat=null; saveState(); renderCountry(state.country);}; $('#myRecipesCard').onclick=()=>{showView('myview'); renderMyRecipes(); vibe(12);}; $('#saveMyRecipe').onclick=saveCustomRecipe; $('#resetMyRecipe').onclick=resetMyForm; $('#closeModal').onclick=closeModalUp; $('#modal').onclick=e=>{if(e.target.id==='modal') closeModalInstant();}; const exportBtn=$('#exportData'), importBtn=$('#importData'), backupFile=$('#backupFile'); if(exportBtn) exportBtn.onclick=exportUserData; if(importBtn&&backupFile) importBtn.onclick=()=>backupFile.click(); if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); backupFile.value='';}; const cloudSignInBtn=$('#cloudSignIn'), cloudSignUpBtn=$('#cloudSignUp'), cloudSignOutBtn=$('#cloudSignOut'), cloudSaveBtn=$('#cloudSave'), cloudLoadBtn=$('#cloudLoad'); if(cloudSignInBtn) cloudSignInBtn.onclick=cloudSignIn; if(cloudSignUpBtn) cloudSignUpBtn.onclick=cloudSignUp; if(cloudSignOutBtn) cloudSignOutBtn.onclick=cloudSignOut; if(cloudSaveBtn) cloudSaveBtn.onclick=()=>saveCloudData(); if(cloudLoadBtn) cloudLoadBtn.onclick=()=>loadCloudData(); const topLoginBtn=$('#topLoginBtn'), topRegisterBtn=$('#topRegisterBtn'), topLogoutBtn=$('#topLogoutBtn'), topAuthClose=$('#topAuthClose'), topPanelSignIn=$('#topPanelSignIn'), topPanelSignUp=$('#topPanelSignUp'), topAuthStatus=$('#topAuthStatus'), cloudCheckBtn=$('#cloudCheck'), cabinetSignOutBtn=$('#cabinetSignOut'), cabinetSettingsBtn=$('#cabinetSettingsBtn'), cabinetUserEmailBtn=$('#cabinetUserEmail'), accountBackBtn=$('#accountBackBtn'), accountSaveNicknameBtn=$('#accountSaveNickname'); if(topLoginBtn) topLoginBtn.onclick=()=>openTopAuth('login'); if(topRegisterBtn) topRegisterBtn.onclick=()=>openTopAuth('register'); if(topLogoutBtn) topLogoutBtn.onclick=cloudSignOut; if(topAuthStatus){topAuthStatus.onclick=()=>openTopAuth('cabinet'); topAuthStatus.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopAuth('cabinet');}};} if(topAuthClose) topAuthClose.onclick=closeTopAuth; if(topPanelSignIn) topPanelSignIn.onclick=topCloudSignIn; if(topPanelSignUp) topPanelSignUp.onclick=topCloudSignUp; ['topCloudNickname','topCloudEmail','topCloudPassword'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); const mode=$('#topAuthPanel')?.dataset.mode; if(mode==='register') topCloudSignUp(); else topCloudSignIn();}});}); if(cloudCheckBtn) cloudCheckBtn.onclick=checkCloudConnection; if(cabinetSignOutBtn) cabinetSignOutBtn.onclick=cloudSignOut; if(cabinetSettingsBtn) cabinetSettingsBtn.onclick=openAccountSettings; if(cabinetUserEmailBtn) cabinetUserEmailBtn.onclick=openAccountSettings; if(accountBackBtn) accountBackBtn.onclick=openCabinetHome; if(accountSaveNicknameBtn) accountSaveNicknameBtn.onclick=saveNickname; document.addEventListener('click',e=>{const panel=$('#topAuthPanel'), wrap=$('#topAuth'); if(panel && wrap && !panel.hidden && !wrap.contains(e.target)) closeTopAuth();}); document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTopAuth(); closeModalInstant();}});
 function boot(){$('#brandMark').innerHTML=iconSvg('book'); persistBackup(); initCloudAuth(); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); fillMyCategory(); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview') showView('myview'); else showView('home'); if(state.editingId) editMyRecipe(state.editingId);} 
 boot();
 </script>
