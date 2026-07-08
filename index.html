@@ -7550,6 +7550,7 @@ const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const CLOUD_TABLE="user_app_state";
 const CLOUD_SESSION_KEY="tableBookSupabaseSession";
 const CLOUD_PROFILE_KEY_PREFIX="tableBookCloudProfile:";
+const CLOUD_LAST_SYNC_KEY_PREFIX="tableBookCloudLastSync:";
 const CLOUD_PENDING_CONFIRM_KEY="tableBookPendingConfirmEmail";
 function getAuthRedirectUrl(){
   try{
@@ -7637,7 +7638,7 @@ async function processAuthRedirect(){
   return false;
 }
 const cloud=createCloudClient();
-let cloudUser=null, cloudProfile={}, cloudSaveTimer=null, cloudBusy=false;
+let cloudUser=null, cloudProfile={}, cloudSaveTimer=null, cloudBusy=false, cloudSyncApplying=false, cloudAutoSyncDoneForUser=null;
 function createCloudClient(){
   if(window.supabase && typeof window.supabase.createClient==='function'){
     try{return window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,flowType:'implicit'}})}catch(e){console.warn('Supabase SDK init failed, using REST fallback',e)}
@@ -7720,8 +7721,8 @@ let myRecipes=safeJson(localStorage.getItem(STORAGE_RECIPES_KEY)||localStorage.g
 function tableBookSnapshot(){return {app:"Table book",version:2,savedAt:new Date().toISOString(),state:Object.assign({},state),myRecipes:myRecipes};}
 function persistBackup(){try{localStorage.setItem(STORAGE_BACKUP_KEY,JSON.stringify(tableBookSnapshot()))}catch(e){console.warn("Backup save failed",e)}}
 function updateBackupStatus(text){const el=$("#backupStatus"); if(el) el.textContent=text;}
-function saveState(){try{localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));persistBackup();queueCloudSave()}catch(e){console.warn("State save failed",e)}}
-function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
+function saveState(){try{localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));persistBackup();if(!cloudSyncApplying) queueCloudSave()}catch(e){console.warn("State save failed",e)}}
+function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
 function vibe(ms=12){try{if(navigator.vibrate) navigator.vibrate(ms)}catch(e){}}
 function theme(name){return cuisineThemes[name]||{emoji:"book",accent:"#b99a5d",bg:"linear-gradient(135deg,#8e714a,#b99a5d)",note:"Коллекция рецептов."}}
 function visual(cat){return typeVisuals[cat]||{icon:"hot",bg:"linear-gradient(135deg,#8e714a,#d2b47d)"}}
@@ -7811,7 +7812,7 @@ function syncCloudProfileFromUser(){
   }
   if(key){try{localStorage.setItem(key,JSON.stringify(cloudProfile));}catch(e){console.warn('Profile cache save failed',e)}}
 }
-function setCloudUser(user){cloudUser=user||null; syncCloudProfileFromUser();}
+function setCloudUser(user){const prevId=cloudUser?.id||null; cloudUser=user||null; if(prevId && cloudUser?.id!==prevId) cloudAutoSyncDoneForUser=null; syncCloudProfileFromUser();}
 function rememberCloudProfile(next={}){
   if(!cloudUser) return;
   cloudProfile=Object.assign({},cloudProfile,next,{email:cloudUser.email||next.email||cloudProfile.email||''});
@@ -8034,6 +8035,73 @@ function cloudErrorMessage(error){
   return raw||'Неизвестная ошибка Supabase.';
 }
 function cloudSnapshot(){const s=tableBookSnapshot(); s.state=Object.assign({},s.state,{editingId:null,profile:{email:cloudUser?.email||cloudProfile.email||'',nickname:userNickname()}}); return s;}
+
+function cloudLastSyncKey(user=cloudUser){return user?.id?CLOUD_LAST_SYNC_KEY_PREFIX+user.id:null;}
+function rememberCloudSyncedAt(value,user=cloudUser){const k=cloudLastSyncKey(user); if(!k) return; try{value?localStorage.setItem(k,String(value)):localStorage.removeItem(k)}catch(e){}}
+function recipeStamp(recipe){const t=Date.parse(recipe?.updatedAt||recipe?.savedAt||recipe?.createdAt||0); return Number.isFinite(t)?t:0;}
+function normalizeRecipeForSync(recipe){return Object.assign({updatedAt:new Date().toISOString()},recipe||{});}
+function mergeRecipeLists(localList,cloudList){
+  const map=new Map();
+  const local=Array.isArray(localList)?localList:[];
+  const cloudRecipes=Array.isArray(cloudList)?cloudList:[];
+  local.forEach(r=>{if(r&&r.id) map.set(r.id,r);});
+  cloudRecipes.forEach(r=>{
+    if(!r||!r.id) return;
+    const existing=map.get(r.id);
+    if(!existing){map.set(r.id,r); return;}
+    const cloudTime=recipeStamp(r), localTime=recipeStamp(existing);
+    if(cloudTime>=localTime) map.set(r.id,Object.assign({},existing,r));
+  });
+  return Array.from(map.values()).sort((a,b)=>recipeStamp(b)-recipeStamp(a));
+}
+function recipeListsSignature(list){return JSON.stringify((Array.isArray(list)?list:[]).map(r=>[r.id,r.updatedAt||'',r.title||'']));}
+function applyCloudPayload(data,{replace=false,silent=true}={}){
+  if(!data) return {changed:false,cloudCount:0,localCount:myRecipes.length};
+  const beforeSig=recipeListsSignature(myRecipes);
+  const cloudRecipes=Array.isArray(data.my_recipes)?data.my_recipes:[];
+  cloudSyncApplying=true;
+  try{
+    if(data.app_state && typeof data.app_state==='object'){
+      if(data.app_state.profile && typeof data.app_state.profile==='object') rememberCloudProfile(data.app_state.profile);
+      if(data.app_state.theme && data.app_state.theme!==state.theme){state.theme=data.app_state.theme; setTheme();}
+    }
+    if(replace) myRecipes=cloudRecipes;
+    else if(cloudRecipes.length) myRecipes=mergeRecipeLists(myRecipes,cloudRecipes);
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
+    localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
+    localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
+    persistBackup();
+  }finally{cloudSyncApplying=false;}
+  renderMyRecipes();
+  updateStats();
+  updateHomeMeta();
+  updateCabinetInfo();
+  const afterSig=recipeListsSignature(myRecipes);
+  const changed=beforeSig!==afterSig;
+  if(data.updated_at) rememberCloudSyncedAt(data.updated_at);
+  if(changed && !silent) cloudStatus(`Синхронизировано: ${cloudRecipes.length} ${plural(cloudRecipes.length,['рецепт','рецепта','рецептов'])} из облака.`);
+  return {changed,cloudCount:cloudRecipes.length,localCount:myRecipes.length};
+}
+async function syncCloudDataAfterLogin({silent=true,reason='login'}={}){
+  if(!cloud || !cloudUser) return false;
+  try{
+    const {data,error}=await cloud.from(CLOUD_TABLE).select('app_state,my_recipes,updated_at').eq('user_id',cloudUser.id).maybeSingle();
+    if(error) throw error;
+    if(!data){
+      if(myRecipes.length) await saveCloudData({silent:true});
+      if(!silent) cloudStatus(myRecipes.length?'Локальные рецепты сохранены в облако для этого аккаунта.':'Облачных рецептов для этого аккаунта пока нет.');
+      return false;
+    }
+    const result=applyCloudPayload(data,{replace:false,silent});
+    if(result.changed){
+      if(!silent) cloudStatus(`Синхронизация выполнена: на устройстве ${result.localCount} ${plural(result.localCount,['рецепт','рецепта','рецептов'])}.`);
+      saveCloudData({silent:true}).catch(e=>console.warn('Merged cloud save failed',e));
+    }else if(!silent){
+      cloudStatus(result.cloudCount?`Синхронизация проверена: ${result.cloudCount} ${plural(result.cloudCount,['рецепт','рецепта','рецептов'])} уже на устройстве.`:'В облаке пока нет сохранённых рецептов.');
+    }
+    return true;
+  }catch(error){console.warn('Cloud sync failed',error); if(!silent) cloudStatus('Не удалось синхронизировать рецепты: '+cloudErrorMessage(error)); return false;}
+}
 async function fetchCloudProfile({silent=true}={}){
   if(!cloud || !cloudUser) return false;
   try{
@@ -8069,8 +8137,8 @@ async function checkCloudConnection(){
     if(activeUser) setCloudUser(activeUser);
     const {error:tableError}=await cloud.from(CLOUD_TABLE).select('user_id',{head:true,count:'exact'}).limit(1);
     if(tableError) throw tableError;
-    if(activeUser) await fetchCloudProfile({silent:true});
-    cloudStatus(activeUser?'Соединение есть. Авторизация и таблица user_app_state доступны. Никнейм: '+userDisplayName()+'.':'Соединение есть. Таблица user_app_state доступна. Войдите, чтобы проверить пользовательскую запись.');
+    if(activeUser) await syncCloudDataAfterLogin({silent:true,reason:'check'});
+    cloudStatus(activeUser?'Соединение есть. Авторизация, таблица user_app_state и синхронизация рецептов доступны. Никнейм: '+userDisplayName()+'. Рецептов на устройстве: '+myRecipes.length+'.':'Соединение есть. Таблица user_app_state доступна. Войдите, чтобы проверить пользовательскую запись.');
     renderCloudUi();
     return true;
   }catch(error){console.warn(error); cloudStatus('Проверка Supabase: '+cloudErrorMessage(error)); return false;}
@@ -8101,18 +8169,22 @@ async function loadCloudData({silent=false}={}){
       const ok=confirm(`Загрузить данные из облака? Текущие пользовательские рецепты на этом устройстве будут заменены. В облаке: ${count} ${plural(count,['рецепт','рецепта','рецептов'])}. Обновлено: ${when}.`);
       if(!ok){cloudStatus('Загрузка из облака отменена.'); return false;}
     }
-    myRecipes=Array.isArray(data.my_recipes)?data.my_recipes:[];
-    if(data.app_state && typeof data.app_state==='object'){
-      Object.assign(state,data.app_state);
-      if(data.app_state.profile && typeof data.app_state.profile==='object') rememberCloudProfile(data.app_state.profile);
-      if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская';
-      state.route='myview';
-      state.editingId=null;
-    }
-    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
-    localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
-    localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
-    persistBackup();
+    cloudSyncApplying=true;
+    try{
+      myRecipes=Array.isArray(data.my_recipes)?data.my_recipes:[];
+      if(data.app_state && typeof data.app_state==='object'){
+        Object.assign(state,data.app_state);
+        if(data.app_state.profile && typeof data.app_state.profile==='object') rememberCloudProfile(data.app_state.profile);
+        if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская';
+        state.route='myview';
+        state.editingId=null;
+      }
+      localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
+      localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
+      localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
+      persistBackup();
+      if(data.updated_at) rememberCloudSyncedAt(data.updated_at);
+    }finally{cloudSyncApplying=false;}
     setTheme(); updateStats(); renderCountries(); renderMyRecipes(); resetMyForm(); showView('myview');
     cloudStatus('Данные загружены из облака и сохранены на этом устройстве.');
     vibe(16);
@@ -8121,9 +8193,9 @@ async function loadCloudData({silent=false}={}){
   finally{if(!silent) setCloudBusy(false); else renderCloudUi();}
 }
 function queueCloudSave(){
-  if(!cloudUser || !cloud) return;
+  if(!cloudUser || !cloud || cloudSyncApplying) return;
   clearTimeout(cloudSaveTimer);
-  cloudSaveTimer=setTimeout(()=>saveCloudData({silent:true}),1400);
+  cloudSaveTimer=setTimeout(()=>saveCloudData({silent:true}),850);
 }
 async function cloudSignUp(){
   if(!cloud){cloudStatus('Supabase не инициализирован. Проверьте интернет и доступ к проекту.'); return;}
@@ -8149,7 +8221,7 @@ async function cloudSignUp(){
       setAuthPlaque('Аккаунт создан. Вход выполнен.', 'success');
       cloudStatus(`Аккаунт создан${cred.nickname?' для '+cred.nickname:''}. Вход выполнен, данные можно сохранить в облако.`);
       saveCloudData({silent:true}).catch(e=>console.warn('Initial cloud save failed',e));
-      fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));
+      syncCloudDataAfterLogin({silent:true,reason:'signup'}).catch(e=>console.warn('Initial sync failed',e));
     }else{
       localStorage.setItem(CLOUD_PENDING_CONFIRM_KEY,cred.email);
       setAuthPlaque('Аккаунт создан. Подтвердите email в письме — после подтверждения вас вернёт в приложение.', 'success', {showResend:true});
@@ -8172,10 +8244,10 @@ async function cloudSignIn(){
     rememberCloudProfile({email:nextUser.email||cred.email});
     renderCloudUi();
     setAuthPlaque('', 'success');
-    cloudStatus('Вход выполнен. Профиль загружается в фоне — можно продолжать работу.');
+    cloudStatus('Вход выполнен. Профиль и рецепты синхронизируются в фоне — можно продолжать работу.');
     clearAuthPasswordFields();
     vibe([12,24,12]);
-    fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));
+    syncCloudDataAfterLogin({silent:true,reason:'login'}).catch(e=>console.warn('Cloud sync failed',e));
   }
   catch(error){console.warn(error); const msg=authErrorForMode(error,'login'); const raw=(error?.message||String(error||'')).toLowerCase(); setAuthPlaque(msg,'error',{showResend:raw.includes('email not confirmed')||raw.includes('confirm')}); cloudStatus('Не удалось войти: '+cloudErrorMessage(error));}
   finally{setCloudBusy(false);}
@@ -8195,11 +8267,11 @@ async function initCloudAuth(){
     renderCloudUi();
     if(cloudUser){
       cloudStatus('Email подтверждён. Вы вошли в аккаунт: '+userDisplayName()+'.');
-      fetchCloudProfile({silent:true}).catch(e=>console.warn('Initial profile load failed',e));
+      syncCloudDataAfterLogin({silent:true,reason:'initial'}).catch(e=>console.warn('Initial sync failed',e));
     }else if(hasAuthRedirectParams()){
       cloudStatus('Подтверждение обработано, но сессия не сохранилась. Нажмите «Войти» и войдите с email и паролем.');
     }
-    cloud.auth.onAuthStateChange((_event,session)=>{setCloudUser(session?.user||null); renderCloudUi(); if(cloudUser) fetchCloudProfile({silent:true}).catch(e=>console.warn('Profile load failed',e));});
+    cloud.auth.onAuthStateChange((_event,session)=>{setCloudUser(session?.user||null); renderCloudUi(); if(cloudUser && cloudAutoSyncDoneForUser!==cloudUser.id){cloudAutoSyncDoneForUser=cloudUser.id; syncCloudDataAfterLogin({silent:true,reason:'auth-change'}).catch(e=>console.warn('Profile sync failed',e));}});
   }
   catch(error){console.warn(error); cloudStatus('Не удалось проверить вход Supabase: '+cloudErrorMessage(error)); renderCloudUi();}
 }
@@ -8208,11 +8280,11 @@ function fillMyCategory(){const sel=$('#myCategory'); sel.innerHTML=categoryOrde
 function resetMyForm(){state.editingId=null; $('#formTitle').textContent='Новый рецепт'; $('#myTitle').value=''; $('#myCategory').value='Горячие блюда'; $('#myTime').value=''; $('#myServings').value=''; $('#myCountry').value=''; $('#myDifficulty').value='легко'; $('#myWeight').value=''; $('#myKcal100').value=''; $('#myProtein100').value=''; $('#myFat100').value=''; $('#myCarbs100').value=''; $('#myIngredients').value=''; $('#mySteps').value=''; $('#myTips').value=''; updateKbjuPreview(); saveState();}
 function renderMyRecipes(){const box=$('#myRecipesList'), empty=$('#myEmpty'); if(!myRecipes.length){box.innerHTML=''; empty.hidden=false; updateHomeMeta(); return;} empty.hidden=true; box.innerHTML=myRecipes.map(r=>`<div class="my-item"><div class="my-item-top"><div><h4>${r.title}</h4><div class="mini-meta"><span>${r.category}</span><span>${r.time||'—'}</span><span>${r.servings||1} порц.</span><span>${r.country||'Мои'}</span>${r.nutrition100?`<span>КБЖУ / 100 г</span>`:''}${r.weight?`<span>${r.weight} г</span>`:''}</div></div><div class="row-actions"><button class="btn" data-open-custom="${r.id}">Открыть</button><button class="btn" data-edit-custom="${r.id}">Изменить</button><button class="btn ghost" data-del-custom="${r.id}">Удалить</button></div></div></div>`).join(''); $$('[data-open-custom]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.openCustom,'custom')); $$('[data-edit-custom]').forEach(b=>b.onclick=()=>editMyRecipe(b.dataset.editCustom)); $$('[data-del-custom]').forEach(b=>b.onclick=()=>deleteMyRecipe(b.dataset.delCustom)); updateHomeMeta();}
 function editMyRecipe(id){const r=myRecipes.find(x=>x.id===id); if(!r) return; state.editingId=id; saveState(); $('#formTitle').textContent='Редактировать'; $('#myTitle').value=r.title||''; $('#myCategory').value=r.category||'Горячие блюда'; $('#myTime').value=r.time||''; $('#myServings').value=r.servings||''; $('#myCountry').value=r.country||''; $('#myDifficulty').value=r.difficulty||'легко'; $('#myWeight').value=r.weight||''; $('#myKcal100').value=r.nutrition100?.kcal??''; $('#myProtein100').value=r.nutrition100?.protein??''; $('#myFat100').value=r.nutrition100?.fat??''; $('#myCarbs100').value=r.nutrition100?.carbs??''; $('#myIngredients').value=(r.ingredients||[]).join('\n'); $('#mySteps').value=(r.steps||[]).join('\n'); $('#myTips').value=r.tips||''; updateKbjuPreview(); window.scrollTo({top:0,behavior:'smooth'}); vibe(10);}
-function deleteMyRecipe(id){myRecipes=myRecipes.filter(x=>x.id!==id); saveMyRecipes(); renderMyRecipes(); if(state.editingId===id) resetMyForm(); vibe(10);}
+function deleteMyRecipe(id){myRecipes=myRecipes.filter(x=>x.id!==id); saveMyRecipes(); if(cloudUser) saveCloudData({silent:true}).catch(e=>console.warn('Immediate delete sync failed',e)); renderMyRecipes(); if(state.editingId===id) resetMyForm(); vibe(10);}
 
 function getCustomNutrition(){const weight=Number($('#myWeight').value)||0, servings=Number($('#myServings').value)||1; const n100={kcal:Number($('#myKcal100').value)||0,protein:Number($('#myProtein100').value)||0,fat:Number($('#myFat100').value)||0,carbs:Number($('#myCarbs100').value)||0}; const has=weight>0 && Object.values(n100).some(v=>v>0); if(!has) return {weight:0,nutrition100:null,nutrition:null,total:null}; const total={kcal:n100.kcal*weight/100,protein:n100.protein*weight/100,fat:n100.fat*weight/100,carbs:n100.carbs*weight/100}; return {weight,nutrition100:n100,total,nutrition:{kcal:total.kcal/servings,protein:total.protein/servings,fat:total.fat/servings,carbs:total.carbs/servings}};}
 function updateKbjuPreview(){const el=$('#myKbjuPreview'); if(!el) return; const data=getCustomNutrition(); if(!data.nutrition){el.textContent='КБЖУ рассчитается после ввода веса и значений на 100 г.'; return;} el.textContent=`На всё блюдо: ${fmt(data.total.kcal)} ккал • Б ${fmt(data.total.protein)} г • Ж ${fmt(data.total.fat)} г • У ${fmt(data.total.carbs)} г. На порцию: ${fmt(data.nutrition.kcal)} ккал • Б ${fmt(data.nutrition.protein)} г • Ж ${fmt(data.nutrition.fat)} г • У ${fmt(data.nutrition.carbs)} г`;}
-function saveCustomRecipe(){const title=$('#myTitle').value.trim(); const ingredients=$('#myIngredients').value.split('\n').map(x=>x.trim()).filter(Boolean); const steps=$('#mySteps').value.split('\n').map(x=>x.trim()).filter(Boolean); if(!title||!ingredients.length||!steps.length){alert('Заполните название, ингредиенты и шаги.'); return;} const calc=getCustomNutrition(); const fallback=nutritionOf({category:$('#myCategory').value,title}); const rec={id:state.editingId||('my-'+Date.now()), title, category:$('#myCategory').value, time:$('#myTime').value.trim()||'—', servings:Number($('#myServings').value)||1, difficulty:$('#myDifficulty').value, country:$('#myCountry').value.trim()||'Мои рецепты', ingredients, steps, tips:$('#myTips').value.trim(), healthy:false, source:'custom', weight:calc.weight||0, nutrition100:calc.nutrition100, nutritionTotal:calc.total, dishEmoji:dishEmoji({title,category:$('#myCategory').value}), nutrition:calc.nutrition||fallback}; const idx=myRecipes.findIndex(x=>x.id===rec.id); if(idx>-1) myRecipes[idx]=rec; else myRecipes.unshift(rec); saveMyRecipes(); renderMyRecipes(); resetMyForm(); vibe(14); alert('Рецепт сохранён.');}
+function saveCustomRecipe(){const title=$('#myTitle').value.trim(); const ingredients=$('#myIngredients').value.split('\n').map(x=>x.trim()).filter(Boolean); const steps=$('#mySteps').value.split('\n').map(x=>x.trim()).filter(Boolean); if(!title||!ingredients.length||!steps.length){alert('Заполните название, ингредиенты и шаги.'); return;} const calc=getCustomNutrition(); const fallback=nutritionOf({category:$('#myCategory').value,title}); const nowIso=new Date().toISOString(); const rec={id:state.editingId||('my-'+Date.now()), createdAt:state.editingId?(myRecipes.find(x=>x.id===state.editingId)?.createdAt||nowIso):nowIso, updatedAt:nowIso, title, category:$('#myCategory').value, time:$('#myTime').value.trim()||'—', servings:Number($('#myServings').value)||1, difficulty:$('#myDifficulty').value, country:$('#myCountry').value.trim()||'Мои рецепты', ingredients, steps, tips:$('#myTips').value.trim(), healthy:false, source:'custom', weight:calc.weight||0, nutrition100:calc.nutrition100, nutritionTotal:calc.total, dishEmoji:dishEmoji({title,category:$('#myCategory').value}), nutrition:calc.nutrition||fallback}; const idx=myRecipes.findIndex(x=>x.id===rec.id); if(idx>-1) myRecipes[idx]=rec; else myRecipes.unshift(rec); saveMyRecipes(); if(cloudUser) saveCloudData({silent:true}).catch(e=>console.warn('Immediate recipe sync failed',e)); renderMyRecipes(); resetMyForm(); vibe(14); alert('Рецепт сохранён.');}
 
 function qtyNumber(v){
   if(String(v).includes('/')){const [a,b]=String(v).split('/').map(x=>Number(x.trim()));return b? a/b : Number(v)}
