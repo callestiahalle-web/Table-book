@@ -1505,6 +1505,59 @@ body.dark .home-calendar-card .home-month-btn{
 }
 
 
+
+
+/* compact and lightweight meal calendar */
+.home-planner-row{
+  max-width:900px !important;
+  grid-template-columns:minmax(250px,.88fr) minmax(320px,.92fr) !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.home-calendar-card{
+  width:min(100%,430px) !important;
+  min-height:318px !important;
+  height:auto !important;
+  justify-self:center !important;
+  align-self:center !important;
+  padding:18px 44px 20px !important;
+  grid-template-rows:34px auto auto auto !important;
+  gap:7px !important;
+  contain:layout paint style;
+}
+.home-my-card{min-height:318px !important;height:auto !important;align-self:center !important}
+.home-calendar-card .home-calendar-top{min-height:32px !important;justify-content:center !important}
+.home-calendar-card h3{font-size:clamp(22px,2.1vw,28px) !important;margin:0 !important;line-height:1.08 !important}
+.home-meal-weekdays,.home-meal-grid{gap:4px !important;width:100%;max-width:320px;margin-left:auto;margin-right:auto}
+.home-meal-weekdays{font-size:9.5px !important;letter-spacing:.03em !important}
+.home-meal-grid{grid-template-rows:repeat(6,34px) !important;min-height:224px !important;align-self:center !important}
+.home-meal-grid .meal-day{min-height:0 !important;height:34px !important;border-radius:11px !important;padding:3px !important;gap:1px !important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.44),0 5px 11px rgba(143,118,91,.10) !important}
+.home-meal-grid .meal-day-number{font-size:11px !important;line-height:1.05 !important}
+.home-meal-grid .meal-day-dots{gap:1px !important;min-height:6px}
+.home-meal-grid .meal-chip{width:5px !important;height:5px !important;padding:0 !important;box-shadow:none !important}
+.home-meal-grid .meal-more{font-size:8.5px !important;line-height:1 !important}
+.home-calendar-card .home-calendar-nav{left:9px !important;right:9px !important}
+.home-calendar-card .home-month-btn{width:30px !important;height:52px !important;border-radius:16px !important;font-size:22px !important}
+.meal-calendar-grid,.home-meal-grid{content-visibility:auto;contain-intrinsic-size:320px 224px}
+.meal-calendar-switching .meal-day{transition:none !important;animation:none !important}
+@media(max-width:900px){
+  .home-planner-row{max-width:520px !important;grid-template-columns:1fr !important}
+  .home-my-card{min-height:152px !important}
+  .home-calendar-card{width:min(100%,410px) !important;min-height:304px !important;padding:16px 38px 18px !important}
+  .home-meal-grid{grid-template-rows:repeat(6,32px) !important;min-height:212px !important;max-width:300px}
+  .home-meal-grid .meal-day{height:32px !important}
+}
+@media(max-width:560px){
+  .home-calendar-card{width:100% !important;min-height:286px !important;padding:14px 34px 16px !important;border-radius:24px !important}
+  .home-meal-weekdays,.home-meal-grid{max-width:280px;gap:3px !important}
+  .home-meal-grid{grid-template-rows:repeat(6,29px) !important;min-height:191px !important}
+  .home-meal-grid .meal-day{height:29px !important;border-radius:10px !important;padding:2px !important}
+  .home-meal-grid .meal-day-number{font-size:10px !important}
+  .home-calendar-card .home-month-btn{width:27px !important;height:46px !important;border-radius:14px !important;font-size:20px !important}
+  .home-calendar-card .home-calendar-nav{left:5px !important;right:5px !important}
+}
+
+
 /* account cabinet: automatic sync only */
 .account-actions-auto{justify-content:center !important}
 .account-actions-auto .account-wide{width:100%;max-width:220px;margin:0 auto}
@@ -1542,6 +1595,106 @@ h3,.panel h3{font-size:clamp(20px,1.55vw,24px);line-height:1.15}
 #myRecipesList:empty{display:none}
 #myEmpty{max-width:680px;margin:0 auto}
 
+
+
+/* compact full meal calendar view */
+#mealview .custom-head{margin-bottom:20px;padding:22px 24px;border-radius:28px}
+#mealview .custom-head h1{font-size:clamp(30px,4vw,46px);line-height:1.02;margin-bottom:8px}
+#mealview .custom-head p{font-size:14px;line-height:1.45;margin:0}
+#mealview .meal-layout{grid-template-columns:minmax(280px,500px) minmax(280px,420px);justify-content:center;align-items:start;gap:22px !important;margin-top:8px}
+#mealview .meal-layout>.panel{width:100%;max-width:500px;padding:18px !important;border-radius:28px;justify-self:center;align-content:start}
+#mealview .meal-day-panel{max-width:420px;gap:10px !important;padding:18px !important;align-self:start}
+#mealview .meal-toolbar{width:100%;max-width:452px;margin:0 auto 10px;display:grid;grid-template-columns:38px minmax(0,1fr) 38px;align-items:center;gap:10px}
+#mealview .meal-toolbar h3{font-size:clamp(21px,2.5vw,25px);line-height:1.05;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mealview .meal-month-btn{width:38px;height:38px;border-radius:15px;font-size:20px;font-weight:500;border:1px solid var(--liquid-border) !important;background:var(--liquid-bg),var(--paper) !important;box-shadow:var(--liquid-glow),var(--softShadow) !important;color:var(--ink)}
+#mealview .meal-weekdays,#mealview .meal-calendar-grid{width:100%;max-width:452px;margin-left:auto;margin-right:auto;gap:5px}
+#mealview .meal-weekdays{margin-bottom:5px;font-size:10px;letter-spacing:.035em;font-weight:700}
+#mealview .meal-calendar-grid{min-height:0;contain:layout paint;content-visibility:auto}
+#mealview .meal-day{min-height:46px;border-radius:14px;padding:5px 4px;gap:2px;align-items:center;justify-content:center;text-align:center;box-shadow:var(--liquid-glow),var(--softShadow) !important;contain:layout paint;will-change:auto}
+#mealview .meal-day-number{font-size:12px;line-height:1;font-weight:750}
+#mealview .meal-day-dots{width:100%;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;min-height:8px}
+#mealview .meal-chip{font-size:0;line-height:0;padding:0;width:6px;height:6px;min-width:6px;border-radius:999px;margin:0;background:rgba(201,164,95,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+body.dark #mealview .meal-chip{background:rgba(226,232,240,.42)}
+#mealview .meal-more{font-size:8.5px;line-height:1;color:var(--muted);padding:0;font-weight:750}
+#mealview #mealDayTitle{font-size:clamp(21px,2.4vw,25px);line-height:1.08;text-align:center;margin:0}
+#mealview .meal-day-sub{font-size:12px;line-height:1.35;margin:0 auto 2px;max-width:330px}
+#mealview #mealDayEditor{display:grid;gap:9px;width:100%}
+#mealview .meal-slot{border-radius:18px;padding:10px;gap:8px;box-shadow:var(--pressed) !important}
+#mealview .meal-slot-head{gap:6px;align-items:center}
+#mealview .meal-slot-head h4{font-size:13.5px;line-height:1.15}
+#mealview .meal-slot-head span{font-size:10.5px;line-height:1.15}
+#mealview .meal-dishes{gap:6px}
+#mealview .meal-dish-row{grid-template-columns:minmax(0,1fr) 32px;gap:6px}
+#mealview .meal-dish-open{min-height:34px;border-radius:14px;padding:8px 10px;font-size:12px;line-height:1.2}
+#mealview .meal-remove{height:34px;border-radius:13px;font-size:15px}
+#mealview .meal-empty{padding:8px 10px;border-radius:14px;font-size:11.5px;line-height:1.3;text-align:center}
+#mealview .meal-add-row{gap:6px;justify-content:center;flex-wrap:wrap}
+#mealview .meal-add-row .btn,#mealview .meal-day-actions .btn{min-height:36px;border-radius:14px;padding:8px 12px;font-size:12px;line-height:1.15}
+#mealview .meal-day-actions{gap:8px;margin-top:4px;display:flex;flex-wrap:wrap;justify-content:center;width:100%}
+#mealview .meal-status{font-size:11.5px;line-height:1.35;text-align:center;min-height:0}
+#mealview .meal-picker{gap:7px}
+#mealview .meal-search{min-height:36px;border-radius:14px;padding:8px 10px;font-size:12px}
+#mealview .meal-pick-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:210px;padding:2px;overscroll-behavior:contain}
+#mealview .meal-pick-card{min-height:58px;border-radius:15px;padding:8px;gap:3px}
+#mealview .meal-pick-card b{font-size:11.5px;line-height:1.15;-webkit-line-clamp:2}
+#mealview .meal-pick-card span{font-size:9.5px}
+#mealview .meal-picker-note{font-size:10.5px;line-height:1.25;margin:0}
+@media(max-width:980px){
+  #mealview .meal-layout{grid-template-columns:minmax(280px,560px);gap:16px !important}
+  #mealview .meal-layout>.panel,#mealview .meal-day-panel{max-width:560px}
+  #mealview .meal-weekdays,#mealview .meal-calendar-grid,#mealview .meal-toolbar{max-width:500px}
+}
+@media(max-width:560px){
+  #mealview .custom-head{padding:18px 16px;border-radius:24px;margin-bottom:16px}
+  #mealview .meal-layout{gap:14px !important;margin-top:0}
+  #mealview .meal-layout>.panel,#mealview .meal-day-panel{padding:14px !important;border-radius:24px}
+  #mealview .meal-toolbar{grid-template-columns:34px minmax(0,1fr) 34px;gap:8px;margin-bottom:8px}
+  #mealview .meal-month-btn{width:34px;height:34px;border-radius:13px;font-size:18px}
+  #mealview .meal-weekdays,#mealview .meal-calendar-grid{gap:4px;max-width:100%}
+  #mealview .meal-day{min-height:40px;border-radius:12px;padding:4px 3px}
+  #mealview .meal-day-number{font-size:11px}
+  #mealview .meal-chip{width:5px;height:5px;min-width:5px}
+  #mealview .meal-slot{padding:9px;border-radius:16px}
+}
+
+
+/* swipe-only meal calendars: centered, no arrow controls */
+.home-calendar-nav,.meal-month-btn#mealPrevMonth,.meal-month-btn#mealNextMonth{display:none !important}
+.home-calendar-card,.meal-calendar-panel{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.home-calendar-card:active,.meal-calendar-panel:active{cursor:grabbing}
+.home-calendar-card{padding-left:18px !important;padding-right:18px !important;justify-items:center !important;text-align:center !important}
+.home-calendar-card .home-calendar-top{justify-content:center !important;text-align:center !important}
+.home-calendar-card .home-calendar-top>div:first-child{justify-items:center !important;text-align:center !important}
+.meal-layout{justify-content:center !important;align-items:start !important}
+.meal-calendar-panel{width:min(100%,560px) !important;max-width:560px !important;justify-self:center !important;margin-inline:auto !important;padding:20px 22px 22px !important;min-height:auto !important;display:grid !important;justify-items:center !important;text-align:center !important}
+.meal-calendar-panel .meal-toolbar{display:grid !important;grid-template-columns:1fr !important;justify-items:center !important;margin:0 0 12px !important;min-height:auto !important;width:100% !important}
+.meal-calendar-panel .meal-toolbar h3{font-size:clamp(23px,2.4vw,31px) !important;line-height:1.08 !important;text-align:center !important;margin:0 !important;letter-spacing:.035em !important}
+.meal-calendar-panel .meal-weekdays,.meal-calendar-panel .meal-calendar-grid{width:100% !important;max-width:500px !important;margin-left:auto !important;margin-right:auto !important;gap:6px !important}
+.meal-calendar-panel .meal-weekdays{margin-bottom:6px !important;text-align:center !important;font-size:10.5px !important}
+.meal-calendar-panel .meal-calendar-grid{grid-template-rows:repeat(6,54px) !important;min-height:354px !important;align-self:center !important}
+.meal-calendar-panel .meal-day{height:54px !important;min-height:0 !important;border-radius:15px !important;padding:5px !important;gap:2px !important;text-align:center !important;align-items:center !important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.42),0 7px 14px rgba(143,118,91,.10) !important}
+.meal-calendar-panel .meal-day-number{font-size:12px !important;line-height:1.05 !important}
+.meal-calendar-panel .meal-day-dots{width:100% !important;gap:2px !important;justify-items:center !important}
+.meal-calendar-panel .meal-chip{max-width:100% !important;font-size:8.5px !important;padding:2px 5px !important;line-height:1.05 !important;text-align:center !important}
+.meal-calendar-panel .meal-more{font-size:8.5px !important;line-height:1 !important;text-align:center !important}
+.meal-layout:has(.meal-day-panel[hidden]){grid-template-columns:minmax(0,560px) !important;justify-content:center !important}
+@media(max-width:900px){
+  .meal-calendar-panel{width:min(100%,440px) !important;max-width:440px !important;padding:18px 18px 20px !important}
+  .meal-calendar-panel .meal-calendar-grid{grid-template-rows:repeat(6,45px) !important;min-height:300px !important;max-width:410px !important}
+  .meal-calendar-panel .meal-weekdays{max-width:410px !important}
+  .meal-calendar-panel .meal-day{height:45px !important;border-radius:13px !important}
+  .home-calendar-card{padding-left:16px !important;padding-right:16px !important}
+}
+@media(max-width:560px){
+  .meal-calendar-panel{width:100% !important;padding:16px 12px 18px !important;border-radius:24px !important}
+  .meal-calendar-panel .meal-calendar-grid{grid-template-rows:repeat(6,38px) !important;min-height:252px !important;gap:4px !important;max-width:330px !important}
+  .meal-calendar-panel .meal-weekdays{max-width:330px !important;gap:4px !important;font-size:9.5px !important}
+  .meal-calendar-panel .meal-day{height:38px !important;border-radius:11px !important;padding:3px !important}
+  .meal-calendar-panel .meal-day-number{font-size:11px !important}
+  .meal-calendar-panel .meal-chip{font-size:0 !important;width:5px !important;height:5px !important;padding:0 !important;box-shadow:none !important}
+  .home-calendar-card{padding-left:14px !important;padding-right:14px !important}
+}
+
 </style>
 </head>
 <body>
@@ -1550,14 +1703,14 @@ h3,.panel h3{font-size:clamp(20px,1.55vw,24px);line-height:1.15}
 <main class="page">
 <section id="home" class="view active"><section class="hero"><div><div class="kicker">Table book</div><h1>Книга рецептов</h1><p class="lead">Выберите кухню или откройте свои рецепты.</p><div class="stats"><div class="stat"><b id="statRecipes">0</b><span>рецептов</span></div><div class="stat"><b id="statCountries">0</b><span>кухонь</span></div><div class="stat"><b id="statTypes">0</b><span>категорий</span></div><div class="stat"><b id="statHealthy">0</b><span>полезных</span></div></div></div></section>
 <div class="section-title"><div><h2>Кухни</h2><p>Страны и ваши записи.</p></div></div>
-<div class="home-planner-row"><button class="tab-card home-my-card" id="myRecipesCard"><div class="tab-icon" id="myRecipesIcon"></div><div><b>Мои рецепты</b><span id="myRecipesCount">0 записей</span></div></button><section class="panel home-calendar-card" id="homeMealCalendarCard"><div class="home-calendar-top"><div><b>Календарь питания</b><span id="mealCalendarCount">0 дней</span></div><div class="home-calendar-nav"><button class="meal-month-btn home-month-btn" id="homeMealPrevMonth" type="button" aria-label="Предыдущий месяц">‹</button><button class="meal-month-btn home-month-btn" id="homeMealNextMonth" type="button" aria-label="Следующий месяц">›</button></div></div><h3 id="homeMealMonthTitle">Месяц</h3><div class="meal-weekdays home-meal-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><div class="meal-calendar-grid home-meal-grid" id="homeMealCalendarGrid"></div></section></div>
+<div class="home-planner-row"><button class="tab-card home-my-card" id="myRecipesCard"><div class="tab-icon" id="myRecipesIcon"></div><div><b>Мои рецепты</b><span id="myRecipesCount">0 записей</span></div></button><section class="panel home-calendar-card" id="homeMealCalendarCard"><div class="home-calendar-top"><div><b>Календарь питания</b><span id="mealCalendarCount">0 дней</span></div></div><h3 id="homeMealMonthTitle">Месяц</h3><div class="meal-weekdays home-meal-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><div class="meal-calendar-grid home-meal-grid" id="homeMealCalendarGrid"></div></section></div>
 <div class="country-grid" id="countryGrid" style="margin-top:14px"></div></section>
 <section id="country" class="view"><section class="country-head" id="countryHead"><div><button class="back-btn" id="backBtn">← Назад</button><h1 id="countryTitle"></h1><p id="countryNote"></p></div><div class="country-meta" id="countryMeta"></div></section><div class="section-title"><div><h2>Меню</h2><p>Выберите тип блюда.</p></div></div><div class="category-choice" id="categoryChoice"></div><div class="cat-control" id="catControl" hidden><button class="clear-filter" id="clearCat">Показать всё</button></div><div id="countryRecipes"></div></section>
 <section id="myview" class="view"><section class="custom-head"><div><button class="back-btn" id="myBackBtn">← Назад</button><h1>Мои рецепты</h1><p>Личная книга блюд: выберите категорию или нажмите «Создание».</p></div><div class="country-meta"><span class="pill" id="myMetaCount">0 рецептов</span><button class="btn primary my-create-btn" id="createMyRecipe" type="button">+ Создание</button></div></section>
 <section class="my-library" id="myLibrary"><div class="section-title my-section-title"><div><h2>Категории</h2><p>Блюдо после сохранения появится в выбранной категории.</p></div></div><div class="category-choice my-category-choice" id="myCategoryChoice"></div><div id="myRecipesList" class="my-list my-list-grid"></div><div id="myEmpty" class="empty-box" hidden>Выберите категорию или нажмите «Создать», чтобы добавить первый рецепт.</div></section>
 <div class="form-layout my-editor-wrap" id="myRecipeEditor" hidden><section class="panel my-editor-panel"><div class="my-editor-head"><div><h3 id="formTitle">Создание рецепта</h3><p>Заполните карточку, продукты и шаги приготовления.</p></div><button class="btn ghost my-editor-close" id="closeMyEditor" type="button">К категориям</button></div><div class="field-grid"><input class="input" id="myTitle" placeholder="Название"><select class="select" id="myCategory"></select><input class="input" id="myTime" placeholder="Время, например 20 мин"><input class="input" id="myServings" type="number" min="1" step="1" placeholder="Порции"><input class="input" id="myCountry" placeholder="Страна / стиль"><select class="select" id="myDifficulty"><option value="легко">легко</option><option value="средне">средне</option><option value="сложно">сложно</option></select></div><section class="product-calc"><div class="product-calc-head"><div><h4>КБЖУ по продуктам</h4><p>Укажите вес каждого продукта и КБЖУ на 100 г — приложение посчитает всё блюдо и порцию.</p></div><button class="btn ghost compact-btn" id="addProductRow" type="button">+ продукт</button></div><div class="product-head"><span>Продукт</span><span>Вес, г</span><span>Ккал</span><span>Б</span><span>Ж</span><span>У</span><span></span></div><div class="product-rows" id="productRows"></div></section><details class="manual-kbju"><summary>Или ввести итоговые КБЖУ вручную</summary><div class="kbju-grid kbju-grid-readable"><label class="field-label"><span>Вес блюда</span><input class="input" id="myWeight" type="number" min="0" step="1" placeholder="например 850 г"></label><label class="field-label"><span>Ккал / 100 г</span><input class="input" id="myKcal100" type="number" min="0" step="1" placeholder="например 145"></label><label class="field-label"><span>Белки / 100 г</span><input class="input" id="myProtein100" type="number" min="0" step="0.1" placeholder="например 8.5"></label><label class="field-label"><span>Жиры / 100 г</span><input class="input" id="myFat100" type="number" min="0" step="0.1" placeholder="например 4.2"></label><label class="field-label"><span>Углеводы / 100 г</span><input class="input" id="myCarbs100" type="number" min="0" step="0.1" placeholder="например 18"></label></div></details><div class="kbju-preview" id="myKbjuPreview">КБЖУ рассчитается после ввода продуктов или итоговых значений.</div><div class="wide-field"><label class="block-label" for="myIngredients">Ингредиенты и дополнения</label><textarea class="textarea recipe-textarea" id="myIngredients" placeholder="Можно добавить специи, воду, соус или продукты без КБЖУ. Каждый пункт с новой строки."></textarea></div><div class="wide-field"><label class="block-label" for="mySteps">Шаги приготовления</label><textarea class="textarea recipe-textarea tall" id="mySteps" placeholder="Каждый шаг с новой строки: нарежьте, прогрейте, добавьте, тушите/запеките, проверьте готовность."></textarea></div><div class="wide-field"><label class="block-label" for="myTips">Заметки</label><textarea class="textarea recipe-textarea" id="myTips" placeholder="Температура, замены продуктов, признаки готовности, как подавать."></textarea></div><div class="actions my-editor-actions"><button class="btn primary" id="saveMyRecipe">Сохранить</button><button class="btn ghost" id="resetMyRecipe">Очистить</button></div></section></div></section>
 <section id="mealview" class="view"><section class="custom-head"><div><button class="back-btn" id="mealBackBtn">← Назад</button><h1>Календарь питания</h1><p>Планируйте блюда на выбранный день: завтрак, обед и ужин.</p></div><div class="country-meta"><span class="pill" id="mealMetaCount">0 дней</span></div></section>
-<div class="meal-layout"><section class="panel"><div class="meal-toolbar"><button class="meal-month-btn" id="mealPrevMonth" type="button" aria-label="Предыдущий месяц">‹</button><h3 id="mealMonthTitle">Месяц</h3><button class="meal-month-btn" id="mealNextMonth" type="button" aria-label="Следующий месяц">›</button></div><div class="meal-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><div class="meal-calendar-grid" id="mealCalendarGrid"></div></section><section class="panel meal-day-panel" id="mealDayPanel" hidden><h3 id="mealDayTitle">Выберите дату</h3><p class="meal-day-sub" id="mealDaySub">Нажмите на день в календаре, чтобы добавить блюда.</p><div id="mealDayEditor"></div><div class="meal-day-actions"><button class="btn primary" id="saveMealDay" type="button">Сохранить день</button><button class="btn ghost" id="editMealDay" type="button">Редактировать</button><button class="btn ghost" id="clearMealDay" type="button">Очистить день</button></div><div class="meal-status" id="mealDayStatus"></div></section></div></section>
+<div class="meal-layout"><section class="panel meal-calendar-panel" id="mealCalendarPanel"><div class="meal-toolbar"><h3 id="mealMonthTitle">Месяц</h3></div><div class="meal-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><div class="meal-calendar-grid" id="mealCalendarGrid"></div></section><section class="panel meal-day-panel" id="mealDayPanel" hidden><h3 id="mealDayTitle">Выберите дату</h3><p class="meal-day-sub" id="mealDaySub">Нажмите на день в календаре, чтобы добавить блюда.</p><div id="mealDayEditor"></div><div class="meal-day-actions"><button class="btn primary" id="saveMealDay" type="button">Сохранить день</button><button class="btn ghost" id="editMealDay" type="button">Редактировать</button><button class="btn ghost" id="clearMealDay" type="button">Очистить день</button></div><div class="meal-status" id="mealDayStatus"></div></section></div></section>
 </main></div>
 <div class="swipe-cue" id="swipeCue"><span>↩</span><b>Главная</b></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true"><article class="dialog" id="dialog"><header class="dialog-head" id="dialogHead"><div class="dialog-title"><div><div class="tags" id="modalTags"></div><h2 id="modalTitle"></h2></div><button class="close" id="closeModal">×</button></div></header><div class="dialog-body" id="modalBody"></div></article></div>
@@ -13853,12 +14006,30 @@ function mealDateSummary(dateKey,limit=3){
   const shown=chips.slice(0,limit).map(x=>`<span class="meal-chip">${esc(x)}</span>`).join('');
   return shown+(chips.length>limit?`<span class="meal-more">+${chips.length-limit}</span>`:'');
 }
-function buildMealCalendarHtml(month,{compact=false}={}){
+function mealCalendarMonthFirstDate(month){
   const start=new Date(month.getFullYear(),month.getMonth(),1);
   const offset=(start.getDay()+6)%7;
   const first=new Date(start); first.setDate(start.getDate()-offset);
+  return first;
+}
+function mealCalendarRenderSignature(month,{compact=false}={}){
+  const first=mealCalendarMonthFirstDate(month);
+  const plan=ensureMealPlan();
+  const parts=[monthKeyFromDate(month),compact?'compact':'full',state.selectedMealDate||''];
+  for(let i=0;i<42;i++){
+    const d=new Date(first); d.setDate(first.getDate()+i);
+    const key=localDateKey(d);
+    const day=normalizeMealDay(plan[key]);
+    const ids=[];
+    MEAL_SLOTS.forEach(([slot])=>day[slot].forEach(item=>ids.push(`${slot}:${item.source||'base'}:${item.id||item.title||''}`)));
+    if(ids.length) parts.push(key+'='+ids.join(','));
+  }
+  return parts.join('|');
+}
+function buildMealCalendarHtml(month,{compact=false}={}){
+  const first=mealCalendarMonthFirstDate(month);
   const todayKey=localDateKey(new Date());
-  let html='';
+  const out=[];
   for(let i=0;i<42;i++){
     const d=new Date(first); d.setDate(first.getDate()+i);
     const key=localDateKey(d);
@@ -13866,9 +14037,44 @@ function buildMealCalendarHtml(month,{compact=false}={}){
     if(d.getMonth()!==month.getMonth()) cls.push('other-month');
     if(key===todayKey) cls.push('today');
     if(key===state.selectedMealDate) cls.push('selected');
-    html+=`<button class="${cls.join(' ')}" data-meal-date="${key}" type="button"><span class="meal-day-number">${d.getDate()}</span><span class="meal-day-dots">${mealDateSummary(key,compact?1:3)}</span></button>`;
+    out.push(`<button class="${cls.join(' ')}" data-meal-date="${key}" type="button"><span class="meal-day-number">${d.getDate()}</span><span class="meal-day-dots">${mealDateSummary(key,compact?1:3)}</span></button>`);
   }
-  return html;
+  return out.join('');
+}
+function bindMealCalendarGrid(grid,mode){
+  if(!grid || grid.dataset.boundMode===mode) return;
+  grid.dataset.boundMode=mode;
+  grid.onclick=e=>{
+    const btn=e.target.closest('[data-meal-date]');
+    if(!btn || !grid.contains(btn)) return;
+    if(mode==='home') openMealCalendar(btn.dataset.mealDate);
+    else openMealDay(btn.dataset.mealDate);
+  };
+}
+function bindMealCalendarSwipe(target){
+  if(!target || target.dataset.swipeBound==='1') return;
+  target.dataset.swipeBound='1';
+  let sx=0, sy=0, active=false;
+  target.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse' && e.button!==0) return;
+    sx=e.clientX; sy=e.clientY; active=true;
+  },{passive:true});
+  target.addEventListener('pointerup',e=>{
+    if(!active) return;
+    const dx=e.clientX-sx;
+    const dy=Math.abs(e.clientY-sy);
+    active=false;
+    if(Math.abs(dx)<58 || dy>48) return;
+    setMealMonthOffset(dx<0?1:-1);
+    vibe(10);
+  },{passive:true});
+  target.addEventListener('pointercancel',()=>{active=false;},{passive:true});
+  target.addEventListener('lostpointercapture',()=>{active=false;},{passive:true});
+}
+function clearInactiveMealGrid(grid){
+  if(!grid) return;
+  if(grid.childElementCount){grid.replaceChildren();}
+  delete grid.dataset.renderSig;
 }
 function renderMealCalendar(){
   ensureMealPlan();
@@ -13877,16 +14083,30 @@ function renderMealCalendar(){
   const homeActive=$('#home')?.classList.contains('active');
   const mealActive=$('#mealview')?.classList.contains('active');
   const fullTitle=$('#mealMonthTitle'), fullGrid=$('#mealCalendarGrid');
-  if(fullTitle) fullTitle.textContent=monthTitle;
-  if(fullGrid && (mealActive || !homeActive)){
-    fullGrid.innerHTML=buildMealCalendarHtml(month,{compact:false});
-    fullGrid.querySelectorAll('[data-meal-date]').forEach(btn=>btn.onclick=()=>openMealDay(btn.dataset.mealDate));
-  }
   const homeTitle=$('#homeMealMonthTitle'), homeGrid=$('#homeMealCalendarGrid');
+  if(fullTitle) fullTitle.textContent=monthTitle;
   if(homeTitle) homeTitle.textContent=monthTitle;
-  if(homeGrid && (homeActive || !mealActive)){
-    homeGrid.innerHTML=buildMealCalendarHtml(month,{compact:true});
-    homeGrid.querySelectorAll('[data-meal-date]').forEach(btn=>btn.onclick=()=>openMealCalendar(btn.dataset.mealDate));
+  if(mealActive && fullGrid){
+    const sig=mealCalendarRenderSignature(month,{compact:false});
+    if(fullGrid.dataset.renderSig!==sig){
+      fullGrid.innerHTML=buildMealCalendarHtml(month,{compact:false});
+      fullGrid.dataset.renderSig=sig;
+    }
+    bindMealCalendarGrid(fullGrid,'full');
+    bindMealCalendarSwipe($('#mealCalendarPanel')||fullGrid);
+    clearInactiveMealGrid(homeGrid);
+  }else if(homeActive && homeGrid){
+    const sig=mealCalendarRenderSignature(month,{compact:true});
+    if(homeGrid.dataset.renderSig!==sig){
+      homeGrid.innerHTML=buildMealCalendarHtml(month,{compact:true});
+      homeGrid.dataset.renderSig=sig;
+    }
+    bindMealCalendarGrid(homeGrid,'home');
+    bindMealCalendarSwipe($('#homeMealCalendarCard')||homeGrid);
+    clearInactiveMealGrid(fullGrid);
+  }else{
+    clearInactiveMealGrid(fullGrid);
+    clearInactiveMealGrid(homeGrid);
   }
   updateHomeMeta();
 }
@@ -15049,10 +15269,6 @@ bindClick('createMyRecipe',()=>openMyEditor(state.myCat));
 bindClick('closeMyEditor',showMyLibrary);
 
 bindClick('addProductRow',()=>addProductRow());
-bindClick('mealPrevMonth',()=>setMealMonthOffset(-1));
-bindClick('mealNextMonth',()=>setMealMonthOffset(1));
-bindClick('homeMealPrevMonth',()=>setMealMonthOffset(-1));
-bindClick('homeMealNextMonth',()=>setMealMonthOffset(1));
 bindClick('saveMealDay',saveMealDay);
 bindClick('editMealDay',editMealDay);
 bindClick('clearMealDay',clearMealDay);
