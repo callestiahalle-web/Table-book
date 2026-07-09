@@ -7819,6 +7819,36 @@ function persistBackup(){try{localStorage.setItem(STORAGE_BACKUP_KEY,JSON.string
 function updateBackupStatus(text){const el=$("#backupStatus"); if(el) el.textContent=text;}
 function saveState(){try{localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));persistBackup();if(!cloudSyncApplying) queueCloudSave()}catch(e){console.warn("State save failed",e)}}
 function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
+function defaultUserState(themeValue=state?.theme||"light"){
+  return {theme:themeValue||"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealMonth:monthKeyFromDate(new Date()),selectedMealDate:null,mealEditorOpen:false};
+}
+function resetLocalPersonalDataAfterLogout({silent=false}={}){
+  const keepTheme=state?.theme||"light";
+  clearTimeout(cloudSaveTimer);
+  cloudSyncApplying=true;
+  try{
+    myRecipes=[];
+    Object.keys(state).forEach(k=>delete state[k]);
+    Object.assign(state,defaultUserState(keepTheme));
+    mealDraftDate=null;
+    mealDraft=null;
+    mealEditorOpen=false;
+    localStorage.removeItem(STORAGE_RECIPES_KEY);
+    localStorage.removeItem("maisonMyRecipes");
+    localStorage.removeItem("maisonState");
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
+    persistBackup();
+  }catch(e){console.warn('Local account data reset failed',e)}
+  finally{cloudSyncApplying=false;}
+  try{closeModalInstant?.();}catch(e){}
+  try{resetMyForm?.();}catch(e){}
+  try{renderMyRecipes?.();}catch(e){}
+  try{renderMealCalendar?.();}catch(e){}
+  try{updateStats?.();}catch(e){}
+  try{updateHomeMeta?.();}catch(e){}
+  try{showView?.('home');}catch(e){}
+  if(!silent) cloudStatus('Вы вышли из аккаунта. Личные рецепты и календарь очищены на этом устройстве. При следующем входе данные загрузятся из облака.');
+}
 function vibe(ms=12){try{if(navigator.vibrate) navigator.vibrate(ms)}catch(e){}}
 function theme(name){return cuisineThemes[name]||{emoji:"book",accent:"#b99a5d",bg:"linear-gradient(135deg,#8e714a,#b99a5d)",note:"Коллекция рецептов."}}
 function visual(cat){return typeVisuals[cat]||{icon:"hot",bg:"linear-gradient(135deg,#8e714a,#d2b47d)"}}
@@ -8344,7 +8374,7 @@ function renderCloudUi(){
     else updateCabinetInfo();
   }
   if(signed) cloudStatus(`Вход выполнен: ${userDisplayName()}. Можно сохранять и загружать облачные данные.`);
-  else cloudStatus(cloud?'Войдите или зарегистрируйтесь для синхронизации.':'Supabase SDK не загрузился. Проверьте интернет-соединение.');
+  else cloudStatus(cloud?'Войдите или зарегистрируйтесь, чтобы загрузить свои рецепты и календарь.':'Supabase SDK не загрузился. Проверьте интернет-соединение.');
 }
 function setCloudBusy(on,text){cloudBusy=on; renderCloudUi(); if(text) cloudStatus(text);}
 
@@ -8619,8 +8649,22 @@ async function cloudSignIn(){
   finally{setCloudBusy(false);}
 }
 async function cloudSignOut(){
-  if(!cloud) return;
-  try{setCloudBusy(true,'Выхожу из аккаунта...'); const {error}=await cloud.auth.signOut(); if(error) throw error; setCloudUser(null); renderCloudUi(); cloudStatus('Вы вышли из аккаунта. Локальные данные остались на устройстве.'); closeTopAuth();}
+  if(!cloud){
+    setCloudUser(null);
+    resetLocalPersonalDataAfterLogout();
+    renderCloudUi();
+    closeTopAuth();
+    return;
+  }
+  try{
+    setCloudBusy(true,'Выхожу из аккаунта...');
+    const {error}=await cloud.auth.signOut();
+    if(error) throw error;
+    setCloudUser(null);
+    resetLocalPersonalDataAfterLogout();
+    renderCloudUi();
+    closeTopAuth();
+  }
   catch(error){console.warn(error); cloudStatus('Не удалось выйти: '+cloudErrorMessage(error));}
   finally{setCloudBusy(false);}
 }
@@ -8634,10 +8678,24 @@ async function initCloudAuth(){
     if(cloudUser){
       cloudStatus('Email подтверждён. Вы вошли в аккаунт: '+userDisplayName()+'.');
       syncCloudDataAfterLogin({silent:true,reason:'initial'}).catch(e=>console.warn('Initial sync failed',e));
-    }else if(hasAuthRedirectParams()){
-      cloudStatus('Подтверждение обработано, но сессия не сохранилась. Нажмите «Войти» и войдите с email и паролем.');
+    }else{
+      resetLocalPersonalDataAfterLogout({silent:true});
+      if(hasAuthRedirectParams()){
+        cloudStatus('Подтверждение обработано, но сессия не сохранилась. Нажмите «Войти» и войдите с email и паролем.');
+      }else{
+        cloudStatus('Войдите в аккаунт, чтобы загрузить свои рецепты и календарь.');
+      }
     }
-    cloud.auth.onAuthStateChange((_event,session)=>{setCloudUser(session?.user||null); renderCloudUi(); if(cloudUser && cloudAutoSyncDoneForUser!==cloudUser.id){cloudAutoSyncDoneForUser=cloudUser.id; syncCloudDataAfterLogin({silent:true,reason:'auth-change'}).catch(e=>console.warn('Profile sync failed',e));}});
+    cloud.auth.onAuthStateChange((_event,session)=>{
+      setCloudUser(session?.user||null);
+      renderCloudUi();
+      if(cloudUser && cloudAutoSyncDoneForUser!==cloudUser.id){
+        cloudAutoSyncDoneForUser=cloudUser.id;
+        syncCloudDataAfterLogin({silent:true,reason:'auth-change'}).catch(e=>console.warn('Profile sync failed',e));
+      }else if(!cloudUser){
+        resetLocalPersonalDataAfterLogout({silent:true});
+      }
+    });
   }
   catch(error){console.warn(error); cloudStatus('Не удалось проверить вход Supabase: '+cloudErrorMessage(error)); renderCloudUi();}
 }
