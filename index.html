@@ -1193,6 +1193,116 @@ body.dark .topbar{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(1
 .checkline input{margin-top:4px;flex:0 0 18px}
 .checkline span{display:block;text-align:left;padding-left:2px;line-height:1.58;overflow-wrap:anywhere;word-break:normal}
 
+
+
+/* compact My Recipes list layout */
+#custom .my-list{
+  width:100%;
+  display:grid;
+  gap:10px !important;
+  justify-items:stretch;
+}
+#custom .my-item{
+  width:100%;
+  min-height:0 !important;
+  padding:11px 12px !important;
+  border-radius:18px !important;
+  text-align:left !important;
+}
+#custom .my-item-top{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:10px 12px;
+  width:100%;
+}
+#custom .my-item-main{
+  min-width:0;
+  width:100%;
+}
+#custom .my-item h4{
+  margin:0 0 6px !important;
+  font-size:clamp(15px,1.2vw,17px) !important;
+  line-height:1.2 !important;
+  letter-spacing:.01em;
+  text-align:left !important;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+#custom .mini-meta{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  align-items:center;
+  font-size:11px !important;
+  line-height:1.15;
+  color:var(--muted);
+  text-align:left;
+}
+#custom .mini-meta span{
+  padding:4px 7px !important;
+  border-radius:999px !important;
+  box-shadow:var(--pressed) !important;
+  max-width:100%;
+}
+#custom .mini-kbju{
+  display:flex !important;
+  flex-wrap:wrap;
+  gap:6px !important;
+  margin-top:8px !important;
+  align-items:stretch;
+}
+#custom .mini-kbju span{
+  min-width:78px;
+  flex:0 1 auto;
+  padding:6px 8px !important;
+  border-radius:13px !important;
+  text-align:left !important;
+  gap:1px !important;
+}
+#custom .mini-kbju b{
+  font-size:13px !important;
+  line-height:1.05 !important;
+  font-weight:650 !important;
+}
+#custom .mini-kbju em{
+  font-size:10px !important;
+  line-height:1.1 !important;
+}
+#custom .row-actions{
+  margin:0 !important;
+  display:flex !important;
+  flex-wrap:nowrap;
+  gap:5px !important;
+  align-items:center;
+  justify-content:flex-end;
+  align-self:start;
+  max-width:100%;
+}
+#custom .row-actions .btn{
+  min-height:30px !important;
+  height:30px;
+  padding:0 9px !important;
+  border-radius:12px !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  font-weight:560 !important;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.45), 4px 4px 10px rgba(153,133,114,.12), -4px -4px 10px rgba(255,255,255,.42) !important;
+}
+body.dark #custom .row-actions .btn{
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.08), 4px 4px 10px rgba(0,0,0,.24), -4px -4px 10px rgba(65,55,48,.08) !important;
+}
+#custom .row-actions .btn.ghost{
+  color:var(--muted);
+}
+@media(max-width:760px){
+  #custom .my-item-top{grid-template-columns:1fr;gap:8px}
+  #custom .row-actions{justify-content:flex-start;flex-wrap:wrap}
+  #custom .row-actions .btn{height:30px;min-height:30px;flex:0 0 auto}
+}
+
 </style>
 </head>
 <body>
