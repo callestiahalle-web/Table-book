@@ -8602,7 +8602,7 @@ async function cloudSignUp(){
     const options={data:{nickname:cred.nickname||''},emailRedirectTo:redirectUrl,redirectTo:redirectUrl};
     const {data,error}=await cloud.auth.signUp({email:cred.email,password:cred.password,options});
     if(error) throw error;
-    const duplicateByIdentities=data?.user && Array.isArray(data.user.identities) && data.user.identities.length===0;
+    const duplicateByIdentities=!data?.session && data?.user && Array.isArray(data.user.identities) && data.user.identities.length===0;
     if(duplicateByIdentities){
       setAuthPlaque('Эта почта уже зарегистрирована. Откройте «Вход» и войдите в аккаунт.');
       cloudStatus('Регистрация не выполнена: почта уже зарегистрирована.');
@@ -8969,9 +8969,73 @@ function initDialogDrag(){
   d.addEventListener('pointerup',finish); d.addEventListener('pointercancel',finish); d.addEventListener('lostpointercapture',finish);
 }
 let touchX=0,touchY=0; function canSwipeBack(){return (state.route==='country' || state.route==='myview' || state.route==='mealview') && !$('#modal').classList.contains('open');} document.addEventListener('touchstart',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; touchX=t.clientX; touchY=t.clientY;},{passive:true}); document.addEventListener('touchmove',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); if(touchX<36 && dx>26 && dy<60) $('#swipeCue').classList.add('show'); else $('#swipeCue').classList.remove('show');},{passive:true}); document.addEventListener('touchend',e=>{if(!canSwipeBack()) return; const t=e.changedTouches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); $('#swipeCue').classList.remove('show'); if(touchX<36 && dx>88 && dy<70) goHomeWithFlip(); touchX=touchY=0;},{passive:true});
-$('#themeBtn').onclick=()=>{const b=$('#themeBtn'); b.classList.remove('tapped','theme-morph'); void b.offsetWidth; b.classList.add('tapped','theme-morph'); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]); setTimeout(()=>b.classList.remove('tapped'),180); setTimeout(()=>b.classList.remove('theme-morph'),460);}; $('#homeBrand').onclick=()=>{if(state.route!=='home') goHomeWithFlip();}; $('#backBtn').onclick=goHomeWithFlip; $('#myBackBtn').onclick=goHomeWithFlip; $('#mealBackBtn').onclick=goHomeWithFlip; $('#clearCat').onclick=()=>{state.filterCat=null; saveState(); renderCountry(state.country);}; $('#myRecipesCard').onclick=()=>{showView('myview'); renderMyRecipes(); vibe(12);}; $('#mealPrevMonth').onclick=()=>setMealMonthOffset(-1); $('#mealNextMonth').onclick=()=>setMealMonthOffset(1); const homeMealPrev=$('#homeMealPrevMonth'), homeMealNext=$('#homeMealNextMonth'); if(homeMealPrev) homeMealPrev.onclick=()=>setMealMonthOffset(-1); if(homeMealNext) homeMealNext.onclick=()=>setMealMonthOffset(1); $('#saveMealDay').onclick=saveMealDay; $('#editMealDay').onclick=editMealDay; $('#clearMealDay').onclick=clearMealDay; $('#closeMealPicker').onclick=closeMealDishPicker; $('#mealPickerBack').onclick=mealPickerBackToCountries; $('#mealPickerSearch').oninput=e=>{mealPickerDialog.q=e.target.value.trim(); renderMealDishPicker();}; $('#mealPickerModal').onclick=e=>{if(e.target.id==='mealPickerModal') closeMealDishPicker();}; $('#saveMyRecipe').onclick=saveCustomRecipe; $('#resetMyRecipe').onclick=resetMyForm; $('#closeModal').onclick=closeModalUp; $('#modal').onclick=e=>{if(e.target.id==='modal') closeModalInstant();}; const exportBtn=$('#exportData'), importBtn=$('#importData'), backupFile=$('#backupFile'); if(exportBtn) exportBtn.onclick=exportUserData; if(importBtn&&backupFile) importBtn.onclick=()=>backupFile.click(); if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); backupFile.value='';}; const cloudSignInBtn=$('#cloudSignIn'), cloudSignUpBtn=$('#cloudSignUp'), cloudSignOutBtn=$('#cloudSignOut'), cloudSaveBtn=$('#cloudSave'), cloudLoadBtn=$('#cloudLoad'); if(cloudSignInBtn) cloudSignInBtn.onclick=cloudSignIn; if(cloudSignUpBtn) cloudSignUpBtn.onclick=cloudSignUp; if(cloudSignOutBtn) cloudSignOutBtn.onclick=cloudSignOut; if(cloudSaveBtn) cloudSaveBtn.onclick=()=>saveCloudData(); if(cloudLoadBtn) cloudLoadBtn.onclick=()=>loadCloudData(); const topLoginBtn=$('#topLoginBtn'), topRegisterBtn=$('#topRegisterBtn'), topLogoutBtn=$('#topLogoutBtn'), topAuthClose=$('#topAuthClose'), topPanelSignIn=$('#topPanelSignIn'), topPanelSignUp=$('#topPanelSignUp'), topAuthStatus=$('#topAuthStatus'), cloudCheckBtn=$('#cloudCheck'), cabinetSignOutBtn=$('#cabinetSignOut'), cabinetSettingsBtn=$('#cabinetSettingsBtn'), cabinetUserEmailBtn=$('#cabinetUserEmail'), accountBackBtn=$('#accountBackBtn'), accountSaveNicknameBtn=$('#accountSaveNickname'); if(topLoginBtn) topLoginBtn.onclick=()=>openTopAuth('login'); if(topRegisterBtn) topRegisterBtn.onclick=()=>openTopAuth('register'); if(topLogoutBtn) topLogoutBtn.onclick=cloudSignOut; if(topAuthStatus){topAuthStatus.onclick=()=>openTopAuth('cabinet'); topAuthStatus.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopAuth('cabinet');}};} if(topAuthClose) topAuthClose.onclick=closeTopAuth; if(topPanelSignIn) topPanelSignIn.onclick=topCloudSignIn; if(topPanelSignUp) topPanelSignUp.onclick=topCloudSignUp; const topResendConfirm=$('#topResendConfirm'); if(topResendConfirm) topResendConfirm.onclick=resendConfirmationEmail; ['topCloudNickname','topCloudEmail','topCloudPassword'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); const mode=$('#topAuthPanel')?.dataset.mode; if(mode==='register') topCloudSignUp(); else topCloudSignIn();}});}); if(cloudCheckBtn) cloudCheckBtn.onclick=checkCloudConnection; if(cabinetSignOutBtn) cabinetSignOutBtn.onclick=cloudSignOut; if(cabinetSettingsBtn) cabinetSettingsBtn.onclick=openAccountSettings; if(cabinetUserEmailBtn) cabinetUserEmailBtn.onclick=openAccountSettings; if(accountBackBtn) accountBackBtn.onclick=openCabinetHome; if(accountSaveNicknameBtn) accountSaveNicknameBtn.onclick=saveNickname; document.addEventListener('click',e=>{const panel=$('#topAuthPanel'), wrap=$('#topAuth'); if(panel && wrap && !panel.hidden && !wrap.contains(e.target)) closeTopAuth();}); document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTopAuth(); closeModalInstant(); closeMealDishPicker();}});
-function boot(){$('#brandMark').innerHTML=iconSvg('book'); persistBackup(); initCloudAuth(); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); const mealIcon=$('#mealCalendarIcon'); if(mealIcon) mealIcon.innerHTML=iconSvg('calendar'); ensureMealPlan(); fillMyCategory(); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderMealCalendar(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview') showView('myview'); else if(state.route==='mealview') openMealCalendar(); else showView('home'); if(state.editingId) editMyRecipe(state.editingId);} 
-boot();
+
+function bindClick(id,handler){const el=$('#'+id); if(el) el.onclick=handler; return el;}
+function bindInput(id,handler){const el=$('#'+id); if(el) el.oninput=handler; return el;}
+window.addEventListener?.('error',event=>{
+  const msg=event?.message||'Ошибка скрипта';
+  console.warn('Table book runtime error',event?.error||msg);
+  try{cloudStatus('Ошибка приложения: '+msg+'. Обновите страницу; если повторяется — пришлите этот текст.');}catch(e){}
+  try{setAuthPlaque('Ошибка приложения: '+msg+'. Я добавила защиту, чтобы авторизация не блокировалась из-за календаря или других блоков.','error');}catch(e){}
+});
+window.addEventListener?.('unhandledrejection',event=>{
+  const msg=event?.reason?.message||String(event?.reason||'Необработанная ошибка');
+  console.warn('Table book unhandled rejection',event?.reason);
+  try{cloudStatus('Ошибка Supabase/синхронизации: '+msg);}catch(e){}
+});
+
+bindClick('topLoginBtn',()=>openTopAuth('login'));
+bindClick('topRegisterBtn',()=>openTopAuth('register'));
+bindClick('topLogoutBtn',cloudSignOut);
+bindClick('topAuthClose',closeTopAuth);
+bindClick('topPanelSignIn',topCloudSignIn);
+bindClick('topPanelSignUp',topCloudSignUp);
+bindClick('topResendConfirm',resendConfirmationEmail);
+const topStatusEl=bindClick('topAuthStatus',()=>openTopAuth('cabinet'));
+if(topStatusEl) topStatusEl.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopAuth('cabinet');}};
+['topCloudNickname','topCloudEmail','topCloudPassword'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); const mode=$('#topAuthPanel')?.dataset.mode; if(mode==='register') topCloudSignUp(); else topCloudSignIn();}});});
+bindClick('cloudCheck',checkCloudConnection);
+bindClick('cabinetSignOut',cloudSignOut);
+bindClick('cabinetSettingsBtn',openAccountSettings);
+bindClick('cabinetUserEmail',openAccountSettings);
+bindClick('accountBackBtn',openCabinetHome);
+bindClick('accountSaveNickname',saveNickname);
+bindClick('cloudSignIn',cloudSignIn);
+bindClick('cloudSignUp',cloudSignUp);
+bindClick('cloudSignOut',cloudSignOut);
+bindClick('cloudSave',()=>saveCloudData());
+bindClick('cloudLoad',()=>loadCloudData());
+bindClick('themeBtn',()=>{const b=$('#themeBtn'); if(!b) return; b.classList.remove('tapped','theme-morph'); void b.offsetWidth; b.classList.add('tapped','theme-morph'); state.theme=state.theme==='dark'?'light':'dark'; saveState(); setTheme(); vibe([12,24,12]); setTimeout(()=>b.classList.remove('tapped'),180); setTimeout(()=>b.classList.remove('theme-morph'),460);});
+bindClick('homeBrand',()=>{if(state.route!=='home') goHomeWithFlip();});
+bindClick('backBtn',goHomeWithFlip);
+bindClick('myBackBtn',goHomeWithFlip);
+bindClick('mealBackBtn',goHomeWithFlip);
+bindClick('clearCat',()=>{state.filterCat=null; saveState(); renderCountry(state.country);});
+bindClick('myRecipesCard',()=>{showView('myview'); renderMyRecipes(); vibe(12);});
+bindClick('mealPrevMonth',()=>setMealMonthOffset(-1));
+bindClick('mealNextMonth',()=>setMealMonthOffset(1));
+bindClick('homeMealPrevMonth',()=>setMealMonthOffset(-1));
+bindClick('homeMealNextMonth',()=>setMealMonthOffset(1));
+bindClick('saveMealDay',saveMealDay);
+bindClick('editMealDay',editMealDay);
+bindClick('clearMealDay',clearMealDay);
+bindClick('closeMealPicker',closeMealDishPicker);
+bindClick('mealPickerBack',mealPickerBackToCountries);
+bindInput('mealPickerSearch',e=>{mealPickerDialog.q=e.target.value.trim(); renderMealDishPicker();});
+const mealPickerModal=$('#mealPickerModal'); if(mealPickerModal) mealPickerModal.onclick=e=>{if(e.target.id==='mealPickerModal') closeMealDishPicker();};
+bindClick('saveMyRecipe',saveCustomRecipe);
+bindClick('resetMyRecipe',resetMyForm);
+bindClick('closeModal',closeModalUp);
+const modalEl=$('#modal'); if(modalEl) modalEl.onclick=e=>{if(e.target.id==='modal') closeModalInstant();};
+bindClick('exportData',exportUserData);
+const importBtn=$('#importData'), backupFile=$('#backupFile');
+if(importBtn&&backupFile) importBtn.onclick=()=>backupFile.click();
+if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); backupFile.value='';};
+document.addEventListener('click',e=>{const panel=$('#topAuthPanel'), wrap=$('#topAuth'); if(panel && wrap && !panel.hidden && !wrap.contains(e.target)) closeTopAuth();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTopAuth(); closeModalInstant(); closeMealDishPicker();}});
+
+function boot(){const brand=$('#brandMark'); if(brand) brand.innerHTML=iconSvg('book'); persistBackup(); initCloudAuth(); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); const mealIcon=$('#mealCalendarIcon'); if(mealIcon) mealIcon.innerHTML=iconSvg('calendar'); ensureMealPlan(); fillMyCategory(); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderMealCalendar(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview') showView('myview'); else if(state.route==='mealview') openMealCalendar(); else showView('home'); if(state.editingId) editMyRecipe(state.editingId);} 
+try{boot();}catch(error){console.warn('Boot failed',error); try{cloudStatus('Ошибка запуска приложения: '+(error?.message||error)+'. Авторизация доступна, попробуйте войти снова.');}catch(e){} try{renderCloudUi();}catch(e){}}
 </script>
 </body>
 </html>
