@@ -3677,3 +3677,184 @@ body.dark .hero::after{
   .hero::before{top:-18px !important;width:min(74%,360px) !important;height:10px !important}
   .hero::after{top:-20px !important;width:min(96%,460px) !important;height:132px !important;filter:blur(10px) !important}
 }
+
+
+/* --- final correction: raise light bar to top panel and keep light in both themes --- */
+.hero{
+  margin-top:86px !important;
+  position:relative !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+}
+
+/* Light source close to the upper navigation panel */
+.hero::before{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  left:50% !important;
+  top:-132px !important;
+  width:min(72%,760px) !important;
+  height:14px !important;
+  transform:translateX(-50%) !important;
+  border-radius:999px !important;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(211,167,82,.18) 10%,
+      rgba(255,228,164,.96) 48%,
+      rgba(255,228,164,.96) 52%,
+      rgba(211,167,82,.18) 90%,
+      rgba(255,255,255,0) 100%) !important;
+  border:1px solid rgba(218,176,93,.62) !important;
+  box-shadow:
+    0 0 12px rgba(255,214,132,.34),
+    0 0 32px rgba(255,196,95,.22),
+    inset 0 1px 0 rgba(255,248,226,.80) !important;
+  pointer-events:none !important;
+  z-index:4 !important;
+  filter:none !important;
+}
+
+/* Falling diffuse beam from the raised source onto the hero card */
+.hero::after{
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  left:50% !important;
+  top:-132px !important;
+  width:min(114%,1160px) !important;
+  height:360px !important;
+  transform:translateX(-50%) !important;
+  border-radius:0 0 48% 48% / 0 0 100% 100% !important;
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(255,232,176,.62) 0%,
+      rgba(255,218,145,.39) 18%,
+      rgba(255,205,120,.20) 40%,
+      rgba(255,205,120,.075) 62%,
+      transparent 86%) !important;
+  filter:blur(11px) !important;
+  opacity:.94 !important;
+  pointer-events:none !important;
+  z-index:1 !important;
+}
+
+body:not(.dark) .hero::before{
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(199,151,62,.16) 10%,
+      rgba(255,221,151,.92) 48%,
+      rgba(255,221,151,.92) 52%,
+      rgba(199,151,62,.16) 90%,
+      rgba(255,255,255,0) 100%) !important;
+  border-color:rgba(200,151,68,.52) !important;
+  box-shadow:
+    0 0 10px rgba(255,214,132,.28),
+    0 0 28px rgba(226,176,86,.18),
+    inset 0 1px 0 rgba(255,249,230,.86) !important;
+}
+
+body:not(.dark) .hero::after{
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(255,228,166,.54) 0%,
+      rgba(255,216,144,.36) 18%,
+      rgba(255,203,124,.20) 40%,
+      rgba(255,203,124,.08) 64%,
+      transparent 88%) !important;
+  opacity:.90 !important;
+  filter:blur(10px) !important;
+}
+
+body.dark .hero::before{
+  background:
+    linear-gradient(90deg,
+      rgba(255,207,117,0) 0%,
+      rgba(255,204,119,.26) 10%,
+      rgba(255,224,153,.98) 48%,
+      rgba(255,224,153,.98) 52%,
+      rgba(255,204,119,.26) 90%,
+      rgba(255,207,117,0) 100%) !important;
+  border-color:rgba(255,218,146,.72) !important;
+  box-shadow:
+    0 0 14px rgba(255,205,111,.42),
+    0 0 46px rgba(255,188,83,.25),
+    inset 0 1px 0 rgba(255,247,224,.62) !important;
+}
+
+body.dark .hero::after{
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(255,214,136,.66) 0%,
+      rgba(255,198,101,.40) 18%,
+      rgba(255,185,78,.20) 42%,
+      rgba(255,185,78,.075) 66%,
+      transparent 88%) !important;
+  filter:blur(12px) !important;
+  opacity:.94 !important;
+}
+
+.hero > div:first-child{
+  position:relative !important;
+  z-index:3 !important;
+}
+
+@media(max-width:760px){
+  .hero{margin-top:64px !important}
+  .hero::before{
+    top:-74px !important;
+    width:min(76%,360px) !important;
+    height:11px !important;
+  }
+  .hero::after{
+    top:-74px !important;
+    width:min(112%,520px) !important;
+    height:230px !important;
+    filter:blur(8px) !important;
+  }
+}
+
+
+/* --- light theme: no light beam from top frame; dark theme keeps warm light --- */
+body:not(.dark) .hero::after{
+  display:none !important;
+  content:none !important;
+  opacity:0 !important;
+  background:none !important;
+  filter:none !important;
+}
+
+body:not(.dark) .hero::before{
+  top:-72px !important;
+  height:10px !important;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(200,151,68,.18) 13%,
+      rgba(212,170,91,.56) 48%,
+      rgba(212,170,91,.56) 52%,
+      rgba(200,151,68,.18) 87%,
+      rgba(255,255,255,0) 100%) !important;
+  border-color:rgba(200,151,68,.40) !important;
+  box-shadow:
+    0 1px 6px rgba(180,135,70,.12),
+    inset 0 1px 0 rgba(255,249,230,.72) !important;
+}
+
+body.dark .hero::after{
+  display:block !important;
+  content:"" !important;
+}
+
+@media(max-width:760px){
+  body:not(.dark) .hero::after{
+    display:none !important;
+    content:none !important;
+  }
+  body:not(.dark) .hero::before{
+    top:-48px !important;
+  }
+}
+
