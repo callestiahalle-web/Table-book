@@ -3641,3 +3641,39 @@ body.dark .hero::after{
   }
 }
 
+
+/* --- positioning fix: light frame closer to hero and aligned with card --- */
+.hero{
+  margin-top:46px !important;
+  padding-top:34px !important;
+}
+.hero::before{
+  top:-24px !important;
+  width:min(72%,720px) !important;
+  height:12px !important;
+  border-radius:999px !important;
+  z-index:4 !important;
+}
+.hero::after{
+  top:-28px !important;
+  width:min(92%,900px) !important;
+  height:156px !important;
+  border-radius:0 0 50% 50% / 0 0 100% 100% !important;
+  filter:blur(12px) !important;
+  opacity:.78 !important;
+  z-index:1 !important;
+}
+body.dark .hero::after{
+  opacity:.82 !important;
+  filter:blur(13px) !important;
+}
+.hero > div:first-child{position:relative !important;z-index:3 !important}
+@media(min-width:821px){
+  .page{padding-top:58px !important}
+  .hero{margin-top:54px !important; padding-top:36px !important}
+}
+@media(max-width:760px){
+  .hero{margin-top:34px !important; padding-top:28px !important}
+  .hero::before{top:-18px !important;width:min(74%,360px) !important;height:10px !important}
+  .hero::after{top:-20px !important;width:min(96%,460px) !important;height:132px !important;filter:blur(10px) !important}
+}
