@@ -10853,17 +10853,36 @@ function countryFlagSvg(key){
 function countryIconKey(country){const m={"Италия":"italy","Испания":"spain","Япония":"japan","Корея":"korea","Россия":"russia","Средиземноморская":"med","Средиземноморская...":"med","Китай":"china","Таиланд":"thai","Кавказская":"caucasus","Мои рецепты":"custom"};return m[country]||'book';}
 
 function countryImageSrc(country){
+  const key=String(country||'').trim();
   const m={
     "Россия":"./assets/countries/country-russia.webp",
     "Таиланд":"./assets/countries/country-thai.webp",
     "Кавказская":"./assets/countries/country-caucasus.webp",
+    "Кавказ":"./assets/countries/country-caucasus.webp",
+    "Грузия":"./assets/countries/country-caucasus.webp",
+    "Армения":"./assets/countries/country-caucasus.webp",
+    "Азербайджан":"./assets/countries/country-caucasus.webp",
+    "Арцах":"./assets/countries/country-caucasus.webp",
     "Средиземноморская":"./assets/countries/country-mediterranean.webp",
     "Средиземноморская...":"./assets/countries/country-mediterranean.webp",
+    "Средиземноморье":"./assets/countries/country-mediterranean.webp",
+    "Италия":"./assets/countries/country-mediterranean.webp",
+    "Испания":"./assets/countries/country-mediterranean.webp",
+    "Греция":"./assets/countries/country-mediterranean.webp",
+    "Греция / Левант":"./assets/countries/country-mediterranean.webp",
+    "Левант":"./assets/countries/country-mediterranean.webp",
+    "Ливан":"./assets/countries/country-mediterranean.webp",
+    "Турция":"./assets/countries/country-mediterranean.webp",
+    "Франция":"./assets/countries/country-mediterranean.webp",
+    "Марокко":"./assets/countries/country-mediterranean.webp",
+    "Северная Африка":"./assets/countries/country-mediterranean.webp",
     "Китай":"./assets/countries/country-chinese.webp",
     "Япония":"./assets/countries/country-japanese.webp",
-    "Корея":"./assets/countries/country-korean.webp"
+    "Корея":"./assets/countries/country-korean.webp",
+    "Мои рецепты":"./assets/icons/icon-512.png",
+    "Каталог":"./assets/icons/icon-512.png"
   };
-  return m[country]||"./assets/icons/icon-512.png";
+  return m[key]||"./assets/icons/icon-512.png";
 }
 function countryImageAlt(country){return `${country} — иллюстрация кухни`;}
 function countryImageHtml(country,cls='country-art'){
