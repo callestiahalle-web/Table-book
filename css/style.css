@@ -2823,3 +2823,355 @@ body.dark .account-settings-card,body.dark .account-info,body.dark .product-calc
 .btn,.back-btn,.theme-btn,.close,.auth-chip,.top-auth-status{outline-offset:-3px}
 .meal-day.empty,.meal-day.outside{box-shadow:none !important;outline-color:transparent !important;border-color:rgba(187,142,72,.24) !important;background-image:none !important;background:transparent !important}
 body.dark .meal-day.empty,body.dark .meal-day.outside{border-color:rgba(5,5,5,.36) !important;background:transparent !important}
+
+/* --- seamless matte paper texture override --- */
+:root{
+  --seamless-paper-opacity:.44;
+  --seamless-surface-opacity:.14;
+}
+body.dark{
+  --seamless-paper-opacity:.34;
+  --seamless-surface-opacity:.12;
+}
+body:before{
+  opacity:var(--seamless-paper-opacity) !important;
+  background-image:
+    radial-gradient(circle at 18% 16%, rgba(255,255,255,.18), transparent 28%),
+    radial-gradient(circle at 84% 10%, rgba(245,215,205,.14), transparent 24%),
+    radial-gradient(circle at 62% 74%, rgba(221,232,228,.12), transparent 26%),
+    var(--texture-image) !important;
+  background-size:auto,auto,auto,cover !important;
+  background-position:center center,center center,center center,center center !important;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat !important;
+  background-blend-mode:screen,normal,normal,multiply !important;
+  filter:contrast(1.03) saturate(.78) !important;
+}
+body.dark:before{
+  background-image:
+    radial-gradient(circle at 20% 15%, rgba(189,199,206,.10), transparent 28%),
+    radial-gradient(circle at 80% 14%, rgba(74,81,86,.12), transparent 24%),
+    radial-gradient(circle at 56% 72%, rgba(0,0,0,.16), transparent 26%),
+    var(--texture-image) !important;
+  background-size:auto,auto,auto,cover !important;
+  background-position:center center,center center,center center,center center !important;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat !important;
+  background-blend-mode:screen,normal,multiply,screen !important;
+  filter:contrast(1.06) saturate(.7) !important;
+}
+
+.topbar,
+.hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.stat,.my-item,
+.btn,.back-btn,.theme-btn,.pill,.close,.clear-filter,.auth-chip,.top-auth-status,
+.input,.textarea,.select,input,textarea,select,.meal-day,.meal-slot,.meal-calendar-panel,
+.home-menu-card,.my-folder-card,.my-item-compact,.meal-type-card,.meal-country-card,.meal-picker-card,.meal-saved-link,
+.account-settings-card,.account-info,.product-calc,.manual-kbju,.empty-box,.brand-mark{
+  background-image:
+    linear-gradient(180deg, var(--surface-grad-1), var(--surface-grad-2) 72%, var(--surface-grad-3)),
+    linear-gradient(180deg, rgba(255,255,255,var(--seamless-surface-opacity)), rgba(255,255,255,0)),
+    var(--texture-image) !important;
+  background-size:auto,auto,cover !important;
+  background-position:center center,center center,center center !important;
+  background-repeat:no-repeat,no-repeat,no-repeat !important;
+  background-blend-mode:normal,screen,multiply !important;
+}
+body.dark .topbar,
+body.dark .hero,body.dark .country-card,body.dark .tab-card,body.dark .cat-tile,body.dark .recipe-card,body.dark .panel,body.dark .dialog,body.dark .country-head,body.dark .custom-head,body.dark .stat,body.dark .my-item,
+body.dark .btn,body.dark .back-btn,body.dark .theme-btn,body.dark .pill,body.dark .close,body.dark .clear-filter,body.dark .auth-chip,body.dark .top-auth-status,
+body.dark .input,body.dark .textarea,body.dark .select,body.dark input,body.dark textarea,body.dark select,body.dark .meal-day,body.dark .meal-slot,body.dark .meal-calendar-panel,
+body.dark .home-menu-card,body.dark .my-folder-card,body.dark .my-item-compact,body.dark .meal-type-card,body.dark .meal-country-card,body.dark .meal-picker-card,body.dark .meal-saved-link,
+body.dark .account-settings-card,body.dark .account-info,body.dark .product-calc,body.dark .manual-kbju,body.dark .empty-box,body.dark .brand-mark{
+  background-image:
+    linear-gradient(180deg, var(--surface-grad-1), var(--surface-grad-2) 72%, var(--surface-grad-3)),
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(0,0,0,.04)),
+    var(--texture-image) !important;
+  background-size:auto,auto,cover !important;
+  background-position:center center,center center,center center !important;
+  background-repeat:no-repeat,no-repeat,no-repeat !important;
+  background-blend-mode:normal,screen,screen !important;
+}
+
+.meal-day.empty,.meal-day.outside{
+  background-image:none !important;
+}
+
+
+/* --- final seamless rough paper canvas + dark country image mat --- */
+:root{
+  --texture-image:url('../assets/textures/paper-light-canvas.webp');
+  --seamless-paper-opacity:.72;
+  --seamless-surface-opacity:.10;
+  --paper-canvas-blend:multiply;
+}
+body.dark{
+  --texture-image:url('../assets/textures/paper-dark-canvas.webp');
+  --seamless-paper-opacity:.76;
+  --seamless-surface-opacity:.045;
+  --paper-canvas-blend:screen;
+}
+body:before{
+  opacity:var(--seamless-paper-opacity) !important;
+  background-image:var(--texture-image) !important;
+  background-size:cover !important;
+  background-position:center center !important;
+  background-repeat:no-repeat !important;
+  background-attachment:fixed !important;
+  background-blend-mode:normal !important;
+  filter:contrast(1.12) saturate(.82) !important;
+  mask-image:none !important;
+}
+body.dark:before{
+  background-image:var(--texture-image) !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
+  background-attachment:fixed !important;
+  filter:contrast(1.18) saturate(.76) !important;
+}
+body:after{
+  opacity:.72 !important;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,.22), transparent 30%),
+    radial-gradient(circle at 82% 18%, rgba(245,215,205,.13), transparent 28%),
+    linear-gradient(135deg, rgba(255,255,255,.14), transparent 46%, rgba(250,244,230,.08)) !important;
+}
+body.dark:after{
+  opacity:.62 !important;
+  background:
+    radial-gradient(circle at 22% 14%, rgba(189,199,206,.08), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(0,0,0,.12), transparent 30%),
+    linear-gradient(135deg, rgba(189,199,206,.045), transparent 46%, rgba(0,0,0,.16)) !important;
+}
+.topbar,
+.hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.stat,.my-item,
+.btn,.back-btn,.theme-btn,.pill,.close,.clear-filter,.auth-chip,.top-auth-status,
+.input,.textarea,.select,input,textarea,select,.meal-day,.meal-slot,.meal-calendar-panel,
+.home-menu-card,.my-folder-card,.my-item-compact,.meal-type-card,.meal-country-card,.meal-picker-card,.meal-saved-link,
+.account-settings-card,.account-info,.product-calc,.manual-kbju,.empty-box,.brand-mark{
+  background-image:
+    linear-gradient(180deg, var(--surface-grad-1), var(--surface-grad-2) 72%, var(--surface-grad-3)),
+    linear-gradient(180deg, rgba(255,255,255,var(--seamless-surface-opacity)), rgba(255,255,255,0)) !important;
+  background-size:auto,auto !important;
+  background-position:center center,center center !important;
+  background-repeat:no-repeat,no-repeat !important;
+  background-blend-mode:normal,screen !important;
+}
+body.dark .topbar,
+body.dark .hero,body.dark .country-card,body.dark .tab-card,body.dark .cat-tile,body.dark .recipe-card,body.dark .panel,body.dark .dialog,body.dark .country-head,body.dark .custom-head,body.dark .stat,body.dark .my-item,
+body.dark .btn,body.dark .back-btn,body.dark .theme-btn,body.dark .pill,body.dark .close,body.dark .clear-filter,body.dark .auth-chip,body.dark .top-auth-status,
+body.dark .input,body.dark .textarea,body.dark .select,body.dark input,body.dark textarea,body.dark select,body.dark .meal-day,body.dark .meal-slot,body.dark .meal-calendar-panel,
+body.dark .home-menu-card,body.dark .my-folder-card,body.dark .my-item-compact,body.dark .meal-type-card,body.dark .meal-country-card,body.dark .meal-picker-card,body.dark .meal-saved-link,
+body.dark .account-settings-card,body.dark .account-info,body.dark .product-calc,body.dark .manual-kbju,body.dark .empty-box,body.dark .brand-mark{
+  background-image:
+    linear-gradient(180deg, var(--surface-grad-1), var(--surface-grad-2) 72%, var(--surface-grad-3)),
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(0,0,0,.055)) !important;
+  background-blend-mode:normal,screen !important;
+}
+.country-img-dark{display:none !important}
+body.dark .country-img-light{display:none !important}
+body.dark .country-img-dark{display:block !important}
+body.dark .country-art-frame,
+body.dark .meal-country-thumb{
+  background:#000 !important;
+  border-color:rgba(0,0,0,.82) !important;
+  outline:1px solid rgba(189,199,206,.12) !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.18), inset 0 0 0 1px rgba(255,255,255,.035) !important;
+}
+body.dark .country-art,
+body.dark .meal-country-img{
+  background:#000 !important;
+}
+
+/* --- patch: seamless one-canvas paper texture + dark country icon mats --- */
+:root{
+  --texture-image:url('../assets/textures/paper-light-canvas.webp');
+  --texture-opacity:.62;
+  --paper-haze-1:rgba(255,255,255,.34);
+  --paper-haze-2:rgba(250,244,230,.18);
+}
+body.dark{
+  --texture-image:url('../assets/textures/paper-dark-canvas.webp');
+  --texture-opacity:.56;
+  --paper-haze-1:rgba(189,199,206,.06);
+  --paper-haze-2:rgba(0,0,0,.18);
+}
+body{
+  background:
+    linear-gradient(180deg,#ffffff 0%, #faf4e6 100%) !important;
+}
+body.dark{
+  background:
+    linear-gradient(180deg,#bdc7ce 0%, #24292e 100%) !important;
+}
+body:before{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-2 !important;
+  pointer-events:none !important;
+  opacity:var(--texture-opacity) !important;
+  background-image:var(--texture-image) !important;
+  background-repeat:no-repeat !important;
+  background-size:cover !important;
+  background-position:center center !important;
+  background-attachment:fixed !important;
+  mix-blend-mode:multiply !important;
+  filter:contrast(1.06) saturate(.88) !important;
+  mask-image:none !important;
+}
+body.dark:before{
+  mix-blend-mode:screen !important;
+  filter:contrast(1.08) saturate(.82) brightness(.96) !important;
+}
+body:after{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-1 !important;
+  pointer-events:none !important;
+  background:
+    radial-gradient(circle at 16% 10%, var(--paper-haze-1), transparent 28%),
+    radial-gradient(circle at 82% 14%, var(--paper-haze-2), transparent 26%),
+    linear-gradient(180deg, rgba(255,255,255,.06), transparent 32%, rgba(255,255,255,.03) 72%, transparent) !important;
+  opacity:.92 !important;
+}
+/* remove remaining patterned striping from surfaces */
+.hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.stat,.my-item,
+.home-menu-card,.home-calendar-card,.meal-day,.meal-slot,.meal-calendar-panel,.meal-picker-card,.meal-step-card,.meal-country-card,.meal-recipe-card,
+.account-settings-card,.auth-popover,.account-info,.my-folder-card,.my-item-compact,.product-calc,.manual-kbju,.empty-box,
+.btn,.input,.select,textarea,.theme-btn,.back-btn,.pill,.close,.clear-filter,.auth-chip,.topbar,.brand-mark,.arrow,.tab-icon,.cat-icon,.dish-icon,.cemoji,
+.meal-add-btn,.meal-save-btn,.meal-clear-btn{
+  background-blend-mode:normal,screen !important;
+  background-size:auto,auto !important;
+}
+body.dark .country-art-frame,
+body.dark .meal-country-thumb,
+body.dark .country-card .cemoji{
+  background:#050505 !important;
+  border-color:rgba(189,199,206,.18) !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.18) !important;
+}
+
+/* --- final rough paper theme refinement --- */
+:root{
+  --texture-image:url('../assets/textures/rough-paper-light.webp') !important;
+  --texture-opacity:.82;
+  --paper-frame-main:rgba(184,137,61,.72);
+  --paper-frame-soft:rgba(218,180,109,.52);
+  --paper-frame-inner:rgba(255,255,255,.70);
+  --paper-frame-shadow:rgba(142,112,68,.10);
+  --surface-grad-1:rgba(255,255,255,.78);
+  --surface-grad-2:rgba(250,244,230,.88);
+  --surface-grad-3:rgba(247,237,220,.82);
+}
+body.dark{
+  --texture-image:url('../assets/textures/rough-paper-dark.webp') !important;
+  --texture-opacity:.72;
+  --paper-frame-main:rgba(5,5,5,.86);
+  --paper-frame-soft:rgba(189,199,206,.18);
+  --paper-frame-inner:rgba(189,199,206,.075);
+  --paper-frame-shadow:rgba(0,0,0,.28);
+  --surface-grad-1:rgba(74,81,86,.94);
+  --surface-grad-2:rgba(68,75,80,.96);
+  --surface-grad-3:rgba(58,64,69,.96);
+}
+body{
+  background:linear-gradient(180deg,#ffffff 0%,#faf4e6 100%) !important;
+}
+body.dark{
+  background:linear-gradient(180deg,#bdc7ce 0%,#24292e 100%) !important;
+}
+body:before{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-2 !important;
+  pointer-events:none !important;
+  opacity:var(--texture-opacity) !important;
+  background-image:var(--texture-image) !important;
+  background-size:cover !important;
+  background-position:center center !important;
+  background-repeat:no-repeat !important;
+  background-attachment:fixed !important;
+  mix-blend-mode:multiply !important;
+  filter:contrast(1.18) saturate(.78) !important;
+  mask-image:none !important;
+}
+body.dark:before{
+  mix-blend-mode:screen !important;
+  filter:contrast(1.22) saturate(.72) brightness(.92) !important;
+}
+body:after{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-1 !important;
+  pointer-events:none !important;
+  opacity:.88 !important;
+  background:
+    radial-gradient(circle at 18% 10%,rgba(255,255,255,.30),transparent 30%),
+    radial-gradient(circle at 84% 15%,rgba(245,215,205,.16),transparent 28%),
+    linear-gradient(180deg,rgba(255,255,255,.08),transparent 38%,rgba(250,244,230,.07)) !important;
+}
+body.dark:after{
+  opacity:.48 !important;
+  background:
+    radial-gradient(circle at 20% 13%,rgba(189,199,206,.08),transparent 32%),
+    radial-gradient(circle at 80% 16%,rgba(0,0,0,.24),transparent 30%),
+    linear-gradient(180deg,rgba(189,199,206,.04),transparent 38%,rgba(0,0,0,.18)) !important;
+}
+.topbar,
+.hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.stat,.my-item,
+.home-menu-card,.home-calendar-card,.meal-day,.meal-slot,.meal-calendar-panel,.meal-picker-card,.meal-step-card,.meal-country-card,.meal-recipe-card,
+.account-settings-card,.auth-popover,.account-info,.my-folder-card,.my-item-compact,.product-calc,.manual-kbju,.empty-box,
+.btn,.input,.select,textarea,.theme-btn,.back-btn,.pill,.close,.clear-filter,.auth-chip,.top-auth-status,.brand-mark,.arrow,.tab-icon,.cat-icon,.dish-icon,.cemoji,
+.meal-add-btn,.meal-save-btn,.meal-clear-btn,.meal-dish-open,.meal-remove,.meal-picker-back,.meal-saved-link{
+  border:1px solid var(--paper-frame-main) !important;
+  outline:1px solid var(--paper-frame-soft) !important;
+  outline-offset:-4px !important;
+  background-image:
+    linear-gradient(180deg,var(--surface-grad-1),var(--surface-grad-2) 70%,var(--surface-grad-3)) !important;
+  background-blend-mode:normal !important;
+  box-shadow:
+    0 8px 18px var(--paper-frame-shadow),
+    inset 0 1px 0 var(--paper-frame-inner),
+    inset 0 -1px 0 rgba(118,84,36,.08) !important;
+}
+body.dark .topbar,
+body.dark .hero,body.dark .country-card,body.dark .tab-card,body.dark .cat-tile,body.dark .recipe-card,body.dark .panel,body.dark .dialog,body.dark .country-head,body.dark .custom-head,body.dark .stat,body.dark .my-item,
+body.dark .home-menu-card,body.dark .home-calendar-card,body.dark .meal-day,body.dark .meal-slot,body.dark .meal-calendar-panel,body.dark .meal-picker-card,body.dark .meal-step-card,body.dark .meal-country-card,body.dark .meal-recipe-card,
+body.dark .account-settings-card,body.dark .auth-popover,body.dark .account-info,body.dark .my-folder-card,body.dark .my-item-compact,body.dark .product-calc,body.dark .manual-kbju,body.dark .empty-box,
+body.dark .btn,body.dark .input,body.dark .select,body.dark textarea,body.dark .theme-btn,body.dark .back-btn,body.dark .pill,body.dark .close,body.dark .clear-filter,body.dark .auth-chip,body.dark .top-auth-status,body.dark .brand-mark,body.dark .arrow,body.dark .tab-icon,body.dark .cat-icon,body.dark .dish-icon,body.dark .cemoji,
+body.dark .meal-add-btn,body.dark .meal-save-btn,body.dark .meal-clear-btn,body.dark .meal-dish-open,body.dark .meal-remove,body.dark .meal-picker-back,body.dark .meal-saved-link{
+  border-color:var(--paper-frame-main) !important;
+  outline-color:var(--paper-frame-soft) !important;
+  box-shadow:
+    0 8px 18px var(--paper-frame-shadow),
+    inset 0 1px 0 var(--paper-frame-inner),
+    inset 0 -1px 0 rgba(0,0,0,.42) !important;
+}
+.btn,.back-btn,.theme-btn,.close,.auth-chip,.top-auth-status,.meal-add-btn,.meal-save-btn,.meal-clear-btn,.meal-picker-back{
+  outline-offset:-3px !important;
+}
+.meal-day.empty,.meal-day.outside{
+  border-color:rgba(184,137,61,.22) !important;
+  outline-color:transparent !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+body.dark .meal-day.empty,body.dark .meal-day.outside{
+  border-color:rgba(5,5,5,.28) !important;
+  outline-color:transparent !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+body.dark .country-art-frame,
+body.dark .meal-country-thumb,
+body.dark .country-card .cemoji{
+  background:#1f2428 !important;
+  border-color:rgba(5,5,5,.88) !important;
+  outline:1px solid rgba(189,199,206,.16) !important;
+  box-shadow:0 6px 14px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.035) !important;
+}
+body.dark .country-art,
+body.dark .meal-country-img{
+  background:#1f2428 !important;
+}

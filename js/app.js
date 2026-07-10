@@ -10885,8 +10885,14 @@ function countryImageSrc(country){
   return m[key]||"./assets/icons/icon-512.png";
 }
 function countryImageAlt(country){return `${country} — иллюстрация кухни`;}
+function countryImageDarkSrc(country){
+  const src=countryImageSrc(country);
+  if(src.startsWith('./assets/countries/')) return src.replace('./assets/countries/','./assets/countries/dark/');
+  return src;
+}
 function countryImageHtml(country,cls='country-art'){
-  return `<img class="${cls}" src="${countryImageSrc(country)}" alt="${esc(countryImageAlt(country))}" loading="lazy" decoding="async">`;
+  const alt=esc(countryImageAlt(country));
+  return `<img class="${cls} country-img-light" src="${countryImageSrc(country)}" alt="${alt}" loading="lazy" decoding="async"><img class="${cls} country-img-dark" src="${countryImageDarkSrc(country)}" alt="${alt}" loading="lazy" decoding="async" aria-hidden="true">`;
 }
 
 function categoryIconKey(cat){const m={"Завтраки":"breakfast","Закуски":"snack","Салаты":"salad","Супы":"soup","Горячие блюда":"hot","Гарниры":"side","Выпечка":"bread","Десерты":"dessert","Морепродукты":"seafood","Соусы":"sauce"};return m[cat]||'hot';}
