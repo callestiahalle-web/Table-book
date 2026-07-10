@@ -3858,3 +3858,87 @@ body.dark .hero::after{
   }
 }
 
+
+/* --- final: light bar closer to Table book + smoother theme switch animation --- */
+.hero{
+  margin-top:94px !important;
+}
+.hero::before{
+  top:-178px !important;
+  width:min(64%,720px) !important;
+  height:13px !important;
+  transform:translateX(-50%) scaleX(1) !important;
+  transition:top .46s cubic-bezier(.22,.9,.2,1),box-shadow .46s ease,background .46s ease,border-color .46s ease !important;
+}
+body.dark .hero::after{
+  top:-178px !important;
+  height:410px !important;
+  opacity:.96 !important;
+  transition:top .46s cubic-bezier(.22,.9,.2,1),opacity .46s ease,filter .46s ease,background .46s ease !important;
+}
+body:not(.dark) .hero::after{
+  display:none !important;
+  content:none !important;
+  opacity:0 !important;
+  background:none !important;
+  filter:none !important;
+}
+body:not(.dark) .hero::before{
+  top:-150px !important;
+  width:min(62%,690px) !important;
+  background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(200,151,68,.14) 14%,rgba(212,170,91,.46) 48%,rgba(212,170,91,.46) 52%,rgba(200,151,68,.14) 86%,rgba(255,255,255,0) 100%) !important;
+  border-color:rgba(200,151,68,.36) !important;
+  box-shadow:0 1px 5px rgba(180,135,70,.10),inset 0 1px 0 rgba(255,249,230,.70) !important;
+}
+.theme-btn{
+  transition:transform .22s cubic-bezier(.2,.9,.2,1),box-shadow .34s ease,border-color .34s ease,background .34s ease !important;
+  will-change:transform;
+}
+.theme-btn.theme-morph{
+  animation:themeSwitchPress .46s cubic-bezier(.22,.9,.2,1);
+}
+@keyframes themeSwitchPress{
+  0%{transform:scale(1)}
+  32%{transform:scale(.965)}
+  68%{transform:scale(1.025)}
+  100%{transform:scale(1)}
+}
+.switch-plate{
+  transition:background .42s ease,border-color .42s ease,box-shadow .42s ease,filter .42s ease !important;
+}
+.switch-rocker{
+  transition:left .42s cubic-bezier(.2,.92,.18,1),transform .42s cubic-bezier(.2,.92,.18,1),background .42s ease,box-shadow .42s ease !important;
+  will-change:left,transform;
+}
+.switch-glow{
+  transition:opacity .42s ease,background .42s ease,filter .42s ease !important;
+}
+.room-switch.is-off .switch-rocker{transform:translateX(0) rotate(-1deg)}
+.room-switch.is-on .switch-rocker{transform:translateX(0) rotate(1deg)}
+.theme-btn.theme-morph .switch-rocker{transform:scale(.92)}
+body.dark .theme-btn.theme-morph .switch-rocker{transform:scale(1.04)}
+.room-switch.is-on .switch-glow{
+  opacity:1 !important;
+  filter:blur(5px) !important;
+}
+body.dark .theme-btn.theme-morph::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:-18px -22px !important;
+  border-radius:26px !important;
+  background:radial-gradient(circle at 72% 48%,rgba(255,202,111,.48),rgba(255,202,111,.14) 38%,transparent 72%) !important;
+  pointer-events:none !important;
+  animation:switchGlowPulse .58s ease both;
+}
+@keyframes switchGlowPulse{
+  0%{opacity:0;transform:scale(.84)}
+  45%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.16)}
+}
+@media(max-width:760px){
+  .hero{margin-top:72px !important}
+  .hero::before{top:-92px !important;width:min(70%,360px) !important}
+  body.dark .hero::after{top:-92px !important;height:260px !important}
+  body:not(.dark) .hero::before{top:-74px !important}
+}
+
