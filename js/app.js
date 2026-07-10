@@ -10863,7 +10863,7 @@ function countryImageSrc(country){
     "Япония":"./assets/countries/country-japanese.webp",
     "Корея":"./assets/countries/country-korean.webp"
   };
-  return m[country]||"./icon-512.png";
+  return m[country]||"./assets/icons/icon-512.png";
 }
 function countryImageAlt(country){return `${country} — иллюстрация кухни`;}
 function countryImageHtml(country,cls='country-art'){
@@ -11060,8 +11060,26 @@ function stateForStorage(){
 }
 function tableBookSnapshot(){return {app:"Table book",version:2,savedAt:new Date().toISOString(),state:stateForStorage(),myRecipes:myRecipes};}
 function persistBackup(){try{localStorage.setItem(STORAGE_BACKUP_KEY,JSON.stringify(tableBookSnapshot()))}catch(e){console.warn("Backup save failed",e)}}
+
+function cloudQueueStateSignature(){
+  const clean=normalizeMealPlan(state.mealPlan);
+  return JSON.stringify({theme:state.theme||'light',mealPlan:clean,mealPlanUpdatedAt:Object.keys(clean).length?(state.mealPlanUpdatedAt||null):null});
+}
 function updateBackupStatus(text){const el=$("#backupStatus"); if(el) el.textContent=text;}
-function saveState(){try{state.mealPlan=normalizeMealPlan(state.mealPlan);localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));persistBackup();if(!cloudSyncApplying) queueCloudSave()}catch(e){console.warn("State save failed",e)}}
+function saveState({sync=true}={}){
+  try{
+    state.mealPlan=normalizeMealPlan(state.mealPlan);
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
+    persistBackup();
+    if(sync && !cloudSyncApplying){
+      const sig=cloudQueueStateSignature();
+      if(sig!==lastCloudQueuedStateSignature){
+        lastCloudQueuedStateSignature=sig;
+        queueCloudSave();
+      }
+    }
+  }catch(e){console.warn("State save failed",e)}
+}
 function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
 function defaultUserState(themeValue=state?.theme||"light"){
   return {theme:themeValue||"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealPlanUpdatedAt:null,mealMonth:monthKeyFromDate(new Date()),selectedMealDate:null,mealEditorOpen:false,myCat:null};
@@ -11150,6 +11168,8 @@ function goHomeWithFlip(){flushMealDraftBeforeNavigation(); routeHistory=[]; con
 const MEAL_SLOTS=[['breakfast','Завтрак'],['lunch','Обед'],['dinner','Ужин']];
 let mealDraftDate=null, mealDraft=null, mealDayEditMode=true;
 let mealPickerDialog={slot:null,category:null,country:null,step:'category'};
+let mealPlanCleanedOnce=false;
+let lastCloudQueuedStateSignature=cloudQueueStateSignature();
 function esc(value){return String(value??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));}
 function pad2(n){return String(n).padStart(2,'0')}
 function localDateKey(d=new Date()){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`}
@@ -11169,9 +11189,16 @@ function normalizeMealPlan(plan){
 }
 function touchMealPlan(){state.mealPlanUpdatedAt=new Date().toISOString();}
 function mealPlanHasItems(day){const d=normalizeMealDay(day); return MEAL_SLOTS.some(([slot])=>d[slot].length);}
-function pruneMealPlan(){state.mealPlan=normalizeMealPlan(state.mealPlan); return state.mealPlan;}
-function ensureMealPlan(){return pruneMealPlan();}
-function mealPlanDayCount(){const plan=ensureMealPlan(); return Object.keys(plan).length;}
+function pruneMealPlan(){state.mealPlan=normalizeMealPlan(state.mealPlan); mealPlanCleanedOnce=true; return state.mealPlan;}
+function ensureMealPlan(){
+  if(!state.mealPlan || typeof state.mealPlan!=='object' || Array.isArray(state.mealPlan)) state.mealPlan={};
+  if(!mealPlanCleanedOnce) return pruneMealPlan();
+  return state.mealPlan;
+}
+function mealPlanDayCount(){
+  const plan=(state.mealPlan&&typeof state.mealPlan==='object'&&!Array.isArray(state.mealPlan))?state.mealPlan:{};
+  return Object.keys(plan).length;
+}
 function mealPlanSignature(plan=state.mealPlan){const p=plan&&typeof plan==='object'?plan:{}; return JSON.stringify(Object.keys(p).sort().map(k=>[k,normalizeMealDay(p[k])]));}
 function mergeMealPlans(localPlan,cloudPlan){
   const merged=Object.assign({},localPlan&&typeof localPlan==='object'?localPlan:{});
@@ -11214,12 +11241,20 @@ function currentMealMonthDate(){
   const d=new Date(); state.mealMonth=monthKeyFromDate(d); return new Date(d.getFullYear(),d.getMonth(),1);
 }
 function setMealMonthOffset(delta){const d=currentMealMonthDate(); d.setMonth(d.getMonth()+delta); state.mealMonth=monthKeyFromDate(d); saveState(); document.body.classList.add('meal-calendar-switching'); if(window.__mealCalendarRaf) cancelAnimationFrame(window.__mealCalendarRaf); window.__mealCalendarRaf=requestAnimationFrame(()=>{renderMealCalendar(); requestAnimationFrame(()=>document.body.classList.remove('meal-calendar-switching'));});}
-function openMealCalendar(dateKey=null){ensureMealPlan(); if(!state.mealMonth) state.mealMonth=monthKeyFromDate(new Date()); if(dateKey) state.selectedMealDate=dateKey; showView('mealview'); renderMealCalendar(); if(state.selectedMealDate) openMealDay(state.selectedMealDate,{scroll:!!dateKey}); vibe(12);}
+function openMealCalendar(dateKey=null){ensureMealPlan(); if(!state.mealMonth) state.mealMonth=monthKeyFromDate(new Date()); if(dateKey) state.selectedMealDate=dateKey; showView('mealview'); if(state.selectedMealDate) openMealDay(state.selectedMealDate,{scroll:!!dateKey}); vibe(12);}
 function mealDateSummary(dateKey,limit=3,plan=null){
   const sourcePlan=plan||ensureMealPlan();
-  const day=normalizeMealDay(sourcePlan[dateKey]);
+  const raw=sourcePlan[dateKey];
+  if(!raw) return '';
+  const day=raw;
   const chips=[];
-  MEAL_SLOTS.forEach(([slot,label])=>day[slot].forEach(item=>{const r=getRecipeByRef(item); chips.push(`${label[0]}: ${(r?.title||item.title||'Рецепт').trim()}`);}));
+  MEAL_SLOTS.forEach(([slot,label])=>{
+    const list=Array.isArray(day?.[slot])?day[slot]:[];
+    list.forEach(item=>{
+      const r=getRecipeByRef(item);
+      chips.push(`${label[0]}: ${(r?.title||item.title||'Рецепт').trim()}`);
+    });
+  });
   const shown=chips.slice(0,limit).map(x=>`<span class="meal-chip">${esc(x)}</span>`).join('');
   return shown+(chips.length>limit?`<span class="meal-more">+${chips.length-limit}</span>`:'');
 }
@@ -11229,35 +11264,50 @@ function mealCalendarMonthFirstDate(month){
   const first=new Date(start); first.setDate(start.getDate()-offset);
   return first;
 }
-function mealCalendarRenderSignature(month,{compact=false}={}){
+
+const mealMonthCellsCache=new Map();
+function mealCalendarMonthCells(month){
+  const key=monthKeyFromDate(month);
+  const cached=mealMonthCellsCache.get(key);
+  if(cached) return cached;
   const first=mealCalendarMonthFirstDate(month);
-  const plan=ensureMealPlan();
-  const parts=[monthKeyFromDate(month),compact?'compact':'full',state.selectedMealDate||''];
+  const cells=[];
   for(let i=0;i<42;i++){
     const d=new Date(first); d.setDate(first.getDate()+i);
-    const key=localDateKey(d);
-    const day=normalizeMealDay(plan[key]);
-    const ids=[];
-    MEAL_SLOTS.forEach(([slot])=>day[slot].forEach(item=>ids.push(`${slot}:${item.source||'base'}:${item.id||item.title||''}`)));
-    if(ids.length) parts.push(key+'='+ids.join(','));
+    const inMonth=d.getMonth()===month.getMonth();
+    cells.push({date:d,key:localDateKey(d),day:d.getDate(),inMonth});
   }
+  mealMonthCellsCache.clear();
+  mealMonthCellsCache.set(key,cells);
+  return cells;
+}
+function mealCalendarRenderSignature(month,{compact=false}={}){
+  const plan=ensureMealPlan();
+  const parts=[monthKeyFromDate(month),compact?'compact':'full',state.selectedMealDate||''];
+  mealCalendarMonthCells(month).forEach(cell=>{
+    if(!cell.inMonth) return;
+    const day=plan[cell.key];
+    if(!day) return;
+    const ids=[];
+    MEAL_SLOTS.forEach(([slot])=>{
+      const list=Array.isArray(day?.[slot])?day[slot]:[];
+      list.forEach(item=>ids.push(`${slot}:${item.source||'base'}:${item.id||item.title||''}`));
+    });
+    if(ids.length) parts.push(cell.key+'='+ids.join(','));
+  });
   return parts.join('|');
 }
 function buildMealCalendarHtml(month,{compact=false}={}){
-  const first=mealCalendarMonthFirstDate(month);
   const todayKey=localDateKey(new Date());
   const plan=ensureMealPlan();
-  const out=[];
-  for(let i=0;i<42;i++){
-    const d=new Date(first); d.setDate(first.getDate()+i);
-    const key=localDateKey(d);
+  return mealCalendarMonthCells(month).map(cell=>{
+    if(!cell.inMonth) return '<span class="meal-day meal-day-empty" aria-hidden="true"></span>';
     const cls=['meal-day'];
-    if(d.getMonth()!==month.getMonth()) cls.push('other-month');
-    if(key===todayKey) cls.push('today');
-    if(key===state.selectedMealDate) cls.push('selected');
-    out.push(`<button class="${cls.join(' ')}" data-meal-date="${key}" type="button"><span class="meal-day-number">${d.getDate()}</span><span class="meal-day-dots">${mealDateSummary(key,compact?1:3,plan)}</span></button>`);
-  }
-  return out.join('');
+    if(cell.key===todayKey) cls.push('today');
+    if(cell.key===state.selectedMealDate) cls.push('selected');
+    const summary=plan[cell.key]?mealDateSummary(cell.key,compact?1:3,plan):'';
+    return `<button class="${cls.join(' ')}" data-meal-date="${cell.key}" type="button"><span class="meal-day-number">${cell.day}</span><span class="meal-day-dots">${summary}</span></button>`;
+  }).join('');
 }
 function bindMealCalendarGrid(grid,mode){
   if(!grid || grid.dataset.boundMode===mode) return;
@@ -11293,6 +11343,7 @@ function clearInactiveMealGrid(grid){
   if(!grid) return;
   if(grid.childElementCount){grid.replaceChildren();}
   delete grid.dataset.renderSig;
+  delete grid.dataset.boundMode;
 }
 function renderMealCalendar(){
   ensureMealPlan();
@@ -11809,20 +11860,22 @@ function cloudErrorMessage(error){
   return raw||'Неизвестная ошибка Supabase.';
 }
 function cloudSnapshot(){
-  ensureMealPlan();
-  const s=tableBookSnapshot();
-  s.state=Object.assign({},s.state,{
+  const cleanMealPlan=normalizeMealPlan(state.mealPlan);
+  state.mealPlan=cleanMealPlan;
+  const base=tableBookSnapshot();
+  base.state={
+    theme:state.theme||'light',
     route:'home',
     country:null,
     filterCat:null,
     editingId:null,
     selectedMealDate:null,
     mealEditorOpen:false,
-    mealPlan:normalizeMealPlan(state.mealPlan),
-    mealPlanUpdatedAt:Object.keys(normalizeMealPlan(state.mealPlan)).length?(state.mealPlanUpdatedAt||null):null,
+    mealPlan:cleanMealPlan,
+    mealPlanUpdatedAt:Object.keys(cleanMealPlan).length?(state.mealPlanUpdatedAt||null):null,
     profile:{email:cloudUser?.email||cloudProfile.email||'',nickname:userNickname()}
-  });
-  return s;
+  };
+  return base;
 }
 
 function cloudLastSyncKey(user=cloudUser){return user?.id?CLOUD_LAST_SYNC_KEY_PREFIX+user.id:null;}
@@ -12638,5 +12691,5 @@ if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); bac
 document.addEventListener('click',e=>{const panel=$('#topAuthPanel'), wrap=$('#topAuth'); if(panel && wrap && !panel.hidden && !wrap.contains(e.target)) closeTopAuth();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTopAuth(); closeModalInstant(); closeMealDishPicker();}});
 
-function boot(){const brand=$('#brandMark'); if(brand && !brand.querySelector('.brand-app-icon')) brand.innerHTML='<img class="brand-app-icon" src="./assets/icons/icon-192.png" alt="" loading="eager">'; persistBackup(); initCloudAuth(); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); const mealIcon=$('#mealCalendarIcon'); if(mealIcon) mealIcon.innerHTML=iconSvg('calendar'); ensureMealPlan(); fillMyCategory(); const myCatSelect=$('#myCategory'); if(myCatSelect) myCatSelect.onchange=()=>{state.myCat=myCatSelect.value; saveState();}; renderProductRows([{name:'',weight:'',kcal:'',protein:'',fat:'',carbs:''}]); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderMealCalendar(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview'){state.editingId=null; showView('myview'); showMyLibrary();} else if(state.route==='mealview') openMealCalendar(); else showView('home');} 
+function boot(){const brand=$('#brandMark'); if(brand && !brand.querySelector('.brand-app-icon')) brand.innerHTML='<img class="brand-app-icon" src="./assets/icons/icon-192.png" alt="" loading="eager">'; persistBackup(); initCloudAuth(); const myIcon=$('#myRecipesIcon'); if(myIcon) myIcon.innerHTML=iconSvg('custom'); const mealIcon=$('#mealCalendarIcon'); if(mealIcon) mealIcon.innerHTML=iconSvg('calendar'); ensureMealPlan(); fillMyCategory(); const myCatSelect=$('#myCategory'); if(myCatSelect) myCatSelect.onchange=()=>{state.myCat=myCatSelect.value; saveState();}; renderProductRows([{name:'',weight:'',kcal:'',protein:'',fat:'',carbs:''}]); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview'){state.editingId=null; showView('myview'); showMyLibrary();} else if(state.route==='mealview') openMealCalendar(); else showView('home');} 
 try{boot();}catch(error){console.warn('Boot failed',error); try{cloudStatus('Ошибка запуска приложения: '+(error?.message||error)+'. Авторизация доступна, попробуйте войти снова.');}catch(e){} try{renderCloudUi();}catch(e){}}
