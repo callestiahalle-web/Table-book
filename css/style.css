@@ -3175,3 +3175,158 @@ body.dark .country-art,
 body.dark .meal-country-img{
   background:#1f2428 !important;
 }
+
+
+/* --- FINAL THEME FIX: luxury rough paper + clean controls + dark country art --- */
+:root{
+  --texture-image:url('../assets/textures/luxury-rough-paper-light.webp') !important;
+  --texture-opacity:.92 !important;
+  --bg:#ffffff !important;
+  --bg2:#FAF4E6 !important;
+  --paper:#fff9ee !important;
+  --paper2:#FAF4E6 !important;
+  --paper3:#fffdf8 !important;
+  --ink:#3f3934 !important;
+  --muted:#847971 !important;
+  --theme-border:rgba(177,128,48,.78) !important;
+  --paper-frame-main:rgba(177,128,48,.78) !important;
+  --paper-frame-soft:rgba(225,194,132,.55) !important;
+  --paper-frame-inner:rgba(255,255,255,.72) !important;
+  --surface-grad-1:rgba(255,255,255,.82) !important;
+  --surface-grad-2:rgba(250,244,230,.94) !important;
+  --surface-grad-3:rgba(247,237,220,.88) !important;
+  --control-bg:linear-gradient(180deg,rgba(255,255,255,.86),rgba(250,244,230,.94)) !important;
+  --surface-shadow:0 10px 22px rgba(116,89,47,.10),0 2px 7px rgba(116,89,47,.065) !important;
+}
+body.dark{
+  --texture-image:url('../assets/textures/luxury-rough-paper-dark.webp') !important;
+  --texture-opacity:.84 !important;
+  --bg:#bdc7ce !important;
+  --bg2:#24292e !important;
+  --paper:#4a5156 !important;
+  --paper2:#42494e !important;
+  --paper3:#555e64 !important;
+  --ink:#eef3f4 !important;
+  --muted:#c7d0d4 !important;
+  --theme-border:rgba(0,0,0,.86) !important;
+  --paper-frame-main:rgba(0,0,0,.86) !important;
+  --paper-frame-soft:rgba(189,199,206,.24) !important;
+  --paper-frame-inner:rgba(255,255,255,.075) !important;
+  --surface-grad-1:rgba(74,81,86,.98) !important;
+  --surface-grad-2:rgba(66,73,78,.98) !important;
+  --surface-grad-3:rgba(58,64,69,.98) !important;
+  --control-bg:linear-gradient(180deg,rgba(83,91,96,.98),rgba(66,73,78,.98)) !important;
+  --surface-shadow:0 10px 22px rgba(0,0,0,.26),0 2px 8px rgba(0,0,0,.20) !important;
+}
+body{
+  background:linear-gradient(180deg,#ffffff 0%,#FAF4E6 100%) !important;
+  background-attachment:fixed !important;
+}
+body.dark{
+  background:linear-gradient(180deg,#bdc7ce 0%,#808a92 28%,#4a5156 58%,#24292e 100%) !important;
+  background-attachment:fixed !important;
+}
+body:before{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-2 !important;
+  pointer-events:none !important;
+  opacity:var(--texture-opacity) !important;
+  background-image:var(--texture-image) !important;
+  background-repeat:no-repeat !important;
+  background-size:cover !important;
+  background-position:center center !important;
+  background-attachment:fixed !important;
+  mix-blend-mode:multiply !important;
+  filter:contrast(1.16) saturate(.82) !important;
+  mask-image:none !important;
+}
+body.dark:before{
+  mix-blend-mode:screen !important;
+  filter:contrast(1.16) saturate(.72) brightness(.86) !important;
+}
+body:after{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-1 !important;
+  pointer-events:none !important;
+  opacity:.72 !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 36%,rgba(250,244,230,.08)) !important;
+}
+body.dark:after{
+  opacity:.52 !important;
+  background:linear-gradient(180deg,rgba(189,199,206,.08),transparent 35%,rgba(0,0,0,.16)) !important;
+}
+/* surfaces keep matte paper color, but no visible repeated pattern on buttons */
+.topbar,
+.hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.stat,.my-item,
+.home-menu-card,.home-calendar-card,.meal-day,.meal-slot,.meal-calendar-panel,.meal-picker-card,.meal-step-card,.meal-country-card,.meal-recipe-card,
+.account-settings-card,.auth-popover,.account-info,.my-folder-card,.my-item-compact,.product-calc,.manual-kbju,.empty-box{
+  border:1px solid var(--paper-frame-main) !important;
+  outline:1px solid var(--paper-frame-soft) !important;
+  outline-offset:-4px !important;
+  background-color:var(--paper) !important;
+  background-image:linear-gradient(180deg,var(--surface-grad-1),var(--surface-grad-2) 68%,var(--surface-grad-3)) !important;
+  background-blend-mode:normal !important;
+  box-shadow:var(--surface-shadow),inset 0 1px 0 var(--paper-frame-inner) !important;
+}
+.btn,.input,.select,textarea,input,select,.theme-btn,.back-btn,.pill,.close,.clear-filter,.auth-chip,.top-auth-status,.brand-mark,.arrow,.tab-icon,.cat-icon,.dish-icon,.cemoji,
+.meal-add-btn,.meal-save-btn,.meal-clear-btn,.meal-dish-open,.meal-remove,.meal-picker-back,.meal-saved-link,.auth-close,.auth-resend-btn,.compact-btn,.product-remove{
+  border:1px solid var(--paper-frame-main) !important;
+  outline:1px solid var(--paper-frame-soft) !important;
+  outline-offset:-3px !important;
+  background-color:var(--paper2) !important;
+  background-image:var(--control-bg) !important;
+  background-blend-mode:normal !important;
+  box-shadow:0 6px 14px rgba(116,89,47,.075),inset 0 1px 0 var(--paper-frame-inner) !important;
+  filter:none !important;
+}
+body.dark .btn,body.dark .input,body.dark .select,body.dark textarea,body.dark input,body.dark select,body.dark .theme-btn,body.dark .back-btn,body.dark .pill,body.dark .close,body.dark .clear-filter,body.dark .auth-chip,body.dark .top-auth-status,body.dark .brand-mark,body.dark .arrow,body.dark .tab-icon,body.dark .cat-icon,body.dark .dish-icon,body.dark .cemoji,
+body.dark .meal-add-btn,body.dark .meal-save-btn,body.dark .meal-clear-btn,body.dark .meal-dish-open,body.dark .meal-remove,body.dark .meal-picker-back,body.dark .meal-saved-link,body.dark .auth-close,body.dark .auth-resend-btn,body.dark .compact-btn,body.dark .product-remove{
+  box-shadow:0 6px 14px rgba(0,0,0,.22),inset 0 1px 0 var(--paper-frame-inner) !important;
+  color:var(--ink) !important;
+}
+button:before,.btn:before,.auth-chip:before,.top-auth-status:before,.close:before,.clear-filter:before,.theme-btn:before,.back-btn:before,.meal-add-btn:before,.meal-save-btn:before,.meal-clear-btn:before{
+  background-image:none !important;
+  background:none !important;
+  opacity:0 !important;
+}
+/* remove dark duplicate illustrations with black corners; use clean light art in both themes */
+.country-img-dark{display:none !important;visibility:hidden !important}
+.country-img-light{display:block !important;visibility:visible !important}
+body.dark .country-img-light{display:block !important;visibility:visible !important}
+body.dark .country-img-dark{display:none !important;visibility:hidden !important}
+.country-art-frame,
+.meal-country-thumb{
+  background:#f4eadb !important;
+  border:1px solid var(--paper-frame-main) !important;
+  outline:1px solid var(--paper-frame-soft) !important;
+  outline-offset:-4px !important;
+  box-shadow:0 8px 18px rgba(116,89,47,.10) !important;
+}
+body.dark .country-art-frame,
+body.dark .meal-country-thumb,
+body.dark .country-card .cemoji{
+  background:#24292e !important;
+  border-color:rgba(0,0,0,.86) !important;
+  outline-color:rgba(189,199,206,.18) !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.22) !important;
+}
+.country-art,.meal-country-img{
+  background:transparent !important;
+  display:block !important;
+}
+body.dark .country-art,body.dark .meal-country-img{
+  background:transparent !important;
+}
+/* keep empty calendar cells free from any texture, data look or hit area */
+.meal-day.empty,.meal-day.outside,.meal-day-empty{
+  background:transparent !important;
+  background-image:none !important;
+  border-color:transparent !important;
+  outline-color:transparent !important;
+  box-shadow:none !important;
+  pointer-events:none !important;
+}
