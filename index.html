@@ -2132,6 +2132,37 @@ button,.btn,.auth-chip,.theme-btn,.meal-month-btn,.meal-dish-open,.meal-remove{
   filter:none !important;
 }
 
+
+
+/* iPhone-like page swipe back */
+.view.active.swipe-back-dragging{
+  transition:none !important;
+  will-change:transform,opacity,filter;
+  transform:translate3d(var(--swipe-x,0px),0,0) scale(calc(1 - var(--swipe-p,0)*.015)) !important;
+  opacity:calc(1 - var(--swipe-p,0)*.12);
+  filter:brightness(calc(1 - var(--swipe-p,0)*.035));
+  border-radius:calc(var(--swipe-p,0)*22px);
+  box-shadow:-18px 0 36px rgba(0,0,0,.08);
+}
+.view.active.swipe-back-finish{
+  transition:transform .34s cubic-bezier(.20,.82,.20,1),opacity .30s ease,filter .30s ease,border-radius .30s ease !important;
+  transform:translate3d(102vw,0,0) scale(.985) !important;
+  opacity:.72;
+  filter:brightness(.96);
+  border-radius:22px;
+}
+.view.active.swipe-back-return{
+  transition:transform .30s cubic-bezier(.22,.78,.24,1),opacity .24s ease,filter .24s ease,border-radius .24s ease !important;
+  transform:translate3d(0,0,0) scale(1) !important;
+  opacity:1;
+  filter:none;
+  border-radius:0;
+}
+body.page-swipe-active{overflow:hidden;overscroll-behavior:none}
+body.page-swipe-active .topbar{transform:translateZ(0)}
+.swipe-cue{font-size:13px;font-weight:650;letter-spacing:.01em}
+.swipe-cue span{font-size:24px;line-height:1}
+
 </style>
 </head>
 <body>
@@ -2150,7 +2181,7 @@ button,.btn,.auth-chip,.theme-btn,.meal-month-btn,.meal-dish-open,.meal-remove{
 <div class="meal-account-reminder">Войдите в учётную запись, чтобы меню дня сохранялось и было доступно на других устройствах.</div>
 <div class="meal-layout"><section class="panel meal-calendar-panel" id="mealCalendarPanel"><div class="meal-toolbar"><h3 id="mealMonthTitle">Месяц</h3></div><div class="meal-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><div class="meal-calendar-grid" id="mealCalendarGrid"></div></section><section class="panel meal-day-panel" id="mealDayPanel" hidden><h3 id="mealDayTitle">Выберите дату</h3><p class="meal-day-sub" id="mealDaySub">Нажмите на день в календаре, чтобы добавить блюда.</p><div id="mealDayEditor"></div><div class="meal-day-actions meal-day-actions-active"><button class="btn primary" id="saveMealDay" type="button">Сохранить день</button><button class="btn ghost" id="clearMealDay" type="button">Удалить блюда дня</button></div><div class="meal-status" id="mealDayStatus"></div></section></div></section>
 </main></div>
-<div class="swipe-cue" id="swipeCue"><span>↩</span><b>Главная</b></div>
+<div class="swipe-cue" id="swipeCue"><span>‹</span><b>Назад</b></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true"><article class="dialog" id="dialog"><header class="dialog-head" id="dialogHead"><div class="dialog-title"><div><div class="tags" id="modalTags"></div><h2 id="modalTitle"></h2></div><button class="close" id="closeModal">×</button></div></header><div class="dialog-body" id="modalBody"></div></article></div>
 <div class="meal-picker-modal" id="mealPickerModal" hidden><article class="meal-picker-dialog"><header class="meal-picker-head"><div><span id="mealPickerSlotLabel">Приём пищи</span><h3 id="mealPickerTitle">Выберите блюдо</h3></div><button class="close" id="closeMealPicker" type="button" aria-label="Закрыть">×</button></header><div class="meal-picker-body"><button class="meal-picker-back" id="mealPickerBack" type="button" hidden>← Назад</button><div class="meal-pick-grid meal-pick-grid-modal" id="mealPickerGrid"></div><p class="meal-picker-note" id="mealPickerNote"></p></div></article></div>
 
@@ -14655,25 +14686,85 @@ function initDialogDrag(){
   const finish=()=>endDialogDrag();
   d.addEventListener('pointerup',finish); d.addEventListener('pointercancel',finish); d.addEventListener('lostpointercapture',finish);
 }
-let touchX=0,touchY=0,touchBackCandidate=false;
-function swipeBackBlockedTarget(target){return !!(target?.closest?.('#mealCalendarPanel,#mealPickerModal,.dialog,.auth-popover,input,textarea,select,button'));}
-function canSwipeBack(){return state.route!=='home' && !$('#modal')?.classList.contains('open');}
-document.addEventListener('touchstart',e=>{
-  if(!canSwipeBack() || swipeBackBlockedTarget(e.target)) return;
-  const t=e.touches[0]; touchX=t.clientX; touchY=t.clientY; touchBackCandidate=touchX<38;
-},{passive:true});
-document.addEventListener('touchmove',e=>{
-  if(!canSwipeBack() || !touchBackCandidate) return;
-  const t=e.touches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY);
-  if(dx>28 && dy<62) $('#swipeCue')?.classList.add('show'); else $('#swipeCue')?.classList.remove('show');
-},{passive:true});
-document.addEventListener('touchend',e=>{
-  if(!canSwipeBack() || !touchBackCandidate){touchX=touchY=0; touchBackCandidate=false; return;}
-  const t=e.changedTouches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY);
+let pageSwipe={active:false,tracking:false,startX:0,startY:0,lastX:0,lastT:0,dx:0,dy:0,view:null,blocked:false};
+function swipeBackBlockedTarget(target){return !!(target?.closest?.('#mealPickerModal,.dialog,.auth-popover,input,textarea,select'))}
+function canSwipeBack(){return state.route!=='home' || $('#modal')?.classList.contains('open') || ($('#mealPickerModal') && !$('#mealPickerModal').hidden);}
+function currentSwipeView(){return $('#'+(state.route||'home')) || $('.view.active');}
+function resetPageSwipeView(view,{returning=false}={}){
+  if(!view) return;
+  view.classList.remove('swipe-back-dragging','swipe-back-finish');
+  if(returning){
+    view.classList.add('swipe-back-return');
+    setTimeout(()=>view.classList.remove('swipe-back-return'),320);
+  }else{
+    view.classList.remove('swipe-back-return');
+  }
+  view.style.removeProperty('--swipe-x');
+  view.style.removeProperty('--swipe-p');
+}
+function finishPageSwipeBack(view){
+  if(!view){goBackPage(); return;}
+  view.classList.remove('swipe-back-dragging','swipe-back-return');
+  view.classList.add('swipe-back-finish');
   $('#swipeCue')?.classList.remove('show');
-  if(dx>88 && dy<70) goBackPage();
-  touchX=touchY=0; touchBackCandidate=false;
+  setTimeout(()=>{
+    resetPageSwipeView(view);
+    document.body.classList.remove('page-swipe-active');
+    goBackPage();
+  },260);
+}
+function cancelPageSwipeBack(view){
+  $('#swipeCue')?.classList.remove('show');
+  document.body.classList.remove('page-swipe-active');
+  resetPageSwipeView(view,{returning:true});
+}
+document.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse' && e.button!==0) return;
+  if(!canSwipeBack() || swipeBackBlockedTarget(e.target)) return;
+  if(e.clientX>64) return;
+  pageSwipe={active:false,tracking:true,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastT:performance.now(),dx:0,dy:0,view:currentSwipeView(),blocked:false};
 },{passive:true});
+document.addEventListener('pointermove',e=>{
+  if(!pageSwipe.tracking || !canSwipeBack()) return;
+  const dx=e.clientX-pageSwipe.startX;
+  const dy=e.clientY-pageSwipe.startY;
+  pageSwipe.dx=dx; pageSwipe.dy=dy;
+  const adx=Math.abs(dx), ady=Math.abs(dy);
+  if(!pageSwipe.active){
+    if(dy>34 && ady>adx*1.05){pageSwipe.tracking=false; return;}
+    if(dx<0 || adx<12 || ady>54) return;
+    pageSwipe.active=true;
+    document.body.classList.add('page-swipe-active');
+    pageSwipe.view=currentSwipeView();
+    pageSwipe.view?.classList.add('swipe-back-dragging');
+    try{e.target.setPointerCapture?.(e.pointerId)}catch(err){}
+  }
+  if(pageSwipe.active){
+    e.preventDefault?.();
+    const x=Math.max(0,dx);
+    const p=Math.min(1,x/Math.min(window.innerWidth,420));
+    if(pageSwipe.view){
+      pageSwipe.view.style.setProperty('--swipe-x', x+'px');
+      pageSwipe.view.style.setProperty('--swipe-p', p.toFixed(3));
+    }
+    if(x>34) $('#swipeCue')?.classList.add('show'); else $('#swipeCue')?.classList.remove('show');
+    pageSwipe.lastX=e.clientX; pageSwipe.lastT=performance.now();
+  }
+},{passive:false});
+function endPageSwipe(e){
+  if(!pageSwipe.tracking){pageSwipe={active:false,tracking:false,startX:0,startY:0,lastX:0,lastT:0,dx:0,dy:0,view:null,blocked:false}; return;}
+  const dx=(e?.clientX??pageSwipe.lastX)-pageSwipe.startX;
+  const dy=Math.abs((e?.clientY??pageSwipe.startY)-pageSwipe.startY);
+  const view=pageSwipe.view;
+  const active=pageSwipe.active;
+  pageSwipe={active:false,tracking:false,startX:0,startY:0,lastX:0,lastT:0,dx:0,dy:0,view:null,blocked:false};
+  if(!active){$('#swipeCue')?.classList.remove('show'); return;}
+  const shouldGo=dx>Math.min(145,window.innerWidth*.34) && dy<96;
+  if(shouldGo){vibe(12); finishPageSwipeBack(view);} else cancelPageSwipeBack(view);
+}
+document.addEventListener('pointerup',endPageSwipe,{passive:true});
+document.addEventListener('pointercancel',()=>cancelPageSwipeBack(pageSwipe.view),{passive:true});
+document.addEventListener('lostpointercapture',()=>cancelPageSwipeBack(pageSwipe.view),{passive:true});
 
 function bindClick(id,handler){const el=$('#'+id); if(el) el.onclick=handler; return el;}
 function bindInput(id,handler){const el=$('#'+id); if(el) el.oninput=handler; return el;}
