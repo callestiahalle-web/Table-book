@@ -2037,6 +2037,101 @@ body.dark .country-art-frame{border-color:rgba(230,235,242,.28)!important;box-sh
 .meal-country-img{width:100%;height:100%;display:block;object-fit:cover;border-radius:inherit}
 .meal-country-card-art b{min-height:18px;display:flex;align-items:center;justify-content:center;text-align:center}
 
+
+
+/* global matte paper finish: soft shadows, no heavy volume */
+:root{
+  --shadow:0 12px 28px rgba(118,96,74,.13), 0 2px 8px rgba(118,96,74,.08), inset 0 1px 0 rgba(255,255,255,.46);
+  --softShadow:0 7px 18px rgba(118,96,74,.11), 0 1px 5px rgba(118,96,74,.07), inset 0 1px 0 rgba(255,255,255,.40);
+  --pressed:inset 0 2px 7px rgba(118,96,74,.15), inset 0 -1px 0 rgba(255,255,255,.48);
+  --inner:inset 0 1px 0 rgba(255,255,255,.34);
+  --liquid-glow:0 10px 24px rgba(126,103,80,.10), 0 2px 8px rgba(126,103,80,.06), inset 0 1px 0 rgba(255,255,255,.44) !important;
+  --backdrop:rgba(238,231,221,.86);
+  --paper:#efe7dc;
+  --paper2:#e9dfd2;
+  --paper3:#f8f0e4;
+  --line:rgba(170,138,94,.24);
+}
+body.dark{
+  --shadow:0 12px 28px rgba(0,0,0,.23), 0 2px 8px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.035);
+  --softShadow:0 7px 18px rgba(0,0,0,.20), 0 1px 5px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.03);
+  --pressed:inset 0 2px 7px rgba(0,0,0,.33), inset 0 -1px 0 rgba(255,255,255,.025);
+  --inner:inset 0 1px 0 rgba(255,255,255,.025);
+  --liquid-glow:0 10px 24px rgba(0,0,0,.24), 0 2px 8px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.045) !important;
+  --backdrop:rgba(27,24,21,.88);
+  --paper:#211d19;
+  --paper2:#1b1714;
+  --paper3:#29231e;
+  --line:rgba(224,229,236,.18);
+}
+body{
+  background:
+    radial-gradient(circle at 18% 10%,rgba(234,210,154,.24),transparent 25%),
+    radial-gradient(circle at 84% 8%,rgba(125,160,138,.15),transparent 24%),
+    linear-gradient(135deg,#efe7dc,#f5eee5 52%,#e7dccf) !important;
+}
+body.dark{
+  background:
+    radial-gradient(circle at 16% 8%,rgba(215,182,109,.08),transparent 24%),
+    radial-gradient(circle at 84% 12%,rgba(145,180,154,.055),transparent 25%),
+    linear-gradient(135deg,#201c18,#171411 54%,#0f0d0b) !important;
+}
+body:before{
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:-1 !important;
+  pointer-events:none !important;
+  opacity:.30 !important;
+  background-image:
+    radial-gradient(circle at 12% 18%,rgba(92,72,54,.18) 0 1px,transparent 1.4px),
+    radial-gradient(circle at 76% 30%,rgba(255,255,255,.38) 0 .8px,transparent 1.3px),
+    radial-gradient(circle at 42% 70%,rgba(142,111,75,.13) 0 1.1px,transparent 1.6px),
+    repeating-linear-gradient(12deg,rgba(138,108,78,.045) 0 1px,transparent 1px 6px),
+    repeating-linear-gradient(96deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px) !important;
+  background-size:18px 18px,24px 24px,29px 29px,100% 100%,100% 100% !important;
+  mask-image:none !important;
+  mix-blend-mode:multiply;
+}
+body.dark:before{
+  opacity:.34 !important;
+  background-image:
+    radial-gradient(circle at 16% 20%,rgba(255,255,255,.105) 0 1px,transparent 1.55px),
+    radial-gradient(circle at 74% 36%,rgba(0,0,0,.38) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 42% 72%,rgba(255,255,255,.06) 0 1px,transparent 1.7px),
+    repeating-linear-gradient(12deg,rgba(255,255,255,.035) 0 1px,transparent 1px 6px),
+    repeating-linear-gradient(96deg,rgba(0,0,0,.16) 0 1px,transparent 1px 8px) !important;
+  background-size:19px 19px,26px 26px,31px 31px,100% 100%,100% 100% !important;
+  mix-blend-mode:screen;
+}
+.hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.stat,.my-item,.meal-day,.meal-slot,.account-settings-card,.auth-popover,.account-info,.input,.select,textarea,.btn,.auth-chip,.theme-btn,.meal-month-btn,.meal-dish-open,.meal-remove,.country-art,.cemoji,.tab-icon,.cat-icon,.dish-icon,.brand-mark,.meal-picker-card,.meal-step-card,.meal-country-card,.meal-recipe-card{
+  box-shadow:var(--softShadow) !important;
+}
+.hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.my-item,.home-menu-card,.home-calendar-card{
+  background:linear-gradient(145deg,rgba(255,255,255,.30),rgba(238,229,216,.30)),var(--paper) !important;
+  border-color:var(--line) !important;
+}
+body.dark .hero,body.dark .country-card,body.dark .tab-card,body.dark .cat-tile,body.dark .recipe-card,body.dark .panel,body.dark .dialog,body.dark .country-head,body.dark .custom-head,body.dark .my-item,body.dark .home-menu-card,body.dark .home-calendar-card{
+  background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(0,0,0,.10)),var(--paper) !important;
+  border-color:var(--line) !important;
+}
+.topbar{
+  box-shadow:0 8px 20px rgba(117,93,68,.09), inset 0 -1px 0 var(--line) !important;
+  backdrop-filter:blur(12px) saturate(1.02) !important;
+  -webkit-backdrop-filter:blur(12px) saturate(1.02) !important;
+}
+body.dark .topbar{box-shadow:0 8px 20px rgba(0,0,0,.20), inset 0 -1px 0 var(--line) !important}
+.hero:before,.hero:after,.country-card:before,.country-card:after,.brand-mark:before,.theme-btn:before,.tab-icon:before,.cat-icon:before,.dish-icon:before,.cemoji:before,.arrow:before,.leaf:before,.close:before{
+  opacity:.34 !important;
+}
+.country-card:active,.recipe-card:active,.cat-tile:active,.tab-card:active,.theme-btn:active,.theme-btn.tapped,.btn:active,.meal-dish-open:active{
+  transform:scale(.992) !important;
+  box-shadow:var(--pressed) !important;
+}
+button,.btn,.auth-chip,.theme-btn,.meal-month-btn,.meal-dish-open,.meal-remove{
+  filter:none !important;
+}
+
 </style>
 </head>
 <body>
@@ -13112,10 +13207,19 @@ function createRestCloudClient(){
 function safeJson(value,fallback){try{return value?JSON.parse(value):fallback}catch(e){return fallback}}
 const state=Object.assign({theme:"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealMonth:null,selectedMealDate:null},safeJson(localStorage.getItem(STORAGE_STATE_KEY)||localStorage.getItem("maisonState"),{}));
 let myRecipes=safeJson(localStorage.getItem(STORAGE_RECIPES_KEY)||localStorage.getItem("maisonMyRecipes"),[]);
-function tableBookSnapshot(){return {app:"Table book",version:2,savedAt:new Date().toISOString(),state:Object.assign({},state),myRecipes:myRecipes};}
+function stateForStorage(){
+  const s=Object.assign({},state);
+  s.mealPlan=normalizeMealPlan(s.mealPlan);
+  const selected=String(s.selectedMealDate||'');
+  if(!selected || !s.mealPlan[selected]) s.selectedMealDate=null;
+  s.mealEditorOpen=false;
+  s.editingId=null;
+  return s;
+}
+function tableBookSnapshot(){return {app:"Table book",version:2,savedAt:new Date().toISOString(),state:stateForStorage(),myRecipes:myRecipes};}
 function persistBackup(){try{localStorage.setItem(STORAGE_BACKUP_KEY,JSON.stringify(tableBookSnapshot()))}catch(e){console.warn("Backup save failed",e)}}
 function updateBackupStatus(text){const el=$("#backupStatus"); if(el) el.textContent=text;}
-function saveState(){try{localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));persistBackup();if(!cloudSyncApplying) queueCloudSave()}catch(e){console.warn("State save failed",e)}}
+function saveState(){try{state.mealPlan=normalizeMealPlan(state.mealPlan);localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));persistBackup();if(!cloudSyncApplying) queueCloudSave()}catch(e){console.warn("State save failed",e)}}
 function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
 function defaultUserState(themeValue=state?.theme||"light"){
   return {theme:themeValue||"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealPlanUpdatedAt:null,mealMonth:monthKeyFromDate(new Date()),selectedMealDate:null,mealEditorOpen:false,myCat:null};
@@ -13166,14 +13270,39 @@ function flushMealDraftBeforeNavigation(){
     try{persistMealDraft({sync:true,render:false,status:false});}catch(e){console.warn('Meal draft flush failed',e)}
   }
 }
-function showView(id,anim='fade'){flushMealDraftBeforeNavigation();$$('.view').forEach(v=>{v.classList.remove('active','anim-in','page-enter','page-leave');v.style.display='';}); const target=$('#'+id); if(!target){console.warn('View not found',id);return;} target.style.display=''; target.classList.add('active'); if(anim==='page') target.classList.add('page-enter'); else target.classList.add('anim-in'); state.route=id; saveState(); if(id==='mealview') requestAnimationFrame(()=>renderMealCalendar()); else if(id==='home') requestAnimationFrame(()=>updateHomeMeta()); if(id==='myview') requestAnimationFrame(()=>renderMyRecipes()); window.scrollTo({top:0,behavior:'smooth'});}
+let routeHistory=[], navBackMode=false;
+const ROUTE_IDS=['home','country','myview','mealview'];
+function rememberRouteForBack(nextRoute){
+  const current=state.route||'home';
+  if(navBackMode || !current || current===nextRoute || !ROUTE_IDS.includes(current)) return;
+  if(routeHistory[routeHistory.length-1]!==current) routeHistory.push(current);
+  if(routeHistory.length>12) routeHistory=routeHistory.slice(-12);
+}
+function restoreRoute(route){
+  if(route==='country'){showView('country','page'); renderCountry(state.country||uniqueCountries()[0]); return;}
+  if(route==='myview'){showView('myview','page'); renderMyRecipes(); return;}
+  if(route==='mealview'){showView('mealview','page'); renderMealCalendar(); return;}
+  showView('home','page');
+}
+function goBackPage(){
+  flushMealDraftBeforeNavigation();
+  if($('#mealPickerModal') && !$('#mealPickerModal').hidden){closeMealDishPicker(); return;}
+  if($('#modal')?.classList.contains('open')){closeModalInstant(); return;}
+  const editor=$('#myRecipeEditor');
+  if(state.route==='myview' && editor && !editor.hidden){showMyLibrary(); return;}
+  const prev=routeHistory.pop() || 'home';
+  navBackMode=true;
+  try{restoreRoute(prev);}finally{navBackMode=false;}
+  vibe(14);
+}
+function showView(id,anim='fade'){flushMealDraftBeforeNavigation();rememberRouteForBack(id);$$('.view').forEach(v=>{v.classList.remove('active','anim-in','page-enter','page-leave');v.style.display='';}); const target=$('#'+id); if(!target){console.warn('View not found',id);return;} target.style.display=''; target.classList.add('active'); if(anim==='page') target.classList.add('page-enter'); else target.classList.add('anim-in'); state.route=id; saveState(); if(id==='mealview') requestAnimationFrame(()=>renderMealCalendar()); else if(id==='home') requestAnimationFrame(()=>updateHomeMeta()); if(id==='myview') requestAnimationFrame(()=>renderMyRecipes()); window.scrollTo({top:0,behavior:'smooth'});}
 function renderCountries(){const g=$('#countryGrid'); g.innerHTML=''; uniqueCountries().forEach(c=>{const th=theme(c), list=recipes.filter(r=>r.country===c), cats=orderedCategories(list).length; const b=document.createElement('button'); b.className='country-card country-card-uniform'; b.style.setProperty('--country-bg', th.bg); b.innerHTML=`<div class="country-main"><div class="country-art-frame">${countryImageHtml(c)}</div><div class="country-copy"><h3>${esc(c)}</h3><p>${esc(th.note)}</p></div></div><div class="country-bottom"><span>${list.length} рецептов • ${cats} категорий</span><span class="arrow country-open-arrow" aria-hidden="true">${iconSvg('arrow')}</span></div>`; b.onclick=()=>showCountry(c); g.appendChild(b);});}
 function renderCategoryTiles(country){const list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.slice(0,8).forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); state.filterCat = state.filterCat===cat ? null : cat; saveState(); renderCountry(country); requestAnimationFrame(()=>$('#categoryChoice').scrollIntoView({behavior:'smooth',block:'start'}));}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
 function recipeCard(r){const badge=r.healthy?'<span class="recipe-badge">Полезный</span>':''; const origin=originLabel(r); return `<button class="recipe-card" data-open="${r.id}" data-source="${r.source||'base'}">${badge}<h3>${r.title}</h3>${origin?`<div class="recipe-origin">${origin}</div>`:''}<div class="recipe-meta"><span>${r.time||'—'}</span><span>${r.servings||1} порц.</span><span>${r.difficulty||'легко'}</span></div></button>`}
 function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); $$('[data-open]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.open,b.dataset.source)); showView('country');}
 function slug(s){return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'')}
 function showCountry(c){vibe(12); renderCountry(c);}
-function goHomeWithFlip(){flushMealDraftBeforeNavigation(); const current=$('#'+(state.route||'home'))||$('.view.active')||$('#home'); if(current.id==='home'){showView('home');return;} current.classList.remove('active'); current.style.display='block'; current.classList.add('page-leave'); const home=$('#home'); home.style.display='block'; home.classList.add('active','page-enter'); vibe(16); setTimeout(()=>{current.classList.remove('page-leave'); current.style.display='none'; home.classList.remove('page-enter'); showView('home');},560)}
+function goHomeWithFlip(){flushMealDraftBeforeNavigation(); routeHistory=[]; const current=$('#'+(state.route||'home'))||$('.view.active')||$('#home'); if(current.id==='home'){showView('home');return;} current.classList.remove('active'); current.style.display='block'; current.classList.add('page-leave'); const home=$('#home'); home.style.display='block'; home.classList.add('active','page-enter'); vibe(16); setTimeout(()=>{current.classList.remove('page-leave'); current.style.display='none'; home.classList.remove('page-enter'); showView('home');},560)}
 
 
 const MEAL_SLOTS=[['breakfast','Завтрак'],['lunch','Обед'],['dinner','Ужин']];
@@ -13197,11 +13326,10 @@ function normalizeMealPlan(plan){
   return out;
 }
 function touchMealPlan(){state.mealPlanUpdatedAt=new Date().toISOString();}
-function ensureMealPlan(){
-  state.mealPlan=normalizeMealPlan(state.mealPlan);
-  return state.mealPlan;
-}
-function mealPlanDayCount(){const plan=ensureMealPlan(); return Object.keys(plan).filter(k=>MEAL_SLOTS.some(([slot])=>Array.isArray(plan[k]?.[slot])&&plan[k][slot].length)).length;}
+function mealPlanHasItems(day){const d=normalizeMealDay(day); return MEAL_SLOTS.some(([slot])=>d[slot].length);}
+function pruneMealPlan(){state.mealPlan=normalizeMealPlan(state.mealPlan); return state.mealPlan;}
+function ensureMealPlan(){return pruneMealPlan();}
+function mealPlanDayCount(){const plan=ensureMealPlan(); return Object.keys(plan).length;}
 function mealPlanSignature(plan=state.mealPlan){const p=plan&&typeof plan==='object'?plan:{}; return JSON.stringify(Object.keys(p).sort().map(k=>[k,normalizeMealDay(p[k])]));}
 function mergeMealPlans(localPlan,cloudPlan){
   const merged=Object.assign({},localPlan&&typeof localPlan==='object'?localPlan:{});
@@ -13245,8 +13373,9 @@ function currentMealMonthDate(){
 }
 function setMealMonthOffset(delta){const d=currentMealMonthDate(); d.setMonth(d.getMonth()+delta); state.mealMonth=monthKeyFromDate(d); saveState(); document.body.classList.add('meal-calendar-switching'); if(window.__mealCalendarRaf) cancelAnimationFrame(window.__mealCalendarRaf); window.__mealCalendarRaf=requestAnimationFrame(()=>{renderMealCalendar(); requestAnimationFrame(()=>document.body.classList.remove('meal-calendar-switching'));});}
 function openMealCalendar(dateKey=null){ensureMealPlan(); if(!state.mealMonth) state.mealMonth=monthKeyFromDate(new Date()); if(dateKey) state.selectedMealDate=dateKey; showView('mealview'); renderMealCalendar(); if(state.selectedMealDate) openMealDay(state.selectedMealDate,{scroll:!!dateKey}); vibe(12);}
-function mealDateSummary(dateKey,limit=3){
-  const day=normalizeMealDay(ensureMealPlan()[dateKey]);
+function mealDateSummary(dateKey,limit=3,plan=null){
+  const sourcePlan=plan||ensureMealPlan();
+  const day=normalizeMealDay(sourcePlan[dateKey]);
   const chips=[];
   MEAL_SLOTS.forEach(([slot,label])=>day[slot].forEach(item=>{const r=getRecipeByRef(item); chips.push(`${label[0]}: ${(r?.title||item.title||'Рецепт').trim()}`);}));
   const shown=chips.slice(0,limit).map(x=>`<span class="meal-chip">${esc(x)}</span>`).join('');
@@ -13275,6 +13404,7 @@ function mealCalendarRenderSignature(month,{compact=false}={}){
 function buildMealCalendarHtml(month,{compact=false}={}){
   const first=mealCalendarMonthFirstDate(month);
   const todayKey=localDateKey(new Date());
+  const plan=ensureMealPlan();
   const out=[];
   for(let i=0;i<42;i++){
     const d=new Date(first); d.setDate(first.getDate()+i);
@@ -13283,7 +13413,7 @@ function buildMealCalendarHtml(month,{compact=false}={}){
     if(d.getMonth()!==month.getMonth()) cls.push('other-month');
     if(key===todayKey) cls.push('today');
     if(key===state.selectedMealDate) cls.push('selected');
-    out.push(`<button class="${cls.join(' ')}" data-meal-date="${key}" type="button"><span class="meal-day-number">${d.getDate()}</span><span class="meal-day-dots">${mealDateSummary(key,compact?1:3)}</span></button>`);
+    out.push(`<button class="${cls.join(' ')}" data-meal-date="${key}" type="button"><span class="meal-day-number">${d.getDate()}</span><span class="meal-day-dots">${mealDateSummary(key,compact?1:3,plan)}</span></button>`);
   }
   return out.join('');
 }
@@ -13489,18 +13619,19 @@ function persistMealDraft({sync=true,render=true,status=true}={}){
   const plan=ensureMealPlan();
   const compact=normalizeMealDay(mealDraft);
   const before=mealPlanSignature(plan);
-  if(MEAL_SLOTS.some(([slot])=>compact[slot].length)) plan[mealDraftDate]=compact;
+  if(mealPlanHasItems(compact)) plan[mealDraftDate]=compact;
   else delete plan[mealDraftDate];
   state.mealPlan=normalizeMealPlan(plan);
   const after=mealPlanSignature(state.mealPlan);
-  if(before!==after || !state.mealPlanUpdatedAt) touchMealPlan();
-  saveState();
-  if(render){renderMealCalendar(); updateHomeMeta();}
-  if(sync && cloudUser){
+  const changed=before!==after;
+  if(changed){touchMealPlan(); saveState();}
+  else state.mealPlan=normalizeMealPlan(state.mealPlan);
+  if(render && changed){renderMealCalendar(); updateHomeMeta();}
+  if(sync && changed && cloudUser){
     clearTimeout(cloudSaveTimer);
     saveCloudData({silent:true}).catch(e=>console.warn('Meal plan sync failed',e));
   }
-  return before!==after;
+  return changed;
 }
 function addMealDish(slot,source,id){
   if(!mealDraft||!MEAL_SLOTS.some(([s])=>s===slot)) return;
@@ -13839,10 +13970,14 @@ function cloudSnapshot(){
   ensureMealPlan();
   const s=tableBookSnapshot();
   s.state=Object.assign({},s.state,{
+    route:'home',
+    country:null,
+    filterCat:null,
     editingId:null,
+    selectedMealDate:null,
+    mealEditorOpen:false,
     mealPlan:normalizeMealPlan(state.mealPlan),
-    mealPlanUpdatedAt:state.mealPlanUpdatedAt||null,
-    selectedMealDate:state.selectedMealDate||null,
+    mealPlanUpdatedAt:Object.keys(normalizeMealPlan(state.mealPlan)).length?(state.mealPlanUpdatedAt||null):null,
     profile:{email:cloudUser?.email||cloudProfile.email||'',nickname:userNickname()}
   });
   return s;
@@ -14520,7 +14655,25 @@ function initDialogDrag(){
   const finish=()=>endDialogDrag();
   d.addEventListener('pointerup',finish); d.addEventListener('pointercancel',finish); d.addEventListener('lostpointercapture',finish);
 }
-let touchX=0,touchY=0; function canSwipeBack(){return (state.route==='country' || state.route==='myview' || state.route==='mealview') && !$('#modal').classList.contains('open');} document.addEventListener('touchstart',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; touchX=t.clientX; touchY=t.clientY;},{passive:true}); document.addEventListener('touchmove',e=>{if(!canSwipeBack()) return; const t=e.touches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); if(touchX<36 && dx>26 && dy<60) $('#swipeCue').classList.add('show'); else $('#swipeCue').classList.remove('show');},{passive:true}); document.addEventListener('touchend',e=>{if(!canSwipeBack()) return; const t=e.changedTouches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY); $('#swipeCue').classList.remove('show'); if(touchX<36 && dx>88 && dy<70) goHomeWithFlip(); touchX=touchY=0;},{passive:true});
+let touchX=0,touchY=0,touchBackCandidate=false;
+function swipeBackBlockedTarget(target){return !!(target?.closest?.('#mealCalendarPanel,#mealPickerModal,.dialog,.auth-popover,input,textarea,select,button'));}
+function canSwipeBack(){return state.route!=='home' && !$('#modal')?.classList.contains('open');}
+document.addEventListener('touchstart',e=>{
+  if(!canSwipeBack() || swipeBackBlockedTarget(e.target)) return;
+  const t=e.touches[0]; touchX=t.clientX; touchY=t.clientY; touchBackCandidate=touchX<38;
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(!canSwipeBack() || !touchBackCandidate) return;
+  const t=e.touches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY);
+  if(dx>28 && dy<62) $('#swipeCue')?.classList.add('show'); else $('#swipeCue')?.classList.remove('show');
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!canSwipeBack() || !touchBackCandidate){touchX=touchY=0; touchBackCandidate=false; return;}
+  const t=e.changedTouches[0]; const dx=t.clientX-touchX, dy=Math.abs(t.clientY-touchY);
+  $('#swipeCue')?.classList.remove('show');
+  if(dx>88 && dy<70) goBackPage();
+  touchX=touchY=0; touchBackCandidate=false;
+},{passive:true});
 
 function bindClick(id,handler){const el=$('#'+id); if(el) el.onclick=handler; return el;}
 function bindInput(id,handler){const el=$('#'+id); if(el) el.oninput=handler; return el;}
