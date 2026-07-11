@@ -4033,3 +4033,261 @@ body.dark .theme-btn.theme-morph::after{
   }
 }
 
+/* Final home, favorites and encyclopedia fixes */
+#home .stats,
+#home .stats-hidden {
+  display: none !important;
+}
+
+#home.view.active {
+  padding-top: 0 !important;
+}
+
+main.page {
+  padding-top: clamp(8px, 1.1vw, 16px) !important;
+}
+
+#home .hero {
+  margin-top: clamp(8px, 1.2vw, 16px) !important;
+  margin-bottom: 10px !important;
+  min-height: 174px !important;
+  padding: clamp(22px, 3vw, 34px) !important;
+}
+
+#home .home-planner-row {
+  margin-top: 8px !important;
+}
+
+.home-tools-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 18px;
+  max-width: 980px;
+  margin: 16px auto 30px;
+}
+
+.home-tools-row .tab-card {
+  min-height: 128px;
+}
+
+.liked-tab-icon,
+.encyclopedia-tab-icon {
+  display: grid !important;
+  place-items: center;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.cuisine-title {
+  margin-top: 26px !important;
+}
+
+.cuisine-carousel-shell {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 46px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0 auto 22px;
+}
+
+#countryGrid.cuisine-carousel {
+  display: grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 340px);
+  grid-template-columns: none !important;
+  justify-content: start;
+  gap: 18px !important;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  padding: 10px 4px 18px !important;
+  scrollbar-width: none;
+}
+
+#countryGrid.cuisine-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.country-slide {
+  scroll-snap-align: center;
+}
+
+.cuisine-carousel-arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--softShadow), var(--inner);
+  font: 400 32px/1 Arial, sans-serif;
+  cursor: pointer;
+}
+
+.recipe-card-with-like {
+  position: relative;
+  display: grid !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.recipe-open-card {
+  width: 100%;
+  min-height: 100%;
+  padding: 20px 54px 18px 18px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: center;
+  display: grid;
+  gap: 10px;
+}
+
+.recipe-open-card h3 {
+  margin: 0 !important;
+}
+
+.like-btn {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(185,104,104,.30);
+  border-radius: 999px;
+  background: var(--paper);
+  color: #ad6a6a;
+  box-shadow: var(--softShadow), var(--inner);
+  cursor: pointer;
+}
+
+.recipe-card .like-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+}
+
+.like-btn .line-icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+}
+
+.like-btn span {
+  display: none;
+}
+
+.like-btn.active {
+  color: #b4515b;
+  border-color: rgba(180,81,91,.50);
+  background: color-mix(in srgb, #f7d7db 68%, var(--paper));
+}
+
+.like-btn.active .line-icon {
+  fill: currentColor;
+}
+
+#modalTags .like-btn {
+  width: 34px;
+  height: 34px;
+}
+
+.liked-recipes-grid {
+  margin-top: 18px;
+}
+
+.encyclopedia-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 18px 0 22px;
+}
+
+.encyclopedia-filter {
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--softShadow), var(--inner);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.encyclopedia-filter.active {
+  box-shadow: var(--pressed);
+}
+
+.encyclopedia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.encyclopedia-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+  box-shadow: var(--shadow), var(--inner);
+}
+
+.encyclopedia-card small {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.encyclopedia-card h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.encyclopedia-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media(max-width:760px) {
+  main.page {
+    padding-top: 6px !important;
+  }
+
+  #home .hero {
+    margin-top: 6px !important;
+    min-height: 150px !important;
+    padding: 20px 18px !important;
+  }
+
+  .home-tools-row {
+    grid-template-columns: 1fr;
+    max-width: 620px;
+    gap: 12px;
+  }
+
+  .cuisine-carousel-shell {
+    grid-template-columns: 38px minmax(0, 1fr) 38px;
+    gap: 4px;
+  }
+
+  #countryGrid.cuisine-carousel {
+    grid-auto-columns: minmax(240px, 78vw);
+  }
+
+  .cuisine-carousel-arrow {
+    width: 38px;
+    height: 38px;
+    font-size: 28px;
+  }
+}
