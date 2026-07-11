@@ -43,6 +43,7 @@
   let carouselTimer = 0;
   let carouselRendering = false;
   let pointerStart = null;
+  const legacyCuisineVisuals = new Map();
 
   function safeVibe(value = 10) {
     try {
@@ -468,6 +469,15 @@
     if (!(card instanceof Element) || !card.matches('.recipe-card')) return;
     const key = keyFromCard(card);
     if (!key) return;
+    card.classList.add('tb-home-style-card');
+    if (!$('.tb-recipe-card-icon', card)) {
+      const item = findRecipeByKey(key);
+      const icon = document.createElement('div');
+      icon.className = 'tab-icon tb-recipe-card-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.innerHTML = categoryVisualMarkup(item?.category || item?.type || 'Рецепт');
+      card.insertBefore(icon, card.firstChild);
+    }
     let heart = $('.favorite-heart', card);
     if (!heart) {
       heart = createHeart(key);
@@ -511,7 +521,7 @@
   function recipeCardForLiked(item) {
     const card = document.createElement('button');
     card.type = 'button';
-    card.className = 'recipe-card';
+    card.className = 'recipe-card tb-home-style-card';
     card.dataset.open = item.id;
     card.dataset.source = item.source || 'base';
     const origin = item.country || item.origin || '';
@@ -540,6 +550,20 @@
 
   function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  }
+
+  function syncHomeCardSurface() {
+    const source = $('#myRecipesCard') || $('#homeMealCalendarCard');
+    if (!source) return;
+    try {
+      const styles = getComputedStyle(source);
+      const root = document.documentElement.style;
+      root.setProperty('--tb-home-card-background', styles.background);
+      root.setProperty('--tb-home-card-border', styles.border);
+      root.setProperty('--tb-home-card-shadow', styles.boxShadow);
+      root.setProperty('--tb-home-card-radius', styles.borderRadius);
+      root.setProperty('--tb-home-card-color', styles.color);
+    } catch (_) {}
   }
 
   function syncRouteClasses(id = $('.view.active')?.id || '') {
@@ -720,25 +744,102 @@
     return [];
   }
 
+  function countryNameFromCard(card) {
+    if (!(card instanceof Element)) return '';
+    return String(
+      card.dataset.country ||
+      card.dataset.cuisine ||
+      card.getAttribute('data-open-country') ||
+      textOf($('h3', card)) ||
+      textOf($('strong', card)) ||
+      ''
+    ).trim();
+  }
+
+  function legacyBackgroundMarkup(element) {
+    if (!(element instanceof Element)) return '';
+    let background = '';
+    try {
+      background = element.style.backgroundImage || getComputedStyle(element).backgroundImage || '';
+    } catch (_) {}
+    if (!background || background === 'none' || !/url\(/i.test(background)) return '';
+    return `<span class="country-legacy-bg" style="background-image:${escapeHtml(background)}"></span>`;
+  }
+
+  function legacyVisualMarkup(card, name) {
+    if (card instanceof Element) {
+      const picture = $('picture', card);
+      if (picture) {
+        const clone = picture.cloneNode(true);
+        $$('[id]', clone).forEach(node => node.removeAttribute('id'));
+        clone.classList.add('country-legacy-picture');
+        return clone.outerHTML;
+      }
+      const image = $('img', card);
+      if (image?.getAttribute('src')) {
+        return `<img class="country-legacy-image" src="${escapeHtml(image.getAttribute('src'))}" alt="" loading="lazy" decoding="async">`;
+      }
+      const selectors = ['.country-picture', '.country-image', '.country-art', '.cuisine-image', '.cuisine-art', '.country-icon', '.country-flag', '.flag', '.cemoji'];
+      for (const selector of selectors) {
+        const node = $(selector, card);
+        if (!node) continue;
+        const bg = legacyBackgroundMarkup(node);
+        if (bg) return bg;
+        if (node.querySelector('svg,img,picture') || /<svg|<img|<picture/i.test(node.innerHTML)) return node.innerHTML;
+      }
+      const candidates = [card, ...Array.from(card.children).slice(0, 8)];
+      for (const candidate of candidates) {
+        const bg = legacyBackgroundMarkup(candidate);
+        if (bg) return bg;
+      }
+    }
+
+    try {
+      if (typeof theme === 'function') {
+        const info = theme(name) || {};
+        for (const key of ['image', 'img', 'picture', 'photo', 'art', 'src', 'icon']) {
+          const value = info[key];
+          if (typeof value !== 'string' || !value.trim()) continue;
+          const trimmed = value.trim();
+          if (/^<svg[\s>]/i.test(trimmed)) return trimmed;
+          if (/^url\(/i.test(trimmed)) return `<span class="country-legacy-bg" style="background-image:${escapeHtml(trimmed)}"></span>`;
+          if (/\.(?:png|jpe?g|webp|gif|svg)(?:[?#].*)?$/i.test(trimmed) || /^(?:\.\/|\.\.\/|\/|https?:)/i.test(trimmed)) {
+            return `<img class="country-legacy-image" src="${escapeHtml(trimmed)}" alt="" loading="lazy" decoding="async">`;
+          }
+        }
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof countryFlagSvg === 'function' && typeof countryIconKey === 'function') return countryFlagSvg(countryIconKey(name));
+    } catch (_) {}
+    return '<span class="country-fallback-symbol" aria-hidden="true">✦</span>';
+  }
+
+  function captureLegacyCuisineVisuals(grid) {
+    if (!(grid instanceof Element)) return;
+    Array.from(grid.children).forEach(card => {
+      if (!(card instanceof Element) || !card.matches('.country-card') || card.dataset.tbCarouselCopy === '1') return;
+      const name = countryNameFromCard(card);
+      if (!name || legacyCuisineVisuals.has(name)) return;
+      const markup = legacyVisualMarkup(card, name);
+      if (markup) legacyCuisineVisuals.set(name, markup);
+    });
+  }
+
   function createCuisineCard(name) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'country-card country-card-rect';
+    button.className = 'country-card country-card-rect tb-home-style-card';
     button.dataset.country = name;
     let note = 'Открыть блюда этой кухни';
-    let background = '';
     try {
       if (typeof theme === 'function') {
         const info = theme(name) || {};
         note = info.note || note;
-        background = info.bg || '';
       }
     } catch (_) {}
-    if (background) button.style.setProperty('--country-bg', background);
-    let visual = '<span aria-hidden="true">✦</span>';
-    try {
-      if (typeof countryFlagSvg === 'function' && typeof countryIconKey === 'function') visual = countryFlagSvg(countryIconKey(name));
-    } catch (_) {}
+    const visual = legacyCuisineVisuals.get(name) || legacyVisualMarkup(null, name);
     let recipeCount = 0;
     let categoryCount = 0;
     try {
@@ -749,12 +850,14 @@
       }
     } catch (_) {}
     const count = `${recipeCount} ${plural(recipeCount, ['рецепт', 'рецепта', 'рецептов'])} • ${categoryCount} ${plural(categoryCount, ['тип', 'типа', 'типов'])}`;
-    button.innerHTML = `<div class="country-visual"><div class="cemoji">${visual}</div></div><div class="country-info-box"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(note)}</p><div class="country-bottom"><span>${escapeHtml(count)}</span><span class="arrow">›</span></div></div>`;
+    button.innerHTML = `<div class="tab-icon country-card-icon"><div class="country-old-media">${visual}</div></div><div class="country-info-box"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(note)}</p><div class="country-bottom"><span>${escapeHtml(count)}</span><span class="arrow">›</span></div></div>`;
     return button;
   }
 
-  function collectCuisineModels() {
-    return getCuisineNames().map(name => ({name, node: createCuisineCard(name)}));
+  function collectCuisineModels(grid = $('#countryGrid')) {
+    captureLegacyCuisineVisuals(grid);
+    const names = getCuisineNames();
+    return names.map(name => ({name, node: createCuisineCard(name)}));
   }
 
   function visibleCuisineCount() {
@@ -964,7 +1067,7 @@
   function fallbackRecipeCard(item) {
     const source = item.source || 'base';
     const badge = item.healthy ? '<span class="recipe-badge">Полезный</span>' : '';
-    return `<button class="recipe-card" data-open="${escapeHtml(item.id)}" data-source="${escapeHtml(source)}">${badge}<h3>${escapeHtml(item.title || 'Без названия')}</h3><div class="recipe-meta"><span>${escapeHtml(item.time || '—')}</span><span>${escapeHtml(item.servings || 1)} порц.</span><span>${escapeHtml(item.difficulty || 'легко')}</span></div></button>`;
+    return `<button class="recipe-card tb-home-style-card" data-open="${escapeHtml(item.id)}" data-source="${escapeHtml(source)}">${badge}<h3>${escapeHtml(item.title || 'Без названия')}</h3><div class="recipe-meta"><span>${escapeHtml(item.time || '—')}</span><span>${escapeHtml(item.servings || 1)} порц.</span><span>${escapeHtml(item.difficulty || 'легко')}</span></div></button>`;
   }
 
   function countryRecipeCardHtml(item) {
@@ -1070,7 +1173,7 @@
         const count = list.filter(item => item.category === category).length;
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = `cat-tile country-type-tile${selected === category ? ' active' : ''}`;
+        button.className = `cat-tile country-type-tile tb-home-style-card${selected === category ? ' active' : ''}`;
         button.dataset.category = category;
         button.setAttribute('aria-label', `Открыть тип блюда ${category}: ${count} ${plural(count, ['блюдо', 'блюда', 'блюд'])}`);
         button.innerHTML = `<div class="cat-icon" aria-hidden="true">${categoryVisualMarkup(category)}</div><div class="country-type-copy"><strong>${escapeHtml(category)}</strong><span>${count} ${plural(count, ['блюдо', 'блюда', 'блюд'])}</span></div><span class="country-type-arrow" aria-hidden="true">›</span>`;
@@ -1327,6 +1430,7 @@
   function init() {
     ensureCustomViews();
     normalizeHomeLayout();
+    syncHomeCardSurface();
     wrapCountryRenderer();
     installCountryTypeNavigation();
     wrapBackNavigation();
@@ -1358,6 +1462,15 @@
       if (!document.hidden && favoritesUserId) syncFavoritesFromSupabase({force: false, migrateLocal: false});
     });
 
+    const themeButton = $('#themeBtn');
+    if (themeButton && themeButton.dataset.tbSurfaceBound !== '1') {
+      themeButton.dataset.tbSurfaceBound = '1';
+      themeButton.addEventListener('click', () => setTimeout(() => {
+        syncHomeCardSurface();
+        renderCarousel();
+      }, 40));
+    }
+
     installFavoritesSupabaseSync();
     syncRouteClasses($('.view.active')?.id || 'home');
 
@@ -1365,6 +1478,7 @@
     window.addEventListener('resize', () => {
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
+        syncHomeCardSurface();
         renderCarousel();
         const clear = $('#clearCat');
         if (clear) clear.textContent = mobileCountryFlow() ? '← Типы блюд' : 'Показать все типы';
