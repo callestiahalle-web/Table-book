@@ -4291,3 +4291,225 @@ main.page {
     font-size: 28px;
   }
 }
+
+/* Compact premium home action cards */
+#home .home-planner-row,
+#home .home-tools-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  width: min(100%, 760px) !important;
+  max-width: 760px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+}
+
+#home .home-planner-row {
+  margin-top: 10px !important;
+}
+
+#home .home-tools-row {
+  margin-top: 12px !important;
+  margin-bottom: 22px !important;
+}
+
+#home .home-planner-row .tab-card,
+#home .home-tools-row .tab-card {
+  width: 100% !important;
+  min-height: 124px !important;
+  height: 124px !important;
+  padding: 14px 16px !important;
+  border-radius: 26px !important;
+  display: grid !important;
+  grid-template-columns: 54px minmax(0, 1fr) !important;
+  grid-template-rows: 1fr !important;
+  align-items: center !important;
+  justify-content: start !important;
+  justify-items: stretch !important;
+  gap: 14px !important;
+  text-align: left !important;
+}
+
+#home .home-planner-row .tab-card::after,
+#home .home-tools-row .tab-card::after {
+  width: 54px !important;
+  height: 54px !important;
+  right: -14px !important;
+  top: -16px !important;
+  opacity: .24 !important;
+}
+
+#home .home-planner-row .tab-icon,
+#home .home-tools-row .tab-icon,
+#home .home-my-card .tab-icon,
+#home .home-menu-card .tab-icon {
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  border-radius: 21px !important;
+  margin: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  align-self: center !important;
+  justify-self: center !important;
+  color: #7f6236 !important;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255,255,255,.95), rgba(255,255,255,.18) 32%, transparent 58%),
+    linear-gradient(145deg, #fff7e4 0%, #ead19b 46%, #c49a52 100%) !important;
+  border: 1px solid rgba(255,255,255,.72) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -10px 18px rgba(132,94,44,.14),
+    0 14px 28px rgba(92,74,48,.14),
+    0 2px 0 rgba(255,255,255,.60) !important;
+}
+
+body.dark #home .home-planner-row .tab-icon,
+body.dark #home .home-tools-row .tab-icon {
+  color: #efd79c !important;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255,255,255,.20), transparent 42%),
+    linear-gradient(145deg, #283149 0%, #7d6336 58%, #b8924f 100%) !important;
+  border-color: rgba(239,215,156,.24) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 -10px 18px rgba(0,0,0,.24),
+    0 14px 28px rgba(0,0,0,.26) !important;
+}
+
+#home .home-planner-row .tab-icon .line-icon,
+#home .home-tools-row .tab-icon .line-icon {
+  width: 29px !important;
+  height: 29px !important;
+  stroke-width: 1.75 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  display: block !important;
+}
+
+#home .home-card-copy {
+  min-width: 0 !important;
+  display: grid !important;
+  align-content: center !important;
+  justify-items: start !important;
+  gap: 4px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#home .home-card-copy b,
+#home .home-card-copy span,
+#home .home-card-copy small {
+  max-width: 100% !important;
+  text-align: left !important;
+}
+
+#home .home-card-copy b {
+  font-size: clamp(14px, 1.7vw, 16px) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.01em !important;
+}
+
+#home .home-card-copy span {
+  font-size: 11.5px !important;
+  line-height: 1.25 !important;
+  font-weight: 650 !important;
+  opacity: .86 !important;
+}
+
+#home .home-card-copy small {
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+  color: var(--accent) !important;
+  font-weight: 800 !important;
+}
+
+#home .home-planner-row .tab-card:hover,
+#home .home-tools-row .tab-card:hover {
+  transform: translateY(-1px) !important;
+}
+
+.cuisine-carousel-arrow,
+.country-open-arrow,
+.arrow {
+  display: grid !important;
+  place-items: center !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.cuisine-carousel-arrow .line-icon,
+.country-open-arrow .line-icon,
+.arrow .line-icon {
+  display: block !important;
+  margin: auto !important;
+}
+
+@media(max-width: 620px) {
+  #home .home-planner-row,
+  #home .home-tools-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  #home .home-planner-row .tab-card,
+  #home .home-tools-row .tab-card {
+    min-height: 118px !important;
+    height: 118px !important;
+    padding: 13px 11px !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 46px 1fr !important;
+    gap: 8px !important;
+    text-align: center !important;
+    align-content: center !important;
+    justify-items: center !important;
+  }
+
+  #home .home-planner-row .tab-icon,
+  #home .home-tools-row .tab-icon,
+  #home .home-my-card .tab-icon,
+  #home .home-menu-card .tab-icon {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    border-radius: 18px !important;
+  }
+
+  #home .home-planner-row .tab-icon .line-icon,
+  #home .home-tools-row .tab-icon .line-icon {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  #home .home-card-copy {
+    justify-items: center !important;
+    gap: 3px !important;
+  }
+
+  #home .home-card-copy b,
+  #home .home-card-copy span,
+  #home .home-card-copy small {
+    text-align: center !important;
+  }
+
+  #home .home-card-copy span {
+    display: none !important;
+  }
+}
+
+@media(max-width: 360px) {
+  #home .home-planner-row .tab-card,
+  #home .home-tools-row .tab-card {
+    min-height: 108px !important;
+    height: 108px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  #home .home-card-copy b {
+    font-size: 13px !important;
+  }
+}
