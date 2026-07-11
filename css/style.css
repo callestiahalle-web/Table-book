@@ -3942,3 +3942,94 @@ body.dark .theme-btn.theme-morph::after{
   body:not(.dark) .hero::before{top:-74px !important}
 }
 
+
+/* --- mobile header alignment: light bar near Table book, title closer to icon --- */
+@media(max-width:760px){
+  .topbar-inner{
+    grid-template-columns:48px minmax(0,1fr) auto !important;
+    gap:10px !important;
+  }
+  .brand{
+    justify-self:start !important;
+  }
+  .site-title{
+    position:relative !important;
+    left:auto !important;
+    top:auto !important;
+    transform:none !important;
+    justify-self:start !important;
+    text-align:left !important;
+    padding-left:2px !important;
+    max-width:42vw !important;
+    font-size:clamp(21px,6.1vw,28px) !important;
+    letter-spacing:.045em !important;
+    white-space:nowrap !important;
+    z-index:2 !important;
+  }
+  .topbar-actions{
+    justify-self:end !important;
+  }
+  .page{
+    padding-top:34px !important;
+  }
+  .hero{
+    margin-top:54px !important;
+  }
+  .hero::before{
+    top:-110px !important;
+    width:min(58%,300px) !important;
+    height:10px !important;
+    left:50% !important;
+    transform:translateX(-50%) !important;
+  }
+  body.dark .hero::after{
+    top:-110px !important;
+    height:245px !important;
+    width:min(112%,520px) !important;
+  }
+  body:not(.dark) .hero::before{
+    top:-94px !important;
+    width:min(54%,290px) !important;
+  }
+  body:not(.dark) .hero::after{
+    display:none !important;
+    content:none !important;
+  }
+}
+
+@media(max-width:430px){
+  .topbar-inner{
+    grid-template-columns:44px minmax(0,1fr) auto !important;
+    gap:8px !important;
+  }
+  .brand,
+  .brand-mark{
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+  }
+  .site-title{
+    font-size:clamp(20px,6vw,25px) !important;
+    max-width:38vw !important;
+    letter-spacing:.035em !important;
+  }
+  .auth-chip-primary{
+    max-width:88px !important;
+  }
+  .theme-btn{
+    width:52px !important;
+    height:36px !important;
+  }
+  .hero::before{
+    top:-104px !important;
+    width:min(56%,250px) !important;
+  }
+  body.dark .hero::after{
+    top:-104px !important;
+    height:228px !important;
+  }
+  body:not(.dark) .hero::before{
+    top:-88px !important;
+  }
+}
+
