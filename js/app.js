@@ -11301,8 +11301,8 @@ function renderCountries(){
 function setupCountryCarousel(previousCountry=''){
   const g=$('#countryGrid'); if(!g) return;
   const prev=$('#cuisinePrev'), next=$('#cuisineNext');
+  const cards=[...g.querySelectorAll('.country-card')];
   const updateFocus=()=>{
-    const cards=[...g.querySelectorAll('.country-card')];
     if(!cards.length) return;
     const mid=g.scrollLeft+g.clientWidth/2;
     let active=null;
@@ -11310,9 +11310,7 @@ function setupCountryCarousel(previousCountry=''){
       const center=card.offsetLeft+card.offsetWidth/2;
       const distance=Math.abs(center-mid);
       const ratio=Math.min(1,distance/(card.offsetWidth*1.35));
-      card.style.setProperty('--carousel-distance',ratio.toFixed(3));
       card.classList.toggle('is-near',ratio<.62);
-      card.classList.toggle('is-far',ratio>.86);
       if(!active || distance<active.distance) active={card,distance};
     });
     cards.forEach(card=>card.classList.toggle('is-active',card===active?.card));
@@ -11343,15 +11341,10 @@ function setupCountryCarousel(previousCountry=''){
   });
   requestAnimationFrame(updateFocus);
 }
-function focusFirstRecipeRow(){
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const firstSection=$('#countryRecipes .cat-section');
-    if(firstSection) firstSection.scrollIntoView({behavior:'smooth',block:'start'});
-  }));
-}
-function renderCategoryTiles(country){const list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.slice(0,8).forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); state.filterCat = state.filterCat===cat ? null : cat; saveState(); renderCountry(country); focusFirstRecipeRow();}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
+function refreshCountryCategory(country,anchorTop){renderCountry(country); const pinMenu=()=>{const choice=$('#categoryChoice'); if(!choice) return; const delta=choice.getBoundingClientRect().top-anchorTop; if(Math.abs(delta)>.5) window.scrollTo({top:Math.max(0,window.scrollY+delta),left:0,behavior:'auto'});}; pinMenu(); requestAnimationFrame(pinMenu);}
+function renderCategoryTiles(country){const list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.slice(0,8).forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); const anchorTop=choice.getBoundingClientRect().top; state.filterCat = state.filterCat===cat ? null : cat; saveState(); refreshCountryCategory(country,anchorTop);}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
 function recipeCard(r){const badge=r.healthy?'<span class="recipe-badge">Полезный</span>':''; const origin=originLabel(r); const source=r.source==='custom'?'custom':'base'; return `<article class="recipe-card recipe-card-with-like">${badge}<button class="recipe-open-card" data-open="${esc(r.id)}" data-source="${source}" type="button"><h3>${esc(r.title)}</h3>${origin?`<div class="recipe-origin">${esc(origin)}</div>`:''}<div class="recipe-meta"><span>${esc(r.time||'—')}</span><span>${r.servings||1} порц.</span><span>${esc(r.difficulty||'легко')}</span></div></button>${likeButtonHtml(r.id,source,'')}</article>`}
-function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); renderRecipeInteractions(wrap); showView('country');}
+function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); renderRecipeInteractions(wrap); const countryView=$('#country'); if(state.route!=='country' || !countryView?.classList.contains('active')) showView('country');}
 function slug(s){return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'')}
 function showCountry(c){vibe(12); renderCountry(c);}
 function goHomeWithFlip(){flushMealDraftBeforeNavigation(); routeHistory=[]; const current=$('#'+(state.route||'home'))||$('.view.active')||$('#home'); if(current.id==='home'){showView('home');return;} current.classList.remove('active'); current.style.display='block'; current.classList.add('page-leave'); const home=$('#home'); home.style.display='block'; home.classList.add('active','page-enter'); vibe(16); setTimeout(()=>{current.classList.remove('page-leave'); current.style.display='none'; home.classList.remove('page-enter'); showView('home');},560)}
