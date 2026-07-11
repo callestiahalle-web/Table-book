@@ -542,19 +542,30 @@
     return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
   }
 
-  function showCustomView(id) {
+  function syncRouteClasses(id = $('.view.active')?.id || '') {
+    document.body.classList.toggle('tb-home-route', id === 'home');
+    document.body.dataset.tbRoute = id || '';
+  }
+
+  function showCustomView(id, options = {}) {
     const target = document.getElementById(id);
     if (!target) return;
-    $$('.view').forEach(view => {
-      view.classList.remove('active', 'anim-in', 'page-enter', 'page-leave');
-      view.style.display = '';
-    });
-    target.classList.add('active', 'anim-in');
+    const alreadyActive = target.classList.contains('active');
+    if (!alreadyActive) {
+      $$('.view').forEach(view => {
+        view.classList.remove('active', 'anim-in', 'page-enter', 'page-leave');
+        view.style.display = '';
+      });
+      target.classList.add('active', 'anim-in');
+    }
+    syncRouteClasses(id);
     try {
       if (typeof state !== 'undefined' && state) state.route = id;
       if (typeof saveState === 'function') saveState();
     } catch (_) {}
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    if (options.scroll !== false) {
+      window.scrollTo({top: 0, behavior: options.instant ? 'auto' : 'smooth'});
+    }
   }
 
   function goHome() {
@@ -712,7 +723,7 @@
   function createCuisineCard(name) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'country-card';
+    button.className = 'country-card country-card-rect';
     button.dataset.country = name;
     let note = 'Открыть блюда этой кухни';
     let background = '';
@@ -728,47 +739,39 @@
     try {
       if (typeof countryFlagSvg === 'function' && typeof countryIconKey === 'function') visual = countryFlagSvg(countryIconKey(name));
     } catch (_) {}
-    let count = '';
+    let recipeCount = 0;
+    let categoryCount = 0;
     try {
       if (typeof recipes !== 'undefined' && Array.isArray(recipes)) {
         const list = recipes.filter(item => item.country === name);
-        count = `${list.length} ${plural(list.length, ['рецепт', 'рецепта', 'рецептов'])}`;
+        recipeCount = list.length;
+        categoryCount = new Set(list.map(item => item.category).filter(Boolean)).size;
       }
     } catch (_) {}
-    button.innerHTML = `<div class="country-main"><div class="cemoji">${visual}</div><div class="country-copy"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(note)}</p></div></div><div class="country-bottom"><span>${escapeHtml(count)}</span><span class="arrow">›</span></div>`;
+    const count = `${recipeCount} ${plural(recipeCount, ['рецепт', 'рецепта', 'рецептов'])} • ${categoryCount} ${plural(categoryCount, ['тип', 'типа', 'типов'])}`;
+    button.innerHTML = `<div class="country-visual"><div class="cemoji">${visual}</div></div><div class="country-info-box"><h3>${escapeHtml(name)}</h3><p>${escapeHtml(note)}</p><div class="country-bottom"><span>${escapeHtml(count)}</span><span class="arrow">›</span></div></div>`;
     return button;
   }
 
-  function collectCuisineModels(grid) {
-    const models = [];
-    const seen = new Set();
-    $$('.country-card', grid).forEach(card => {
-      if (card.dataset.tbCarouselCopy === '1') return;
-      const name = card.dataset.country || textOf($('h3', card));
-      if (!name || seen.has(name)) return;
-      seen.add(name);
-      const clone = card.cloneNode(true);
-      clone.removeAttribute('id');
-      clone.removeAttribute('onclick');
-      models.push({name, node: clone});
-    });
-    getCuisineNames().forEach(name => {
-      if (seen.has(name)) return;
-      seen.add(name);
-      models.push({name, node: createCuisineCard(name)});
-    });
-    return models;
+  function collectCuisineModels() {
+    return getCuisineNames().map(name => ({name, node: createCuisineCard(name)}));
   }
 
   function visibleCuisineCount() {
-    if (window.matchMedia('(max-width: 700px)').matches) return 1;
-    if (window.matchMedia('(max-width: 980px)').matches) return 3;
-    return 5;
+    return window.matchMedia('(max-width: 700px)').matches ? 1 : 3;
   }
 
   function openCuisine(name) {
     stopCarouselAutoplay();
     safeVibe(12);
+    try {
+      if (typeof state !== 'undefined' && state) {
+        state.country = name;
+        state.filterCat = null;
+        state.category = null;
+        if (typeof saveState === 'function') saveState();
+      }
+    } catch (_) {}
     let opened = false;
     try {
       if (typeof showCountry === 'function') {
@@ -921,6 +924,251 @@
     } catch (_) {}
   }
 
+  function baseRecipeList() {
+    try {
+      if (typeof recipes !== 'undefined' && Array.isArray(recipes)) return recipes;
+    } catch (_) {}
+    return [];
+  }
+
+  function orderedCountryCategories(list) {
+    try {
+      if (typeof orderedCategories === 'function') {
+        const result = orderedCategories(list);
+        if (Array.isArray(result)) return result.filter(Boolean);
+      }
+    } catch (_) {}
+    const preferred = ['Завтраки','Закуски','Салаты','Супы','Горячие блюда','Морепродукты','Гарниры','Выпечка','Десерты','Соусы','Напитки'];
+    const found = Array.from(new Set(list.map(item => item.category).filter(Boolean)));
+    return found.sort((a, b) => {
+      const ai = preferred.indexOf(a);
+      const bi = preferred.indexOf(b);
+      if (ai >= 0 || bi >= 0) return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+      return String(a).localeCompare(String(b), 'ru');
+    });
+  }
+
+  function categoryVisualMarkup(category) {
+    try {
+      if (typeof iconSvg === 'function' && typeof categoryIconKey === 'function') return iconSvg(categoryIconKey(category));
+    } catch (_) {}
+    try {
+      if (typeof visual === 'function') {
+        const item = visual(category) || {};
+        if (item.icon) return escapeHtml(item.icon);
+      }
+    } catch (_) {}
+    return escapeHtml(String(category || '•').slice(0, 1));
+  }
+
+  function fallbackRecipeCard(item) {
+    const source = item.source || 'base';
+    const badge = item.healthy ? '<span class="recipe-badge">Полезный</span>' : '';
+    return `<button class="recipe-card" data-open="${escapeHtml(item.id)}" data-source="${escapeHtml(source)}">${badge}<h3>${escapeHtml(item.title || 'Без названия')}</h3><div class="recipe-meta"><span>${escapeHtml(item.time || '—')}</span><span>${escapeHtml(item.servings || 1)} порц.</span><span>${escapeHtml(item.difficulty || 'легко')}</span></div></button>`;
+  }
+
+  function countryRecipeCardHtml(item) {
+    try {
+      if (typeof recipeCard === 'function') return recipeCard(item);
+    } catch (_) {}
+    return fallbackRecipeCard(item);
+  }
+
+  function bindCountryRecipeCards(root) {
+    $$('[data-open]', root).forEach(card => {
+      card.onclick = event => {
+        if (event.target.closest('.favorite-heart')) return;
+        currentRecipeKey = recipeKey(card.dataset.open, card.dataset.source || 'base');
+        try {
+          if (typeof openRecipe === 'function') openRecipe(card.dataset.open, card.dataset.source || 'base');
+        } catch (error) {
+          console.warn('Table book: recipe opening failed', error);
+        }
+        setTimeout(syncModalHeart, 0);
+      };
+    });
+    decorateRecipeCards(root);
+  }
+
+  function mobileCountryFlow() {
+    return window.matchMedia('(max-width: 700px)').matches;
+  }
+
+  function clearCountryCategoryState() {
+    try {
+      if (typeof state !== 'undefined' && state) {
+        state.filterCat = null;
+        state.category = null;
+        if (typeof saveState === 'function') saveState();
+      }
+    } catch (_) {}
+  }
+
+  function scrollCountryStage(selector, behavior = 'smooth') {
+    const node = $(selector);
+    if (!node) return;
+    const top = Math.max(0, node.getBoundingClientRect().top + window.scrollY - (mobileCountryFlow() ? 14 : 88));
+    window.scrollTo({top, behavior});
+  }
+
+  function renderCountryTypes(country, options = {}) {
+    const list = baseRecipeList().filter(item => item.country === country);
+    const categories = orderedCountryCategories(list);
+    let selected = (() => {
+      try { return typeof state !== 'undefined' && state ? (state.filterCat || state.category || null) : null; }
+      catch (_) { return null; }
+    })();
+    if (selected && !categories.includes(selected)) {
+      selected = null;
+      clearCountryCategoryState();
+    }
+
+    try {
+      if (typeof state !== 'undefined' && state) {
+        state.country = country;
+        state.route = 'country';
+        if (typeof saveState === 'function') saveState();
+      }
+    } catch (_) {}
+
+    let note = 'Выберите тип блюда.';
+    let background = '';
+    try {
+      if (typeof theme === 'function') {
+        const info = theme(country) || {};
+        note = info.note || note;
+        background = info.bg || '';
+      }
+    } catch (_) {}
+
+    const countryView = $('#country');
+    const head = $('#countryHead');
+    if (head && background) head.style.setProperty('--head-bg', background);
+    const title = $('#countryTitle');
+    const noteNode = $('#countryNote');
+    const meta = $('#countryMeta');
+    const choice = $('#categoryChoice');
+    const recipesWrap = $('#countryRecipes');
+    const control = $('#catControl');
+    const clear = $('#clearCat');
+    const sectionTitle = $('#country > .section-title');
+    if (title) title.textContent = country;
+    if (noteNode) noteNode.textContent = selected ? `Выбран тип блюда: ${selected}.` : note;
+    if (meta) meta.innerHTML = `<span class="pill">${list.length} ${plural(list.length, ['рецепт', 'рецепта', 'рецептов'])}</span><span class="pill">${categories.length} ${plural(categories.length, ['тип', 'типа', 'типов'])}</span>`;
+    if (sectionTitle) {
+      const heading = $('h2', sectionTitle);
+      const lead = $('p', sectionTitle);
+      if (heading) heading.textContent = 'Типы блюд';
+      if (lead) lead.textContent = 'Выберите блок, чтобы открыть рецепты этого типа.';
+    }
+    countryView?.classList.toggle('tb-country-category-selected', Boolean(selected));
+    countryView?.setAttribute('data-country-stage', selected ? 'recipes' : 'types');
+
+    if (choice) {
+      choice.innerHTML = '';
+      categories.forEach(category => {
+        const count = list.filter(item => item.category === category).length;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `cat-tile country-type-tile${selected === category ? ' active' : ''}`;
+        button.dataset.category = category;
+        button.setAttribute('aria-label', `Открыть тип блюда ${category}: ${count} ${plural(count, ['блюдо', 'блюда', 'блюд'])}`);
+        button.innerHTML = `<div class="cat-icon" aria-hidden="true">${categoryVisualMarkup(category)}</div><div class="country-type-copy"><strong>${escapeHtml(category)}</strong><span>${count} ${plural(count, ['блюдо', 'блюда', 'блюд'])}</span></div><span class="country-type-arrow" aria-hidden="true">›</span>`;
+        button.addEventListener('click', () => {
+          try {
+            if (typeof state !== 'undefined' && state) {
+              state.filterCat = category;
+              state.category = category;
+              if (typeof saveState === 'function') saveState();
+            }
+          } catch (_) {}
+          safeVibe(10);
+          renderCountryTypes(country, {scroll: false});
+          requestAnimationFrame(() => scrollCountryStage('#countryRecipes'));
+        });
+        choice.appendChild(button);
+      });
+    }
+
+    if (control) control.hidden = !selected;
+    if (clear) clear.textContent = mobileCountryFlow() ? '← Типы блюд' : 'Показать все типы';
+    if (recipesWrap) {
+      recipesWrap.innerHTML = '';
+      if (!selected) {
+        recipesWrap.innerHTML = '<div class="empty-box country-type-prompt">Выберите прямоугольный блок типа блюда — ниже появятся все блюда этого типа.</div>';
+      } else {
+        const items = list.filter(item => item.category === selected);
+        const section = document.createElement('section');
+        section.className = 'cat-section selected-country-category';
+        section.innerHTML = `<div class="cat-line"><h2>${escapeHtml(selected)}</h2><span class="pill">${items.length} ${plural(items.length, ['блюдо', 'блюда', 'блюд'])}</span></div><div class="recipe-grid">${items.map(countryRecipeCardHtml).join('')}</div>`;
+        recipesWrap.appendChild(section);
+        bindCountryRecipeCards(section);
+      }
+    }
+
+    showCustomView('country', {scroll: options.scroll !== false});
+  }
+
+  function installCountryTypeNavigation() {
+    const patchedRenderCountry = function(country) { renderCountryTypes(String(country)); };
+    const patchedShowCountry = function(country) {
+      try {
+        if (typeof state !== 'undefined' && state) {
+          state.country = String(country);
+          state.filterCat = null;
+          state.category = null;
+          if (typeof saveState === 'function') saveState();
+        }
+      } catch (_) {}
+      safeVibe(12);
+      renderCountryTypes(String(country));
+    };
+    try { renderCountry = patchedRenderCountry; } catch (_) {}
+    try { showCountry = patchedShowCountry; } catch (_) {}
+    try { window.renderCountry = patchedRenderCountry; } catch (_) {}
+    try { window.showCountry = patchedShowCountry; } catch (_) {}
+
+    const clear = $('#clearCat');
+    if (clear && clear.dataset.tbTypesBound !== '1') {
+      clear.dataset.tbTypesBound = '1';
+      clear.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        let country = '';
+        try {
+          if (typeof state !== 'undefined' && state) country = state.country || '';
+        } catch (_) {}
+        clearCountryCategoryState();
+        if (country) {
+          renderCountryTypes(country, {scroll: false});
+          requestAnimationFrame(() => scrollCountryStage('#categoryChoice'));
+        }
+      }, true);
+    }
+
+    const back = $('#backBtn');
+    if (back && back.dataset.tbMobileFlowBound !== '1') {
+      back.dataset.tbMobileFlowBound = '1';
+      back.addEventListener('click', event => {
+        if (!mobileCountryFlow()) return;
+        let country = '';
+        let category = null;
+        try {
+          if (typeof state !== 'undefined' && state) {
+            country = state.country || '';
+            category = state.filterCat || state.category || null;
+          }
+        } catch (_) {}
+        if (!country || !category) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        clearCountryCategoryState();
+        renderCountryTypes(country, {scroll: false});
+        requestAnimationFrame(() => scrollCountryStage('#countryHead'));
+      }, true);
+    }
+  }
+
   function wrapBackNavigation() {
     try {
       if (typeof goHomeWithFlip === 'function' && !goHomeWithFlip.__tableBookHotfix) {
@@ -928,7 +1176,13 @@
         const wrapped = function(...args) {
           const active = $('.view.active');
           if (active?.id === 'likedview' || active?.id === 'equipmentview') return goHome();
-          return original.apply(this, args);
+          const result = original.apply(this, args);
+          window.setTimeout(() => {
+            const nextId = $('.view.active')?.id || '';
+            syncRouteClasses(nextId);
+            if (nextId === 'home') installCarousel(false);
+          }, 0);
+          return result;
         };
         wrapped.__tableBookHotfix = true;
         goHomeWithFlip = wrapped;
@@ -1016,6 +1270,11 @@
     });
     bodyObserver.observe(document.body, {childList: true, subtree: true});
 
+    const routeObserver = new MutationObserver(() => {
+      syncRouteClasses($('.view.active')?.id || '');
+    });
+    $$('.view').forEach(view => routeObserver.observe(view, {attributes: true, attributeFilter: ['class']}));
+
     const grid = $('#countryGrid');
     if (grid) {
       const gridObserver = new MutationObserver(() => {
@@ -1069,6 +1328,7 @@
     ensureCustomViews();
     normalizeHomeLayout();
     wrapCountryRenderer();
+    installCountryTypeNavigation();
     wrapBackNavigation();
     bindCustomNavigation();
     installCarousel(true);
@@ -1099,16 +1359,22 @@
     });
 
     installFavoritesSupabaseSync();
+    syncRouteClasses($('.view.active')?.id || 'home');
 
     let resizeTimer = 0;
     window.addEventListener('resize', () => {
       window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(renderCarousel, 120);
+      resizeTimer = window.setTimeout(() => {
+        renderCarousel();
+        const clear = $('#clearCat');
+        if (clear) clear.textContent = mobileCountryFlow() ? '← Типы блюд' : 'Показать все типы';
+      }, 120);
     });
 
     try {
       if (typeof state !== 'undefined' && state?.route === 'likedview') openLiked();
       if (typeof state !== 'undefined' && state?.route === 'equipmentview') openEquipment();
+      if (typeof state !== 'undefined' && state?.route === 'country' && state.country) renderCountryTypes(state.country);
     } catch (_) {}
   }
 
