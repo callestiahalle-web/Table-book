@@ -5145,3 +5145,43 @@ body.dark .country-art-frame,
 body.dark .meal-country-thumb {
   background: color-mix(in srgb, var(--paper) 84%, var(--bg)) !important;
 }
+
+/* Clear carousel edges and show every round country illustration in full */
+#countryGrid.cuisine-carousel {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+.cuisine-carousel-shell::before,
+.cuisine-carousel-shell::after {
+  content: none !important;
+  display: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#countryGrid.cuisine-carousel .country-slide,
+body.dark #countryGrid.cuisine-carousel .country-slide {
+  filter: saturate(.82) brightness(.86) !important;
+}
+
+#countryGrid.cuisine-carousel .country-slide.is-near,
+body.dark #countryGrid.cuisine-carousel .country-slide.is-near {
+  filter: saturate(.94) brightness(.94) !important;
+}
+
+#countryGrid.cuisine-carousel .country-slide.is-active,
+body.dark #countryGrid.cuisine-carousel .country-slide.is-active {
+  filter: none !important;
+}
+
+.country-art,
+.meal-country-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: none !important;
+}
