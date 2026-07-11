@@ -4849,3 +4849,156 @@ textarea {
 .dialog-title .tags {
   justify-content: center;
 }
+
+/* Final card alignment + softer country carousel fade */
+.cat-section .recipe-grid,
+.liked-recipes-grid {
+  align-items: stretch !important;
+  grid-auto-rows: 1fr !important;
+}
+
+.recipe-card-with-like {
+  min-height: 154px !important;
+  height: 100% !important;
+  display: grid !important;
+  grid-template-rows: 1fr !important;
+  align-items: stretch !important;
+}
+
+.recipe-card-with-like .recipe-open-card {
+  min-height: 154px !important;
+  height: 100% !important;
+  padding: 50px 18px 18px !important;
+  display: grid !important;
+  grid-template-rows: minmax(42px, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+  align-content: stretch !important;
+  gap: 12px !important;
+}
+
+.recipe-card-with-like .recipe-badge {
+  position: absolute !important;
+  top: 10px !important;
+  left: 50% !important;
+  width: min(68%, 250px) !important;
+  min-height: 30px !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  z-index: 3 !important;
+}
+
+.recipe-card-with-like .recipe-open-card h3 {
+  min-height: 42px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.recipe-card-with-like .recipe-meta {
+  min-height: 34px !important;
+  align-self: end !important;
+}
+
+.recipe-card-with-like .like-btn {
+  top: 10px !important;
+  right: 10px !important;
+}
+
+.cuisine-carousel-shell {
+  isolation: isolate !important;
+  background: transparent !important;
+}
+
+#countryGrid.cuisine-carousel {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, .16) 26px,
+    #000 clamp(86px, 15vw, 184px),
+    #000 calc(100% - clamp(86px, 15vw, 184px)),
+    rgba(0, 0, 0, .16) calc(100% - 26px),
+    transparent 100%
+  ) !important;
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, .16) 26px,
+    #000 clamp(86px, 15vw, 184px),
+    #000 calc(100% - clamp(86px, 15vw, 184px)),
+    rgba(0, 0, 0, .16) calc(100% - 26px),
+    transparent 100%
+  ) !important;
+}
+
+.cuisine-carousel-shell::before,
+.cuisine-carousel-shell::after {
+  width: clamp(76px, 14vw, 172px) !important;
+  z-index: 5 !important;
+  backdrop-filter: blur(8px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.08) !important;
+}
+
+.cuisine-carousel-shell::before {
+  background: linear-gradient(
+    90deg,
+    var(--bg) 0%,
+    color-mix(in srgb, var(--bg) 84%, transparent) 34%,
+    color-mix(in srgb, var(--bg) 30%, transparent) 72%,
+    transparent 100%
+  ) !important;
+}
+
+.cuisine-carousel-shell::after {
+  background: linear-gradient(
+    270deg,
+    var(--bg) 0%,
+    color-mix(in srgb, var(--bg) 84%, transparent) 34%,
+    color-mix(in srgb, var(--bg) 30%, transparent) 72%,
+    transparent 100%
+  ) !important;
+}
+
+body.dark .cuisine-carousel-shell::before {
+  background: linear-gradient(
+    90deg,
+    var(--bg) 0%,
+    color-mix(in srgb, var(--bg) 88%, transparent) 34%,
+    color-mix(in srgb, var(--bg) 36%, transparent) 74%,
+    transparent 100%
+  ) !important;
+}
+
+body.dark .cuisine-carousel-shell::after {
+  background: linear-gradient(
+    270deg,
+    var(--bg) 0%,
+    color-mix(in srgb, var(--bg) 88%, transparent) 34%,
+    color-mix(in srgb, var(--bg) 36%, transparent) 74%,
+    transparent 100%
+  ) !important;
+}
+
+@media(max-width: 760px) {
+  .recipe-card-with-like,
+  .recipe-card-with-like .recipe-open-card {
+    min-height: 148px !important;
+  }
+
+  .recipe-card-with-like .recipe-open-card {
+    padding: 48px 16px 17px !important;
+  }
+
+  .cuisine-carousel-shell::before,
+  .cuisine-carousel-shell::after {
+    width: 64px !important;
+    backdrop-filter: blur(7px) saturate(1.06) !important;
+    -webkit-backdrop-filter: blur(7px) saturate(1.06) !important;
+  }
+
+  #countryGrid.cuisine-carousel {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, rgba(0, 0, 0, .18) 18px, #000 64px, #000 calc(100% - 64px), rgba(0, 0, 0, .18) calc(100% - 18px), transparent 100%) !important;
+    mask-image: linear-gradient(90deg, transparent 0, rgba(0, 0, 0, .18) 18px, #000 64px, #000 calc(100% - 64px), rgba(0, 0, 0, .18) calc(100% - 18px), transparent 100%) !important;
+  }
+}
