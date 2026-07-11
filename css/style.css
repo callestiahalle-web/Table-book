@@ -4033,28 +4033,3 @@ body.dark .theme-btn.theme-morph::after{
   }
 }
 
-
-
-/* --- calendar controls matte grain, centered swipe zone, likes, carousel, encyclopedia --- */
-.meal-add-btn,.meal-save-btn,.meal-clear-btn,.meal-picker-back,.meal-remove,.meal-dish-open,.meal-type-card,.meal-country-card,.meal-pick-card,
-.meal-day,.meal-chip,.meal-more{
-  background-image:
-    radial-gradient(circle at 18% 22%,rgba(255,255,255,.18) 0 1px,transparent 1.7px),
-    radial-gradient(circle at 72% 66%,rgba(80,68,54,.08) 0 1px,transparent 1.8px),
-    var(--control-bg) !important;
-  background-size:18px 18px,22px 22px,100% 100% !important;
-  box-shadow:0 7px 15px rgba(60,48,38,.08),inset 0 1px 0 rgba(255,255,255,.16) !important;
-}
-body.dark .meal-add-btn,body.dark .meal-save-btn,body.dark .meal-clear-btn,body.dark .meal-picker-back,body.dark .meal-remove,body.dark .meal-dish-open,body.dark .meal-type-card,body.dark .meal-country-card,body.dark .meal-pick-card,
-body.dark .meal-day,body.dark .meal-chip,body.dark .meal-more{
-  background-image:
-    radial-gradient(circle at 18% 22%,rgba(255,255,255,.055) 0 1px,transparent 1.7px),
-    radial-gradient(circle at 72% 66%,rgba(0,0,0,.18) 0 1px,transparent 1.8px),
-    var(--control-bg) !important;
-  background-size:18px 18px,22px 22px,100% 100% !important;
-  box-shadow:0 7px 16px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.06) !important;
-}
-.hero-actions{justify-content:center}.hero-stat-btn{cursor:pointer;color:var(--ink);transition:transform .18s ease,border-color .2s ease,box-shadow .2s ease}.hero-stat-btn:hover{transform:translateY(-2px);border-color:var(--gold)}
-.recipe-card-with-like{position:relative;display:grid;padding:0;overflow:visible}.recipe-open-card{width:100%;height:100%;padding:18px 16px 16px;text-align:left;background:transparent;color:inherit;border:0;border-radius:inherit;display:grid;gap:8px}.recipe-open-card h3{margin:0}.like-btn{display:inline-grid;grid-auto-flow:column;align-items:center;justify-content:center;gap:6px;width:36px;height:36px;border-radius:999px;background:var(--paper);color:var(--muted);border:1px solid var(--line);box-shadow:0 6px 14px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.20);transition:transform .16s ease,color .18s ease,border-color .18s ease,background .18s ease}.recipe-card .like-btn{position:absolute;right:10px;top:10px;z-index:3}.like-btn .line-icon{width:17px;height:17px;fill:none}.like-btn span{display:none}.like-btn.active{color:#d56b78;border-color:rgba(213,107,120,.55);background:linear-gradient(180deg,rgba(255,242,242,.92),rgba(250,224,225,.92))}.like-btn.active .line-icon{fill:currentColor}.like-btn:hover{transform:translateY(-1px) scale(1.03)}body.dark .like-btn{background:rgba(30,55,96,.96);border-color:rgba(231,195,124,.26);box-shadow:0 7px 15px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06)}body.dark .like-btn.active{color:#f1b4bd;background:linear-gradient(180deg,rgba(57,74,117,.98),rgba(44,55,92,.98));border-color:rgba(241,180,189,.42)}#modalTags .like-btn{position:relative;width:34px;height:34px;margin-left:2px}.liked-grid{margin-top:6px}.empty-box{text-align:center}.encyclopedia-panel{padding:22px}.encyclopedia-tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}.encyclopedia-tab.active{border-color:var(--gold);color:var(--ink);box-shadow:0 6px 14px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.18)}.encyclopedia-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.ency-card{padding:17px;border-radius:24px;background:var(--paper);border:1px solid var(--line);box-shadow:0 8px 18px rgba(0,0,0,.07)}.ency-card h3{font:400 22px/1.1 Georgia,"Times New Roman",serif;margin:0 0 8px}.ency-card p{margin:0;color:var(--muted);line-height:1.55}.country-grid.country-carousel{display:grid !important;grid-auto-flow:column;grid-auto-columns:minmax(280px,360px);grid-template-columns:none !important;gap:18px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:8px max(18px,calc((100vw - var(--max))/2 + 18px)) 18px;margin-left:calc(-1 * max(18px,calc((100vw - var(--max))/2 + 18px)));margin-right:calc(-1 * max(18px,calc((100vw - var(--max))/2 + 18px)));scrollbar-width:none}.country-grid.country-carousel::-webkit-scrollbar{display:none}.country-slide{scroll-snap-align:center;min-height:100%}.swipe-cue{left:50% !important;top:56% !important;transform:translate(-50%,-50%) scale(.96) !important}.swipe-cue.show{transform:translate(-50%,-50%) scale(1) !important}
-@media(max-width:760px){.country-grid.country-carousel{grid-auto-columns:minmax(250px,82vw);padding-inline:18px;margin-inline:-18px}.recipe-open-card{padding-right:52px}.encyclopedia-grid{grid-template-columns:1fr}.stats.hero-actions{gap:9px}.hero-stat-btn{min-width:96px;padding:10px 12px}}
-

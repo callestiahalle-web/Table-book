@@ -455,99 +455,6 @@ body.dark .cuisine-carousel-arrow {
   }
 }
 
-/* Final design alignment: countries, dish types and recipes reuse the same
-   calm paper-card language as "Мои рецепты" and "Меню недели". */
-body.tb-home-route main.page {
-  padding-top: clamp(8px, 1.1vw, 16px) !important;
-}
-
-#home .hero {
-  margin-top: 0 !important;
-  min-height: 190px !important;
-  padding: clamp(22px, 3vw, 34px) !important;
-  border-radius: 30px !important;
-}
-
-.cuisine-carousel .country-card,
-#country .country-type-tile,
-.recipe-card {
-  border: 1px solid var(--line, rgba(126, 112, 96, .18)) !important;
-  background: var(--paper, #f2ece3) !important;
-  box-shadow: var(--shadow), var(--inner) !important;
-}
-
-.cuisine-carousel .country-card {
-  border-radius: 30px !important;
-}
-
-.country-visual {
-  background: var(--paper2, #ebe2d7) !important;
-  border-bottom: 1px solid var(--line, rgba(126, 112, 96, .18));
-}
-
-.country-visual .cemoji {
-  width: 112px !important;
-  height: 92px !important;
-  border-radius: 24px !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.country-visual .cemoji img,
-.country-visual .cemoji picture,
-.country-visual .cemoji svg {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-}
-
-.country-info-box {
-  background: var(--paper, #f2ece3) !important;
-  padding: 18px 20px 20px !important;
-}
-
-#country .country-type-tile {
-  border-radius: 30px !important;
-  min-height: 118px !important;
-  transition: transform .22s ease, box-shadow .22s ease;
-}
-
-#country .country-type-tile:hover,
-#country .country-type-tile:focus-visible,
-.recipe-card:hover,
-.recipe-card:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: var(--softShadow), var(--inner) !important;
-}
-
-.recipe-card {
-  border-radius: 30px !important;
-  min-height: 210px;
-}
-
-@media (max-width: 700px) {
-  body.tb-home-route main.page {
-    padding-top: 6px !important;
-  }
-
-  #home .hero {
-    min-height: 164px !important;
-    padding: 20px 18px !important;
-    border-radius: 26px !important;
-  }
-
-  .cuisine-carousel .country-card,
-  #country .country-type-tile,
-  .recipe-card {
-    border-radius: 26px !important;
-  }
-
-  #country .country-type-tile {
-    min-height: 98px !important;
-    padding: 14px !important;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cuisine-carousel .country-card,
   .cuisine-carousel-arrow,
@@ -703,18 +610,447 @@ body.tb-home-route main.page {
   }
 }
 
-/* Authoritative final spacing/card overrides. */
-body.tb-home-route main.page { padding-top: clamp(8px, 1.1vw, 16px) !important; }
-#home .hero { margin-top: 0 !important; min-height: 190px !important; padding: clamp(22px, 3vw, 34px) !important; border-radius: 30px !important; }
-.cuisine-carousel .country-card,
-#country .country-type-tile,
-.recipe-card { border: 1px solid var(--line, rgba(126,112,96,.18)) !important; background: var(--paper, #f2ece3) !important; box-shadow: var(--shadow), var(--inner) !important; border-radius: 30px !important; }
-.country-visual { background: var(--paper2, #ebe2d7) !important; border-bottom: 1px solid var(--line, rgba(126,112,96,.18)); }
-.country-info-box { background: var(--paper, #f2ece3) !important; }
-@media (max-width:700px) {
-  body.tb-home-route main.page { padding-top: 6px !important; }
-  #home .hero { min-height: 164px !important; padding: 20px 18px !important; border-radius: 26px !important; }
-  .cuisine-carousel .country-card,
-  #country .country-type-tile,
-  .recipe-card { border-radius: 26px !important; }
+/* ==========================================================
+   v4 — restored original Table book card language
+   Countries, dish types and recipes inherit the visual surface
+   of “Мои рецепты” / “Меню недели”.
+   ========================================================== */
+
+/* Keep the opening block almost attached to the top bar. */
+body.tb-home-route main.page,
+body[data-tb-route="home"] main.page {
+  padding-top: 4px !important;
+}
+
+body.tb-home-route #home.view.active,
+body[data-tb-route="home"] #home.view.active {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+body.tb-home-route #home .hero,
+body[data-tb-route="home"] #home .hero {
+  margin-top: 4px !important;
+  margin-bottom: 10px !important;
+}
+
+/* One surface language, read directly from the original home cards in JS. */
+.tb-home-style-card {
+  border: var(--tb-home-card-border, 1px solid var(--line, rgba(255,255,255,.36))) !important;
+  border-radius: var(--tb-home-card-radius, 28px) !important;
+  background: var(--tb-home-card-background, var(--paper2, rgba(255,255,255,.12))) !important;
+  color: var(--tb-home-card-color, var(--ink, inherit)) !important;
+  box-shadow: var(--tb-home-card-shadow, var(--softShadow, 0 14px 34px rgba(0,0,0,.16))) !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tb-home-style-card:hover,
+.tb-home-style-card:focus-visible {
+  transform: translateY(-3px) !important;
+  filter: brightness(1.035);
+}
+
+.tb-home-style-card:active {
+  transform: translateY(0) scale(.985) !important;
+}
+
+/* Countries: original illustration is reused as the compact icon. */
+.cuisine-carousel-shell {
+  min-height: 300px;
+}
+
+#countryGrid.cuisine-carousel,
+.cuisine-carousel {
+  min-height: 282px;
+  align-items: center;
+}
+
+.cuisine-carousel .country-card {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 0 0 clamp(250px, 27vw, 322px) !important;
+  width: clamp(250px, 27vw, 322px) !important;
+  min-width: clamp(250px, 27vw, 322px) !important;
+  max-width: 322px !important;
+  min-height: 260px !important;
+  height: 260px !important;
+  padding: 22px 22px 20px !important;
+  overflow: hidden !important;
+  text-align: center !important;
+  opacity: .78;
+  transform: scale(.94);
+}
+
+.cuisine-carousel .country-card.tb-carousel-center {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cuisine-carousel .country-card.tb-carousel-near {
+  opacity: .9;
+  transform: scale(.965);
+}
+
+.cuisine-carousel .country-card::before,
+.cuisine-carousel .country-card::after {
+  display: none !important;
+}
+
+.country-card-icon,
+.tb-recipe-card-icon,
+#country .country-type-tile .cat-icon {
+  display: grid !important;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 74px !important;
+  height: 74px !important;
+  min-width: 74px !important;
+  min-height: 74px !important;
+  margin: 0 auto 13px !important;
+  padding: 5px !important;
+  border: 1px solid var(--line, rgba(255,255,255,.38));
+  border-radius: 22px !important;
+  background: color-mix(in srgb, var(--paper3, rgba(255,255,255,.16)) 82%, transparent) !important;
+  box-shadow: var(--pressed, inset 0 3px 10px rgba(0,0,0,.14));
+  overflow: hidden;
+}
+
+.country-old-media,
+.country-old-media > picture,
+.country-old-media > .country-legacy-picture,
+.country-old-media > .country-legacy-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.country-old-media {
+  position: relative;
+  border-radius: 17px;
+  overflow: hidden;
+}
+
+.country-old-media img,
+.country-old-media picture img,
+.country-legacy-image {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  object-fit: cover;
+  border-radius: 17px;
+}
+
+.country-legacy-bg {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 17px;
+}
+
+.country-old-media svg {
+  width: 78% !important;
+  height: 78% !important;
+  max-width: 78% !important;
+  max-height: 78% !important;
+}
+
+.country-fallback-symbol {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 30px;
+}
+
+.cuisine-carousel .country-info-box {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  width: 100%;
+  min-height: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  text-align: center !important;
+}
+
+.cuisine-carousel .country-card h3,
+.cuisine-carousel .country-card p,
+.cuisine-carousel .country-bottom {
+  width: 100%;
+  max-width: none;
+  text-align: center !important;
+}
+
+.cuisine-carousel .country-card h3 {
+  margin: 0;
+  font-size: clamp(21px, 1.8vw, 27px);
+  line-height: 1.08;
+}
+
+.cuisine-carousel .country-card p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted, inherit);
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.cuisine-carousel .country-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  font-size: 13px;
+}
+
+.cuisine-carousel .country-bottom .arrow {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Dish types use the same icon-over-copy composition as the home cards. */
+#country .category-choice {
+  grid-auto-rows: 1fr;
+  gap: 16px !important;
+}
+
+#country .country-type-tile {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0;
+  min-height: 186px !important;
+  padding: 22px 18px 20px !important;
+  text-align: center !important;
+  overflow: hidden;
+}
+
+#country .country-type-tile .cat-icon {
+  margin-bottom: 14px !important;
+}
+
+#country .country-type-tile .cat-icon svg {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+#country .country-type-copy {
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  text-align: center !important;
+}
+
+#country .country-type-copy strong,
+#country .country-type-copy span {
+  text-align: center !important;
+}
+
+#country .country-type-copy strong {
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+#country .country-type-copy span {
+  color: var(--muted, inherit);
+  font-size: 13px;
+}
+
+#country .country-type-arrow {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  font-size: 22px;
+}
+
+#country .country-type-tile.active {
+  box-shadow: var(--pressed, inset 0 4px 12px rgba(0,0,0,.2)) !important;
+}
+
+/* Recipe cards keep their content and heart but return to the old home-card shape. */
+#country .recipe-grid,
+#likedview .recipe-grid {
+  gap: 16px !important;
+}
+
+#country .recipe-card,
+#likedview .recipe-card {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 214px !important;
+  padding: 24px 22px 20px !important;
+  text-align: center !important;
+  overflow: hidden;
+}
+
+.tb-recipe-card-icon {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  margin-bottom: 14px !important;
+}
+
+.tb-recipe-card-icon svg {
+  width: 31px !important;
+  height: 31px !important;
+}
+
+#country .recipe-card h3,
+#likedview .recipe-card h3 {
+  width: 100%;
+  margin: 0 0 9px !important;
+  text-align: center !important;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+#country .recipe-origin,
+#likedview .recipe-origin {
+  margin-bottom: 9px;
+  color: var(--muted, inherit);
+  text-align: center;
+}
+
+#country .recipe-meta,
+#likedview .recipe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+}
+
+#country .recipe-meta span,
+#likedview .recipe-meta span {
+  min-height: 27px;
+  padding: 5px 9px;
+  border: 1px solid var(--line, rgba(255,255,255,.28));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper3, rgba(255,255,255,.12)) 76%, transparent);
+  font-size: 12px;
+}
+
+#country .recipe-badge,
+#likedview .recipe-badge {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+}
+
+@media (max-width: 980px) {
+  .cuisine-carousel .country-card {
+    flex-basis: clamp(218px, 31vw, 276px) !important;
+    width: clamp(218px, 31vw, 276px) !important;
+    min-width: clamp(218px, 31vw, 276px) !important;
+  }
+
+  #country .country-type-tile {
+    min-height: 174px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  body.tb-home-route main.page,
+  body[data-tb-route="home"] main.page {
+    padding-top: 2px !important;
+  }
+
+  body.tb-home-route #home .hero,
+  body[data-tb-route="home"] #home .hero {
+    margin-top: 2px !important;
+  }
+
+  .cuisine-carousel-shell {
+    min-height: 292px;
+  }
+
+  #countryGrid.cuisine-carousel,
+  .cuisine-carousel {
+    min-height: 272px;
+  }
+
+  .cuisine-carousel .country-card {
+    flex: 0 0 min(76vw, 286px) !important;
+    width: min(76vw, 286px) !important;
+    min-width: min(76vw, 286px) !important;
+    max-width: 286px !important;
+    min-height: 246px !important;
+    height: 246px !important;
+    padding: 18px 18px 17px !important;
+  }
+
+  .country-card-icon {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
+    min-height: 68px !important;
+    margin-bottom: 11px !important;
+  }
+
+  #country .country-type-tile {
+    min-height: 156px !important;
+    padding: 18px 16px !important;
+  }
+
+  #country .country-type-tile .cat-icon {
+    width: 62px !important;
+    height: 62px !important;
+    min-width: 62px !important;
+    min-height: 62px !important;
+    margin-bottom: 11px !important;
+  }
+
+  #country .recipe-card,
+  #likedview .recipe-card {
+    min-height: 190px !important;
+    padding: 20px 18px 18px !important;
+  }
+
+  .tb-recipe-card-icon {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+  }
+}
+
+/* Immediate layout correction before the route class is attached by JavaScript. */
+main.page:has(> #home.view.active) {
+  padding-top: 4px !important;
+}
+
+#home.view.active {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+#home.view.active > .hero {
+  margin-top: 4px !important;
+}
+
+@media (max-width: 700px) {
+  main.page:has(> #home.view.active) {
+    padding-top: 2px !important;
+  }
+
+  #home.view.active > .hero {
+    margin-top: 2px !important;
+  }
 }
