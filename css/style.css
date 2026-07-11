@@ -3293,11 +3293,11 @@ button:before,.btn:before,.auth-chip:before,.top-auth-status:before,.close:befor
   background:none !important;
   opacity:0 !important;
 }
-/* remove dark duplicate illustrations with black corners; use clean light art in both themes */
+/* The country artwork now has separate clean day/night variants */
 .country-img-dark{display:none !important;visibility:hidden !important}
 .country-img-light{display:block !important;visibility:visible !important}
-body.dark .country-img-light{display:block !important;visibility:visible !important}
-body.dark .country-img-dark{display:none !important;visibility:hidden !important}
+body.dark .country-img-light{display:none !important;visibility:hidden !important}
+body.dark .country-img-dark{display:block !important;visibility:visible !important}
 .country-art-frame,
 .meal-country-thumb{
   background:#f4eadb !important;
@@ -5001,4 +5001,147 @@ body.dark .cuisine-carousel-shell::after {
     -webkit-mask-image: linear-gradient(90deg, transparent 0, rgba(0, 0, 0, .18) 18px, #000 64px, #000 calc(100% - 64px), rgba(0, 0, 0, .18) calc(100% - 18px), transparent 100%) !important;
     mask-image: linear-gradient(90deg, transparent 0, rgba(0, 0, 0, .18) 18px, #000 64px, #000 calc(100% - 64px), rgba(0, 0, 0, .18) calc(100% - 18px), transparent 100%) !important;
   }
+}
+
+/* Pinterest-style focused country slider */
+.cuisine-carousel-shell {
+  margin-top: 6px !important;
+  perspective: 1100px !important;
+  overflow: hidden visible !important;
+}
+
+#countryGrid.cuisine-carousel {
+  --country-slide-width: clamp(250px, 28vw, 360px);
+  grid-auto-columns: var(--country-slide-width) !important;
+  gap: clamp(16px, 2.4vw, 30px) !important;
+  padding: 38px max(24px, calc((100% - var(--country-slide-width)) / 2)) 42px !important;
+  scroll-padding-inline: max(24px, calc((100% - var(--country-slide-width)) / 2)) !important;
+  align-items: center !important;
+  overflow-y: visible !important;
+  scroll-snap-stop: always;
+}
+
+#countryGrid.cuisine-carousel .country-slide {
+  scroll-snap-align: center !important;
+  transform: translateY(14px) scale(.84) rotateY(0deg) !important;
+  transform-origin: center center !important;
+  opacity: .44 !important;
+  filter: blur(2px) saturate(.72) brightness(.78) !important;
+  z-index: 1 !important;
+  transition:
+    transform .36s cubic-bezier(.2,.85,.22,1),
+    opacity .36s ease,
+    filter .36s ease,
+    box-shadow .36s ease !important;
+  will-change: transform, opacity, filter !important;
+}
+
+#countryGrid.cuisine-carousel .country-slide.is-near {
+  transform: translateY(8px) scale(.92) !important;
+  opacity: .72 !important;
+  filter: blur(.7px) saturate(.9) brightness(.9) !important;
+  z-index: 2 !important;
+}
+
+#countryGrid.cuisine-carousel .country-slide.is-active {
+  transform: translateY(0) scale(1) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  z-index: 4 !important;
+  box-shadow:
+    0 26px 60px color-mix(in srgb, var(--ink) 16%, transparent),
+    var(--liquid-glow),
+    var(--softShadow) !important;
+}
+
+#countryGrid.cuisine-carousel .country-slide.is-active .country-art-frame {
+  transform: scale(1.035);
+  box-shadow:
+    0 16px 34px rgba(0,0,0,.14),
+    0 0 0 8px color-mix(in srgb, var(--paper) 42%, transparent) !important;
+}
+
+#countryGrid.cuisine-carousel .country-slide .country-art-frame {
+  transition: transform .36s cubic-bezier(.2,.85,.22,1), box-shadow .36s ease !important;
+}
+
+body.dark #countryGrid.cuisine-carousel .country-slide {
+  filter: blur(2px) saturate(.68) brightness(.62) !important;
+}
+
+body.dark #countryGrid.cuisine-carousel .country-slide.is-near {
+  filter: blur(.8px) saturate(.86) brightness(.82) !important;
+}
+
+body.dark #countryGrid.cuisine-carousel .country-slide.is-active {
+  filter: none !important;
+  box-shadow:
+    0 30px 68px rgba(0,0,0,.46),
+    0 0 44px rgba(76,124,198,.18),
+    var(--liquid-glow),
+    var(--softShadow) !important;
+}
+
+@media(max-width: 760px) {
+  #countryGrid.cuisine-carousel {
+    --country-slide-width: min(78vw, 320px);
+    padding-top: 28px !important;
+    padding-bottom: 34px !important;
+  }
+
+  #countryGrid.cuisine-carousel .country-slide {
+    transform: translateY(10px) scale(.88) !important;
+  }
+
+  #countryGrid.cuisine-carousel .country-slide.is-near {
+    transform: translateY(6px) scale(.94) !important;
+  }
+
+  #countryGrid.cuisine-carousel .country-slide.is-active {
+    transform: translateY(0) scale(1) !important;
+  }
+}
+
+/* Final country photo crop + theme-safe visibility */
+.country-art-frame,
+.meal-country-thumb {
+  overflow: hidden !important;
+  background: color-mix(in srgb, var(--paper) 86%, var(--bg)) !important;
+}
+
+.country-art,
+.meal-country-img {
+  width: 108% !important;
+  height: 108% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  transform: scale(1.035) !important;
+  transform-origin: center !important;
+}
+
+.country-img-light {
+  display: block !important;
+  visibility: visible !important;
+}
+
+.country-img-dark {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+body.dark .country-img-light {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+body.dark .country-img-dark {
+  display: block !important;
+  visibility: visible !important;
+}
+
+body.dark .country-art-frame,
+body.dark .meal-country-thumb {
+  background: color-mix(in srgb, var(--paper) 84%, var(--bg)) !important;
 }
