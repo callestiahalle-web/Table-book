@@ -4730,6 +4730,41 @@ body.dark {
   filter: none !important;
 }
 
+body .country-card-uniform .arrow.country-open-arrow,
+body.dark .country-card-uniform .arrow.country-open-arrow,
+body.dark .arrow,
+body.dark .country-open-arrow,
+body.dark .cuisine-carousel-arrow {
+  background: var(--nav-matte-bg) !important;
+  background-color: var(--nav-matte-bg) !important;
+  background-image: none !important;
+  background-size: auto !important;
+  background-repeat: no-repeat !important;
+  background-blend-mode: normal !important;
+  background-clip: padding-box !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  border-radius: 50% !important;
+  outline: 0 !important;
+  box-shadow: var(--nav-matte-shadow) !important;
+  filter: none !important;
+  isolation: isolate !important;
+  contain: paint !important;
+}
+
+body .country-card-uniform .arrow.country-open-arrow::before,
+body .country-card-uniform .arrow.country-open-arrow::after,
+body.dark .arrow::before,
+body.dark .arrow::after,
+body.dark .country-open-arrow::before,
+body.dark .country-open-arrow::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  background: none !important;
+  background-image: none !important;
+}
+
 .arrow::before,
 .arrow::after,
 .country-open-arrow::before,
