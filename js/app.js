@@ -11156,6 +11156,11 @@ function visual(cat){return typeVisuals[cat]||{icon:"hot",bg:"linear-gradient(13
 function uniqueCountries(){return [...new Set(recipes.map(r=>r.country))].sort((a,b)=>a.localeCompare(b,'ru'))}
 function orderedCategories(list){const set=[...new Set(list.map(r=>r.category))]; return [...categoryOrder.filter(c=>set.includes(c)), ...set.filter(c=>!categoryOrder.includes(c)).sort((a,b)=>a.localeCompare(b,'ru'))]}
 function originLabel(r){return r&&r.country==='Средиземноморская'&&r.origin?`Происхождение: ${r.origin}`:''}
+function canonicalRecipeId(id,source='base'){
+  const value=String(id||'');
+  if(source==='custom') return value;
+  return String(window.TABLE_BOOK_RECIPE_QUALITY?.aliases?.[value]||value);
+}
 
 function normalizeLikedRecipes(list){
   const arr=Array.isArray(list)?list:[];
@@ -11165,12 +11170,14 @@ function normalizeLikedRecipes(list){
       const split=item.indexOf(':');
       const source=split>-1?item.slice(0,split):'base';
       const id=split>-1?item.slice(split+1):item;
-      return {source:source==='custom'?'custom':'base',id:String(id||'')};
+      const normalizedSource=source==='custom'?'custom':'base';
+      return {source:normalizedSource,id:canonicalRecipeId(id,normalizedSource)};
     }
-    return {source:item?.source==='custom'?'custom':'base',id:String(item?.id||'')};
+    const source=item?.source==='custom'?'custom':'base';
+    return {source,id:canonicalRecipeId(item?.id,source)};
   }).filter(item=>item.id && !seen.has(item.source+':'+item.id) && seen.add(item.source+':'+item.id));
 }
-function recipeKey(id,source='base'){return (source==='custom'?'custom':'base')+':'+String(id)}
+function recipeKey(id,source='base'){const normalizedSource=source==='custom'?'custom':'base'; return normalizedSource+':'+canonicalRecipeId(id,normalizedSource)}
 function isRecipeLiked(id,source='base'){
   const key=recipeKey(id,source);
   return normalizeLikedRecipes(state.likedRecipes).some(item=>recipeKey(item.id,item.source)===key);
@@ -11179,7 +11186,7 @@ function resolveRecipeRef(ref){
   if(!ref) return null;
   const source=ref.source==='custom'?'custom':'base';
   const list=source==='custom'?myRecipes:recipes;
-  const recipe=list.find(item=>String(item.id)===String(ref.id));
+  const recipe=list.find(item=>String(item.id)===canonicalRecipeId(ref.id,source));
   return recipe?Object.assign({source},recipe):null;
 }
 function refreshLikeButtons(root=document){
@@ -11221,18 +11228,58 @@ const encyclopediaItems=[
   {type:'Посуда',name:'Сотейник',text:'Посуда с высокими бортами для тушения, соусов и блюд с жидкостью. Удобен, когда нужно часто перемешивать.'},
   {type:'Посуда',name:'Сковорода',text:'Подходит для обжаривания, быстрого прогрева и получения румяной корочки. Важно хорошо разогревать поверхность.'},
   {type:'Посуда',name:'Форма для запекания',text:'Керамическая, стеклянная или металлическая форма для духовки. Материал влияет на скорость нагрева и румяность.'},
+  {type:'Посуда',name:'Вок',text:'Глубокая сковорода с округлыми стенками для быстрого обжаривания небольших порций. Продукты постоянно перемещают от горячего центра к менее нагретым краям.'},
+  {type:'Посуда',name:'Казан',text:'Толстостенная посуда с округлым дном для плова, тушения и длительного томления. Хорошо удерживает и равномерно распределяет тепло.'},
+  {type:'Посуда',name:'Жаровня',text:'Тяжёлая глубокая посуда с крышкой для обжаривания и последующего запекания или тушения. Подходит для крупных кусков мяса и птицы.'},
+  {type:'Посуда',name:'Гриль-сковорода',text:'Сковорода с рельефным дном, которое оставляет полосы и отводит часть жира. Для выраженной корочки поверхность предварительно хорошо разогревают.'},
+  {type:'Посуда',name:'Паровая корзина',text:'Перфорированная вставка из металла или бамбука для приготовления над кипящей водой. Продукты не должны соприкасаться с жидкостью.'},
+  {type:'Посуда',name:'Ступка с пестиком',text:'Инструмент для растирания специй, трав, чеснока и паст. Растирание раскрывает эфирные масла лучше, чем грубое измельчение ножом.'},
+  {type:'Посуда',name:'Кокотница',text:'Небольшая порционная жаропрочная форма для жюльена, запечённых яиц, суфле и горячих закусок.'},
+  {type:'Посуда',name:'Таджин',text:'Керамическая посуда с высокой конической крышкой. Пар конденсируется на стенках и возвращается к продуктам, сохраняя влагу.'},
+  {type:'Посуда',name:'Утятница',text:'Продолговатая толстостенная жаровня для птицы, мяса и овощей. Плотная крышка поддерживает влажную среду при длительном приготовлении.'},
+  {type:'Посуда',name:'Кондитерское кольцо',text:'Форма без дна для выпечки коржей, сборки муссовых тортов и аккуратной порционной подачи. Устанавливается на противень или подложку.'},
   {type:'Оборудование',name:'Духовой шкаф',text:'Даёт сухой равномерный жар для выпечки, запекания овощей, мяса и рыбы. Конвекция помогает выровнять температуру.'},
   {type:'Оборудование',name:'Мультиварка',text:'Поддерживает стабильный нагрев для круп, тушения и томления. Полезна для блюд, которым нужно время без постоянного контроля.'},
   {type:'Оборудование',name:'Блендер',text:'Измельчает, взбивает и делает пюре, супы-кремы, соусы и напитки. Для горячих смесей важна термостойкая чаша или погружная насадка.'},
   {type:'Оборудование',name:'Кухонные весы',text:'Нужны для точных граммовок, выпечки и расчёта КБЖУ. Функция тары позволяет взвешивать продукты прямо в миске.'},
+  {type:'Оборудование',name:'Планетарный миксер',text:'Одновременно вращает насадку и ведёт её по окружности чаши. Равномерно замешивает тесто, взбивает белки, сливки и кремы.'},
+  {type:'Оборудование',name:'Кухонный комбайн',text:'Нарезает, натирает, измельчает и замешивает с помощью сменных насадок. Размер чаши и допустимая нагрузка определяют объём одной партии.'},
+  {type:'Оборудование',name:'Погружной блендер',text:'Измельчает продукт непосредственно в кастрюле или высоком стакане. Насадку держат погружённой, чтобы не разбрызгивать горячую смесь.'},
+  {type:'Оборудование',name:'Кулинарный термометр',text:'Показывает температуру внутри продукта, масла, сиропа или крема. Щуп вводят в самую толстую часть, не касаясь кости и стенок посуды.'},
+  {type:'Оборудование',name:'Скороварка',text:'Готовит под повышенным давлением, поэтому вода кипит при более высокой температуре. Сокращает время приготовления бобовых, бульонов и жёсткого мяса.'},
+  {type:'Оборудование',name:'Су-вид',text:'Термостат поддерживает точную температуру водяной бани. Продукт готовят в герметичном пакете, а затем при необходимости быстро обжаривают.'},
+  {type:'Оборудование',name:'Дегидратор',text:'Медленно удаляет влагу при невысокой температуре. Используется для фруктов, овощей, трав, пастилы и вяленых продуктов.'},
+  {type:'Оборудование',name:'Мясорубка',text:'Измельчает мясо, рыбу и овощи через решётку выбранного диаметра. Для чистого среза продукты и металлические детали предварительно охлаждают.'},
+  {type:'Оборудование',name:'Индукционная панель',text:'Нагревает совместимую посуду электромагнитным полем. Быстро меняет мощность и почти не нагревает свободную поверхность конфорки.'},
+  {type:'Оборудование',name:'Вакууматор',text:'Удаляет воздух и герметично запаивает пакет. Используется для су-вида, порционного хранения и защиты продуктов от окисления.'},
   {type:'Техники',name:'Бланширование',text:'Короткое погружение продукта в кипящую воду с последующим охлаждением. Сохраняет цвет овощей и помогает снять кожицу.'},
   {type:'Техники',name:'Пассерование',text:'Мягкий прогрев овощей на умеренном огне без сильной корочки. Раскрывает вкус лука, моркови, специй и томатной основы.'},
   {type:'Техники',name:'Тушение',text:'Приготовление под крышкой с небольшим количеством жидкости. Продукты становятся мягкими и насыщаются соусом.'},
   {type:'Техники',name:'Деглазирование',text:'Добавление жидкости на горячую сковороду после жарки, чтобы растворить поджаристые соки и сделать основу соуса.'},
+  {type:'Техники',name:'Поширование',text:'Бережное приготовление в жидкости при 70–85°C без активного кипения. Подходит для яиц, рыбы, птицы и фруктов.'},
+  {type:'Техники',name:'Припускание',text:'Продукт готовят под крышкой в небольшом количестве жидкости или собственном соку. Способ сохраняет форму и даёт концентрированный отвар.'},
+  {type:'Техники',name:'Обжаривание',text:'Быстрая обработка на хорошо разогретой поверхности с небольшим количеством жира. Между кусками оставляют пространство, чтобы они жарились, а не тушились.'},
+  {type:'Техники',name:'Карамелизация',text:'Нагрев сахаров до появления золотистого цвета и сложного аромата. Процесс происходит в сахарном сиропе и на поверхности овощей, фруктов или мяса.'},
+  {type:'Техники',name:'Темперирование',text:'Постепенное выравнивание температуры компонентов. Горячую жидкость вводят в яйца небольшими порциями, а шоколад нагревают и охлаждают по заданной схеме.'},
+  {type:'Техники',name:'Ферментация',text:'Преобразование продукта микроорганизмами или ферментами. Требует чистой посуды, подходящей температуры, времени и контроля количества соли.'},
+  {type:'Техники',name:'Конфи',text:'Медленное приготовление при невысокой температуре в жире или концентрированном сахарном сиропе. Продукт остаётся сочным и приобретает насыщенный вкус.'},
+  {type:'Техники',name:'Су-вид',text:'Длительное приготовление герметично упакованного продукта в воде с точно заданной температурой. После обработки мясо или рыбу быстро подрумянивают.'},
+  {type:'Техники',name:'Складывание смеси',text:'Деликатное соединение лёгкой и плотной масс движениями лопатки снизу вверх. Так сохраняют воздух во взбитых белках, сливках и муссах.'},
+  {type:'Техники',name:'Шоковое охлаждение',text:'Быстрое снижение температуры продукта с помощью ледяной воды или интенсивного холода. Останавливает приготовление и сокращает время в опасном температурном диапазоне.'},
   {type:'Термины',name:'Al dente',text:'Степень готовности пасты или овощей, когда продукт уже мягкий, но сохраняет лёгкое сопротивление при укусе.'},
   {type:'Термины',name:'Редуцирование',text:'Уваривание жидкости для концентрации вкуса и густоты. Так получают плотные соусы, сиропы и насыщенные бульоны.'},
   {type:'Термины',name:'Расстойка',text:'Отдых дрожжевого теста перед выпечкой, во время которого оно увеличивается в объёме и становится воздушнее.'},
-  {type:'Термины',name:'Эмульсия',text:'Смесь жидкости и жира, удержанная вместе перемешиванием или стабилизатором. Примеры: майонез, винегрет, голландез.'}
+  {type:'Термины',name:'Эмульсия',text:'Смесь жидкости и жира, удержанная вместе перемешиванием или стабилизатором. Примеры: майонез, винегрет, голландез.'},
+  {type:'Термины',name:'Mise en place',text:'Предварительная организация работы: все продукты отмерены, нарезаны и размещены рядом, а оборудование подготовлено до начала приготовления.'},
+  {type:'Термины',name:'Брунуаз',text:'Очень мелкая кубическая нарезка овощей со стороной примерно 2–3 мм. Используется для гарниров, супов и аккуратных соусов.'},
+  {type:'Термины',name:'Жюльен',text:'Тонкая нарезка продукта соломкой. Для овощей обычно ориентируются на длину 4–5 см и толщину около 2 мм.'},
+  {type:'Термины',name:'Ру',text:'Смесь муки и жира, прогретая до нужного цвета. Используется для загущения бешамеля, велюте, подлив и супов.'},
+  {type:'Термины',name:'Фонд',text:'Концентрированная основа из костей, мяса, рыбы или овощей. После варки её процеживают и используют для супов и соусов.'},
+  {type:'Термины',name:'Букет гарни',text:'Связка ароматных трав, которую кладут в бульон или рагу и удаляют перед подачей. Часто включает тимьян, лавровый лист и петрушку.'},
+  {type:'Термины',name:'Умами',text:'Один из основных вкусов, связанный с глутаматами и некоторыми нуклеотидами. Особенно выражен в выдержанном сыре, грибах, томатах, водорослях и ферментированных продуктах.'},
+  {type:'Термины',name:'Наппе',text:'Консистенция соуса, при которой он покрывает ложку ровным слоем. Проведённая пальцем дорожка не должна сразу затягиваться.'},
+  {type:'Термины',name:'Альбумин',text:'Белок, который может выступать белыми каплями на поверхности рыбы при сильном или длительном нагреве. Умеренная температура уменьшает его выделение.'},
+  {type:'Термины',name:'Автолиз',text:'Отдых смеси муки и воды до активного замеса. За это время мука увлажняется, а тесто становится более растяжимым.'}
 ];
 function setTheme(){const isDark=state.theme==='dark'; document.body.classList.toggle('dark',isDark); const tb=$('#themeBtn'); if(tb){tb.innerHTML=ambientThemeIcon(state.theme); tb.setAttribute('aria-label', isDark?'Светлая тема':'Тёмная тема'); tb.setAttribute('title', isDark?'Светлая тема':'Тёмная тема');} const themeMeta=document.querySelector('meta[name="theme-color"]'); if(themeMeta) themeMeta.setAttribute('content', isDark?'#0c1a33':'#FAF4E6'); const iconPng=document.querySelector('link[rel="icon"][type="image/png"]'); if(iconPng) iconPng.setAttribute('href', isDark?'./assets/icons/favicon-dark-32.png':'./assets/icons/favicon-32.png'); const appleIcon=document.querySelector('link[rel="apple-touch-icon"]'); if(appleIcon) appleIcon.setAttribute('href', isDark?'./assets/icons/apple-touch-icon-dark.png':'./assets/icons/apple-touch-icon.png'); updateHomeActionIcons();}
 function dishEmoji(r){return dishIconKey(r);}
@@ -11361,7 +11408,7 @@ function pad2(n){return String(n).padStart(2,'0')}
 function localDateKey(d=new Date()){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`}
 function dateFromKey(key){const [y,m,d]=String(key||'').split('-').map(Number); return new Date(y||new Date().getFullYear(),(m||1)-1,d||1)}
 function monthKeyFromDate(d){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`}
-function normalizeMealItem(item){return {id:String(item?.id||''),source:item?.source==='custom'?'custom':'base',title:String(item?.title||'').trim()};}
+function normalizeMealItem(item){const source=item?.source==='custom'?'custom':'base'; return {id:canonicalRecipeId(item?.id,source),source,title:String(item?.title||'').trim()};}
 function normalizeMealDay(day){const out={}; MEAL_SLOTS.forEach(([slot])=>{out[slot]=Array.isArray(day?.[slot])?day[slot].map(normalizeMealItem).filter(x=>x.id):[];}); return out;}
 function normalizeMealPlan(plan){
   const source=plan&&typeof plan==='object'&&!Array.isArray(plan)?plan:{};
@@ -11401,7 +11448,7 @@ function mergeMealPlans(localPlan,cloudPlan){
   });
   return merged;
 }
-function getRecipeByRef(ref){return (ref?.source==='custom'?myRecipes:recipes).find(r=>String(r.id)===String(ref?.id))||null;}
+function getRecipeByRef(ref){const source=ref?.source==='custom'?'custom':'base'; return (source==='custom'?myRecipes:recipes).find(r=>String(r.id)===canonicalRecipeId(ref?.id,source))||null;}
 function recipeToMealRef(recipe){return {id:String(recipe.id),source:recipe.source==='custom'?'custom':'base',title:recipe.title||'Без названия'};}
 function allRecipeOptions(){return recipes.map(r=>Object.assign({source:'base'},r)).concat(myRecipes.map(r=>Object.assign({source:'custom'},r))).sort((a,b)=>(a.category||'').localeCompare(b.category||'','ru') || (a.title||'').localeCompare(b.title||'','ru'));}
 function mealCountryLabel(recipe){
@@ -12689,7 +12736,9 @@ function renderEncyclopedia(){
 function openEncyclopediaView(){showView('encyclopediaview','page'); renderEncyclopedia();}
 function openRecipe(id,source='base'){
   clearRecipeStepTimers();
-  const r=source==='custom'?myRecipes.find(x=>x.id===id):recipes.find(x=>x.id===id); if(!r) return;
+  const normalizedSource=source==='custom'?'custom':'base';
+  const canonicalId=canonicalRecipeId(id,normalizedSource);
+  const r=normalizedSource==='custom'?myRecipes.find(x=>x.id===canonicalId):recipes.find(x=>x.id===canonicalId); if(!r) return;
   $('#modalTags').innerHTML=`<span class="tag">${r.country||'Мои рецепты'}</span><span class="tag">${r.category}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}${likeButtonHtml(r.id,source,'')}`;
   $('#modalTitle').innerHTML=`<span>${r.title}</span>${originLabel(r)?`<small>${originLabel(r)}</small>`:''}`;
   const nut=r.nutrition||nutritionOf(r);
