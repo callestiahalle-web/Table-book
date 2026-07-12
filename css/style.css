@@ -4697,6 +4697,195 @@ body.dark #home .home-tools-row .tab-icon {
   mask-image: linear-gradient(90deg, transparent 0, #000 clamp(34px, 8vw, 96px), #000 calc(100% - clamp(34px, 8vw, 96px)), transparent 100%) !important;
 }
 
+/* Unified matte navigation controls */
+:root {
+  --nav-matte-bg: #f8f2e7;
+  --nav-matte-bg-hover: #fffaf1;
+  --nav-matte-border: rgba(176, 128, 54, .58);
+  --nav-matte-icon: #705532;
+  --nav-matte-shadow: 0 7px 18px rgba(91, 64, 31, .11);
+}
+
+body.dark {
+  --nav-matte-bg: #303940;
+  --nav-matte-bg-hover: #39434a;
+  --nav-matte-border: rgba(201, 177, 125, .44);
+  --nav-matte-icon: #ead9b7;
+  --nav-matte-shadow: 0 8px 20px rgba(0, 0, 0, .27);
+}
+
+.arrow,
+.country-open-arrow,
+.cuisine-carousel-arrow,
+.back-btn,
+.meal-picker-back,
+.swipe-cue .nav-arrow-icon {
+  background: var(--nav-matte-bg) !important;
+  background-color: var(--nav-matte-bg) !important;
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  border: 1px solid var(--nav-matte-border) !important;
+  outline: 0 !important;
+  box-shadow: var(--nav-matte-shadow) !important;
+  filter: none !important;
+}
+
+.arrow::before,
+.arrow::after,
+.country-open-arrow::before,
+.country-open-arrow::after,
+.cuisine-carousel-arrow::before,
+.cuisine-carousel-arrow::after,
+.back-btn::before,
+.back-btn::after,
+.meal-picker-back::before,
+.meal-picker-back::after,
+.swipe-cue .nav-arrow-icon::before,
+.swipe-cue .nav-arrow-icon::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  background-image: none !important;
+}
+
+.arrow,
+.country-open-arrow,
+.cuisine-carousel-arrow {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: grid !important;
+  place-items: center !important;
+  color: var(--nav-matte-icon) !important;
+  transition: transform .2s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease !important;
+}
+
+.arrow .line-icon,
+.country-open-arrow .line-icon,
+.cuisine-carousel-arrow .line-icon {
+  width: 19px !important;
+  height: 19px !important;
+  margin: 0 !important;
+  stroke: currentColor !important;
+  stroke-width: 1.7 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  filter: none !important;
+  transform: translateX(.5px);
+}
+
+.country-card:hover .country-open-arrow,
+.arrow:hover,
+.cuisine-carousel-arrow:hover {
+  background: var(--nav-matte-bg-hover) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 9px 20px rgba(91, 64, 31, .14) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.dark .country-card:hover .country-open-arrow,
+body.dark .arrow:hover,
+body.dark .cuisine-carousel-arrow:hover {
+  box-shadow: 0 9px 22px rgba(0, 0, 0, .34) !important;
+}
+
+.country-card:active .country-open-arrow,
+.arrow:active,
+.cuisine-carousel-arrow:active {
+  transform: translateY(0) scale(.95) !important;
+  box-shadow: 0 3px 9px rgba(91, 64, 31, .12) !important;
+}
+
+.back-btn,
+.meal-picker-back {
+  min-height: 42px !important;
+  padding: 7px 14px 7px 8px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: .01em !important;
+  transition: transform .2s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease !important;
+}
+
+.nav-arrow-icon {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--nav-matte-icon);
+  background: rgba(176, 128, 54, .08);
+  border: 1px solid rgba(176, 128, 54, .22);
+}
+
+body.dark .nav-arrow-icon {
+  background: rgba(234, 217, 183, .06);
+  border-color: rgba(234, 217, 183, .16);
+}
+
+.nav-arrow-icon .line-icon {
+  width: 16px !important;
+  height: 16px !important;
+  stroke: currentColor !important;
+  stroke-width: 1.75 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  filter: none !important;
+  transform: translateX(-.35px);
+}
+
+.back-btn:hover,
+.meal-picker-back:hover {
+  background: var(--nav-matte-bg-hover) !important;
+  border-color: var(--gold) !important;
+  transform: translateY(-1px) !important;
+}
+
+.back-btn:active,
+.meal-picker-back:active {
+  transform: translateY(0) scale(.98) !important;
+  box-shadow: 0 3px 9px rgba(91, 64, 31, .11) !important;
+}
+
+.back-btn:focus-visible,
+.meal-picker-back:focus-visible,
+.cuisine-carousel-arrow:focus-visible {
+  outline: 2px solid var(--gold) !important;
+  outline-offset: 3px !important;
+}
+
+.swipe-cue .nav-arrow-icon {
+  width: 32px !important;
+  height: 32px !important;
+  flex-basis: 32px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+}
+
+.swipe-cue .nav-arrow-icon .line-icon {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow,
+  .country-open-arrow,
+  .cuisine-carousel-arrow,
+  .back-btn,
+  .meal-picker-back {
+    transition: none !important;
+  }
+}
+
 .cuisine-carousel-shell::before,
 .cuisine-carousel-shell::after {
   content: "" !important;
