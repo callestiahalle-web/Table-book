@@ -10822,6 +10822,7 @@ if(window.TABLE_BOOK_CAUCASUS_RECIPES) window.TABLE_BOOK_CAUCASUS_RECIPES.apply(
 if(window.TABLE_BOOK_DETAILED_RECIPES) window.TABLE_BOOK_DETAILED_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_MEDITERRANEAN_RECIPES) window.TABLE_BOOK_MEDITERRANEAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_THAI_RECIPES) window.TABLE_BOOK_THAI_RECIPES.apply(recipes);
+if(window.TABLE_BOOK_JAPANESE_RECIPES) window.TABLE_BOOK_JAPANESE_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_KOREAN_RECIPES) window.TABLE_BOOK_KOREAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_RUSSIAN_RECIPES) window.TABLE_BOOK_RUSSIAN_RECIPES.apply(recipes);
 const categoryOrder=["Завтраки","Закуски","Салаты","Супы","Горячие блюда","Гарниры","Выпечка","Десерты","Морепродукты","Соусы"];
