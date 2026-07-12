@@ -4699,19 +4699,19 @@ body.dark #home .home-tools-row .tab-icon {
 
 /* Unified matte navigation controls */
 :root {
-  --nav-matte-bg: #f8f2e7;
-  --nav-matte-bg-hover: #fffaf1;
-  --nav-matte-border: rgba(176, 128, 54, .58);
+  --nav-matte-bg: #f7f0e5;
+  --nav-matte-bg-hover: #fffaf2;
+  --nav-matte-border: rgba(176, 128, 54, .46);
   --nav-matte-icon: #705532;
-  --nav-matte-shadow: 0 7px 18px rgba(91, 64, 31, .11);
+  --nav-matte-shadow: 0 5px 13px rgba(91, 64, 31, .09);
 }
 
 body.dark {
-  --nav-matte-bg: #303940;
-  --nav-matte-bg-hover: #39434a;
-  --nav-matte-border: rgba(201, 177, 125, .44);
+  --nav-matte-bg: #172f5a;
+  --nav-matte-bg-hover: #1c396b;
+  --nav-matte-border: rgba(201, 177, 125, .38);
   --nav-matte-icon: #ead9b7;
-  --nav-matte-shadow: 0 8px 20px rgba(0, 0, 0, .27);
+  --nav-matte-shadow: 0 5px 14px rgba(0, 0, 0, .22);
 }
 
 .arrow,
@@ -4751,10 +4751,10 @@ body.dark {
 .arrow,
 .country-open-arrow,
 .cuisine-carousel-arrow {
-  width: 42px !important;
-  height: 42px !important;
-  min-width: 42px !important;
-  min-height: 42px !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
   padding: 0 !important;
   border-radius: 50% !important;
   display: grid !important;
@@ -4766,15 +4766,15 @@ body.dark {
 .arrow .line-icon,
 .country-open-arrow .line-icon,
 .cuisine-carousel-arrow .line-icon {
-  width: 19px !important;
-  height: 19px !important;
+  width: 20px !important;
+  height: 20px !important;
   margin: 0 !important;
   stroke: currentColor !important;
-  stroke-width: 1.7 !important;
+  stroke-width: 2 !important;
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
   filter: none !important;
-  transform: translateX(.5px);
+  transform: translateX(1px);
 }
 
 .country-card:hover .country-open-arrow,
