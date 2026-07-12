@@ -10918,9 +10918,12 @@ function dishIconKey(recipe){const t=(recipe.title+' '+recipe.category).toLowerC
 const STORAGE_STATE_KEY="tableBookState";
 const STORAGE_RECIPES_KEY="tableBookUserRecipes";
 const STORAGE_BACKUP_KEY="tableBookBackup";
+const STORAGE_MEAL_LEGACY_KEY="tableBookLegacyMealPlan";
 const SUPABASE_URL="https://qshwxcxhxkchpdjaecdk.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaHd4Y3hoeGtjaHBkamFlY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjM3NTYsImV4cCI6MjA5OTA5OTc1Nn0.aQM03By8cL4VkFsI4NiVugWtSKU1bcZkHfErK_4PMB4";
 const CLOUD_TABLE="user_app_state";
+const CLOUD_MEAL_TABLE="user_meal_days";
+const MEAL_MONTH_CACHE_LIMIT=3;
 const CLOUD_SESSION_KEY="tableBookSupabaseSession";
 const CLOUD_PROFILE_KEY_PREFIX="tableBookCloudProfile:";
 const CLOUD_LAST_SYNC_KEY_PREFIX="tableBookCloudLastSync:";
@@ -11054,22 +11057,37 @@ function createRestCloudClient(){
     const next=normalizeSession(payload); saveSession(next); return next;
   }
   function restFrom(table){
-    const query={selectCols:null,head:false,count:null,filters:[],limitN:null};
+    const query={selectCols:null,head:false,count:null,filters:[],limitN:null,orderBy:null,action:'select'};
     const api={
       select(cols,opts={}){query.selectCols=cols||'*';query.head=!!opts.head;query.count=opts.count||null;return api;},
       eq(col,val){query.filters.push([col,'eq',val]);return api;},
+      gte(col,val){query.filters.push([col,'gte',val]);return api;},
+      lt(col,val){query.filters.push([col,'lt',val]);return api;},
+      order(col,opts={}){query.orderBy=[col,opts.ascending!==false];return api;},
+      delete(){query.action='delete';return api;},
       limit(n){query.limitN=n;return executeSelect();},
       maybeSingle(){return executeSelect(true);},
-      async upsert(row,opts={}){await refreshSession(); const onConflict=opts.onConflict?`?on_conflict=${encodeURIComponent(opts.onConflict)}`:''; try{const data=await request(`/rest/v1/${encodeURIComponent(table)}${onConflict}`,{method:'POST',headers:Object.assign(headers(session?.access_token),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(row)}); return {data,error:null}}catch(error){return {data:null,error}}}
+      async upsert(row,opts={}){await refreshSession(); const onConflict=opts.onConflict?`?on_conflict=${encodeURIComponent(opts.onConflict)}`:''; try{const data=await request(`/rest/v1/${encodeURIComponent(table)}${onConflict}`,{method:'POST',headers:Object.assign(headers(session?.access_token),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(row)}); return {data,error:null}}catch(error){return {data:null,error}}},
+      then(resolve,reject){return (query.action==='delete'?executeDelete():executeSelect()).then(resolve,reject);}
     };
+    function queryParams(){
+      const params=new URLSearchParams();
+      if(query.action==='select') params.set('select',query.selectCols||'*');
+      for(const [c,op,v] of query.filters) params.append(c,`${op}.${v}`);
+      if(query.limitN!=null) params.set('limit',String(query.limitN));
+      if(query.orderBy) params.set('order',`${query.orderBy[0]}.${query.orderBy[1]?'asc':'desc'}`);
+      return params;
+    }
     async function executeSelect(single=false){
       await refreshSession();
-      const params=new URLSearchParams();
-      params.set('select',query.selectCols||'*');
-      for(const [c,op,v] of query.filters) params.set(c,`${op}.${v}`);
-      if(query.limitN!=null) params.set('limit',String(query.limitN));
+      const params=queryParams();
       const extra={}; if(query.head) extra['Prefer']=query.count?`count=${query.count}`:'';
       try{const data=await request(`/rest/v1/${encodeURIComponent(table)}?${params.toString()}`,{method:query.head?'HEAD':'GET',headers:Object.assign(headers(session?.access_token),extra)}); return {data:single?(Array.isArray(data)?(data[0]||null):data):data,error:null}}catch(error){return {data:null,error}}
+    }
+    async function executeDelete(){
+      await refreshSession();
+      const params=queryParams();
+      try{const data=await request(`/rest/v1/${encodeURIComponent(table)}?${params.toString()}`,{method:'DELETE',headers:Object.assign(headers(session?.access_token),{'Prefer':'return=minimal'})}); return {data,error:null}}catch(error){return {data:null,error}}
     }
     return api;
   }
@@ -11089,11 +11107,15 @@ function createRestCloudClient(){
   };
 }
 function safeJson(value,fallback){try{return value?JSON.parse(value):fallback}catch(e){return fallback}}
-const state=Object.assign({theme:"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealMonth:null,selectedMealDate:null,likedRecipes:[],encyTab:"Все"},safeJson(localStorage.getItem(STORAGE_STATE_KEY)||localStorage.getItem("maisonState"),{}));
+const storedState=safeJson(localStorage.getItem(STORAGE_STATE_KEY)||localStorage.getItem("maisonState"),{});
+const state=Object.assign({theme:"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealMonth:null,selectedMealDate:null,likedRecipes:[],encyTab:"Все",mealStorageVersion:2,mealDirtyDays:[]},storedState);
 let myRecipes=safeJson(localStorage.getItem(STORAGE_RECIPES_KEY)||localStorage.getItem("maisonMyRecipes"),[]);
+let legacyMealPlanPending=Object.assign({},safeJson(localStorage.getItem(STORAGE_MEAL_LEGACY_KEY),{}),storedState?.mealStorageVersion===2?{}:(storedState?.mealPlan||{}));
 function stateForStorage(){
   const s=Object.assign({},state);
-  s.mealPlan=normalizeMealPlan(s.mealPlan);
+  s.mealPlan=compactCachedMealPlan(s.mealPlan);
+  s.mealStorageVersion=2;
+  s.mealDirtyDays=[...new Set((Array.isArray(s.mealDirtyDays)?s.mealDirtyDays:[]).filter(key=>/^\d{4}-\d{2}-\d{2}$/.test(String(key))))];
   const selected=String(s.selectedMealDate||'');
   if(!selected || !s.mealPlan[selected]) s.selectedMealDate=null;
   s.mealEditorOpen=false;
@@ -11104,8 +11126,7 @@ function tableBookSnapshot(){return {app:"Table book",version:2,savedAt:new Date
 function persistBackup(){try{localStorage.setItem(STORAGE_BACKUP_KEY,JSON.stringify(tableBookSnapshot()))}catch(e){console.warn("Backup save failed",e)}}
 
 function cloudQueueStateSignature(){
-  const clean=normalizeMealPlan(state.mealPlan);
-  return JSON.stringify({theme:state.theme||'light',mealPlan:clean,mealPlanUpdatedAt:Object.keys(clean).length?(state.mealPlanUpdatedAt||null):null,likedRecipes:normalizeLikedRecipes(state.likedRecipes)});
+  return JSON.stringify({theme:state.theme||'light',likedRecipes:normalizeLikedRecipes(state.likedRecipes),encyTab:state.encyTab||'Все'});
 }
 function updateBackupStatus(text){const el=$("#backupStatus"); if(el) el.textContent=text;}
 function saveState({sync=true}={}){
@@ -11124,11 +11145,16 @@ function saveState({sync=true}={}){
 }
 function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
 function defaultUserState(themeValue=state?.theme||"light"){
-  return {theme:themeValue||"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealPlanUpdatedAt:null,mealMonth:monthKeyFromDate(new Date()),selectedMealDate:null,mealEditorOpen:false,myCat:null,likedRecipes:[],encyTab:"Все"};
+  return {theme:themeValue||"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealPlanUpdatedAt:null,mealMonth:monthKeyFromDate(new Date()),selectedMealDate:null,mealEditorOpen:false,myCat:null,likedRecipes:[],encyTab:"Все",mealStorageVersion:2,mealDirtyDays:[]};
 }
 function resetLocalPersonalDataAfterLogout({silent=false}={}){
   const keepTheme=state?.theme||"light";
   clearTimeout(cloudSaveTimer);
+  cloudMealSaveTimers.forEach(timer=>clearTimeout(timer));
+  cloudMealSaveTimers.clear();
+  mealMonthLoads.clear();
+  mealMonthCache.clear();
+  legacyMealPlanPending={};
   cloudSyncApplying=true;
   try{
     myRecipes=[];
@@ -11139,9 +11165,10 @@ function resetLocalPersonalDataAfterLogout({silent=false}={}){
     mealDraft=null;
     mealEditorOpen=false;
     localStorage.removeItem(STORAGE_RECIPES_KEY);
+    localStorage.removeItem(STORAGE_MEAL_LEGACY_KEY);
     localStorage.removeItem("maisonMyRecipes");
     localStorage.removeItem("maisonState");
-    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
     persistBackup();
   }catch(e){console.warn('Local account data reset failed',e)}
   finally{cloudSyncApplying=false;}
@@ -11406,12 +11433,24 @@ const MEAL_SLOTS=[['breakfast','Завтрак'],['lunch','Обед'],['dinner',
 let mealDraftDate=null, mealDraft=null, mealDayEditMode=true;
 let mealPickerDialog={slot:null,category:null,country:null,step:'category'};
 let mealPlanCleanedOnce=false;
+const mealMonthCache=new Map();
+const mealMonthLoads=new Map();
+const cloudMealSaveTimers=new Map();
 let lastCloudQueuedStateSignature=cloudQueueStateSignature();
 function esc(value){return String(value??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));}
 function pad2(n){return String(n).padStart(2,'0')}
 function localDateKey(d=new Date()){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`}
 function dateFromKey(key){const [y,m,d]=String(key||'').split('-').map(Number); return new Date(y||new Date().getFullYear(),(m||1)-1,d||1)}
 function monthKeyFromDate(d){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`}
+function validMonthKey(key){return /^\d{4}-\d{2}$/.test(String(key||''));}
+function monthKeyFromDayKey(key){return /^\d{4}-\d{2}-\d{2}$/.test(String(key||''))?String(key).slice(0,7):null;}
+function relevantMealMonthKey(){return state.route==='mealview'&&validMonthKey(state.mealMonth)?state.mealMonth:monthKeyFromDate(new Date());}
+function mealMonthRange(monthKey){
+  if(!validMonthKey(monthKey)) return null;
+  const [year,month]=monthKey.split('-').map(Number);
+  const next=new Date(year,month,1);
+  return {start:`${monthKey}-01`,end:`${monthKeyFromDate(next)}-01`};
+}
 function normalizeMealItem(item){const source=item?.source==='custom'?'custom':'base'; return {id:canonicalRecipeId(item?.id,source),source,title:String(item?.title||'').trim()};}
 function normalizeMealDay(day){const out={}; MEAL_SLOTS.forEach(([slot])=>{out[slot]=Array.isArray(day?.[slot])?day[slot].map(normalizeMealItem).filter(x=>x.id):[];}); return out;}
 function normalizeMealPlan(plan){
@@ -11424,9 +11463,164 @@ function normalizeMealPlan(plan){
   });
   return out;
 }
+function mealPlanForMonth(plan,monthKey){
+  const source=normalizeMealPlan(plan);
+  const out={};
+  Object.keys(source).forEach(dateKey=>{if(monthKeyFromDayKey(dateKey)===monthKey) out[dateKey]=source[dateKey];});
+  return out;
+}
+function touchMealMonthCache(monthKey){
+  if(!validMonthKey(monthKey)) return;
+  if(mealMonthCache.has(monthKey)) mealMonthCache.delete(monthKey);
+  mealMonthCache.set(monthKey,true);
+}
+function trimMealMonthCache(){
+  const active=validMonthKey(state.mealMonth)?state.mealMonth:monthKeyFromDate(new Date());
+  while(mealMonthCache.size>MEAL_MONTH_CACHE_LIMIT){
+    const dirtyMonths=new Set((Array.isArray(state.mealDirtyDays)?state.mealDirtyDays:[]).map(monthKeyFromDayKey).filter(Boolean));
+    const candidate=[...mealMonthCache.keys()].find(key=>key!==active&&!dirtyMonths.has(key));
+    if(!candidate) break;
+    mealMonthCache.delete(candidate);
+    Object.keys(state.mealPlan||{}).forEach(dateKey=>{if(monthKeyFromDayKey(dateKey)===candidate) delete state.mealPlan[dateKey];});
+  }
+}
+function initializeMealMonthCache(plan=state.mealPlan){
+  const clean=normalizeMealPlan(plan);
+  const active=validMonthKey(state.mealMonth)?state.mealMonth:monthKeyFromDate(new Date());
+  const current=monthKeyFromDate(new Date());
+  const months=[active,current,...Object.keys(clean).map(monthKeyFromDayKey).filter(Boolean).sort().reverse()];
+  [...new Set(months)].slice(0,MEAL_MONTH_CACHE_LIMIT).forEach(touchMealMonthCache);
+  const allowed=new Set(mealMonthCache.keys());
+  state.mealPlan={};
+  Object.keys(clean).forEach(dateKey=>{if(allowed.has(monthKeyFromDayKey(dateKey))) state.mealPlan[dateKey]=clean[dateKey];});
+  trimMealMonthCache();
+  return state.mealPlan;
+}
+function compactCachedMealPlan(plan=state.mealPlan){
+  const clean=normalizeMealPlan(plan);
+  if(!mealMonthCache.size) initializeMealMonthCache(clean);
+  const allowed=new Set(mealMonthCache.keys());
+  const out={};
+  Object.keys(clean).forEach(dateKey=>{if(allowed.has(monthKeyFromDayKey(dateKey))) out[dateKey]=clean[dateKey];});
+  return out;
+}
+function cacheMealMonth(monthKey,monthPlan,{persist=true}={}){
+  if(!validMonthKey(monthKey)) return;
+  const next=normalizeMealPlan(state.mealPlan);
+  Object.keys(next).forEach(dateKey=>{if(monthKeyFromDayKey(dateKey)===monthKey) delete next[dateKey];});
+  Object.assign(next,mealPlanForMonth(monthPlan,monthKey));
+  state.mealPlan=next;
+  touchMealMonthCache(monthKey);
+  trimMealMonthCache();
+  if(persist) saveState({sync:false});
+}
+async function loadMealMonth(monthKey,{force=false,silent=true}={}){
+  if(!validMonthKey(monthKey)) return false;
+  if(!force && mealMonthCache.has(monthKey)){touchMealMonthCache(monthKey);return true;}
+  if(mealMonthLoads.has(monthKey)) return mealMonthLoads.get(monthKey);
+  const task=(async()=>{
+    const cachedLocalMonth=mealPlanForMonth(mergeMealPlans(legacyMealPlanPending,state.mealPlan),monthKey);
+    if(!cloud || !cloudUser){
+      cacheMealMonth(monthKey,cachedLocalMonth);
+      return true;
+    }
+    const dirtyDays=new Set(Array.isArray(state.mealDirtyDays)?state.mealDirtyDays:[]);
+    const dirtyLocalMonth={};
+    Object.keys(cachedLocalMonth).forEach(dateKey=>{
+      if(dirtyDays.has(dateKey) || Object.prototype.hasOwnProperty.call(legacyMealPlanPending,dateKey)) dirtyLocalMonth[dateKey]=cachedLocalMonth[dateKey];
+    });
+    const range=mealMonthRange(monthKey);
+    try{
+      const {data,error}=await cloud.from(CLOUD_MEAL_TABLE)
+        .select('meal_date,meal_day,updated_at')
+        .eq('user_id',cloudUser.id)
+        .gte('meal_date',range.start)
+        .lt('meal_date',range.end)
+        .order('meal_date',{ascending:true});
+      if(error) throw error;
+      const cloudMonth={};
+      (Array.isArray(data)?data:[]).forEach(row=>{
+        const dateKey=String(row?.meal_date||'').slice(0,10);
+        const day=normalizeMealDay(row?.meal_day);
+        if(/^\d{4}-\d{2}-\d{2}$/.test(dateKey) && mealPlanHasItems(day)) cloudMonth[dateKey]=day;
+      });
+      dirtyDays.forEach(dateKey=>{if(monthKeyFromDayKey(dateKey)===monthKey && !cachedLocalMonth[dateKey]) delete cloudMonth[dateKey];});
+      cacheMealMonth(monthKey,mergeMealPlans(cloudMonth,dirtyLocalMonth));
+      if(state.mealMonth===monthKey){renderMealCalendar();updateHomeMeta();}
+      return true;
+    }catch(error){
+      console.warn('Meal month load failed',error);
+      cacheMealMonth(monthKey,cachedLocalMonth);
+      if(!silent) cloudStatus('Не удалось загрузить меню за выбранный месяц: '+cloudErrorMessage(error));
+      return false;
+    }
+  })().finally(()=>mealMonthLoads.delete(monthKey));
+  mealMonthLoads.set(monthKey,task);
+  return task;
+}
+async function saveCloudMealDay(dateKey,day){
+  if(!cloud || !cloudUser || !/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey||''))) return false;
+  const compact=normalizeMealDay(day);
+  try{
+    if(mealPlanHasItems(compact)){
+      const {error}=await cloud.from(CLOUD_MEAL_TABLE).upsert({user_id:cloudUser.id,meal_date:dateKey,meal_day:compact,updated_at:new Date().toISOString()},{onConflict:'user_id,meal_date'});
+      if(error) throw error;
+    }else{
+      const {error}=await cloud.from(CLOUD_MEAL_TABLE).delete().eq('user_id',cloudUser.id).eq('meal_date',dateKey);
+      if(error) throw error;
+    }
+    state.mealDirtyDays=(Array.isArray(state.mealDirtyDays)?state.mealDirtyDays:[]).filter(key=>key!==dateKey);
+    trimMealMonthCache();
+    saveState({sync:false});
+    return true;
+  }catch(error){console.warn('Meal day sync failed',error);return false;}
+}
+function queueCloudMealDaySave(dateKey,day){
+  if(!cloud || !cloudUser) return;
+  const snapshot=normalizeMealDay(day);
+  clearTimeout(cloudMealSaveTimers.get(dateKey));
+  cloudMealSaveTimers.set(dateKey,setTimeout(()=>{
+    cloudMealSaveTimers.delete(dateKey);
+    saveCloudMealDay(dateKey,snapshot);
+  },650));
+}
+async function flushDirtyMealDays(){
+  if(!cloud || !cloudUser) return false;
+  const dates=[...new Set((Array.isArray(state.mealDirtyDays)?state.mealDirtyDays:[]).filter(key=>/^\d{4}-\d{2}-\d{2}$/.test(String(key))))];
+  for(const dateKey of dates){
+    const day=state.mealPlan?.[dateKey]||legacyMealPlanPending?.[dateKey]||normalizeMealDay(null);
+    await saveCloudMealDay(dateKey,day);
+  }
+  return true;
+}
+async function migrateLegacyMealPlan(){
+  const legacy=normalizeMealPlan(legacyMealPlanPending);
+  const dates=Object.keys(legacy);
+  if(!dates.length){try{localStorage.removeItem(STORAGE_MEAL_LEGACY_KEY);}catch(e){} return true;}
+  try{localStorage.setItem(STORAGE_MEAL_LEGACY_KEY,JSON.stringify(legacy));}catch(e){}
+  if(!cloud || !cloudUser) return false;
+  try{
+    for(let index=0;index<dates.length;index+=100){
+      const rows=dates.slice(index,index+100).map(dateKey=>({user_id:cloudUser.id,meal_date:dateKey,meal_day:legacy[dateKey],updated_at:new Date().toISOString()}));
+      const {error}=await cloud.from(CLOUD_MEAL_TABLE).upsert(rows,{onConflict:'user_id,meal_date'});
+      if(error) throw error;
+    }
+    legacyMealPlanPending={};
+    localStorage.removeItem(STORAGE_MEAL_LEGACY_KEY);
+    state.mealStorageVersion=2;
+    saveState({sync:false});
+    return true;
+  }catch(error){console.warn('Legacy meal plan migration failed',error);return false;}
+}
 function touchMealPlan(){state.mealPlanUpdatedAt=new Date().toISOString();}
 function mealPlanHasItems(day){const d=normalizeMealDay(day); return MEAL_SLOTS.some(([slot])=>d[slot].length);}
-function pruneMealPlan(){state.mealPlan=normalizeMealPlan(state.mealPlan); mealPlanCleanedOnce=true; return state.mealPlan;}
+function pruneMealPlan(){
+  state.mealPlan=normalizeMealPlan(state.mealPlan);
+  if(Object.keys(legacyMealPlanPending).length){try{localStorage.setItem(STORAGE_MEAL_LEGACY_KEY,JSON.stringify(legacyMealPlanPending));}catch(e){}}
+  initializeMealMonthCache(state.mealPlan);
+  mealPlanCleanedOnce=true;
+  return state.mealPlan;
+}
 function ensureMealPlan(){
   if(!state.mealPlan || typeof state.mealPlan!=='object' || Array.isArray(state.mealPlan)) state.mealPlan={};
   if(!mealPlanCleanedOnce) return pruneMealPlan();
@@ -11477,8 +11671,8 @@ function currentMealMonthDate(){
   if(/^\d{4}-\d{2}$/.test(String(state.mealMonth||''))){const [y,m]=state.mealMonth.split('-').map(Number); return new Date(y,m-1,1);}
   const d=new Date(); state.mealMonth=monthKeyFromDate(d); return new Date(d.getFullYear(),d.getMonth(),1);
 }
-function setMealMonthOffset(delta){const d=currentMealMonthDate(); d.setMonth(d.getMonth()+delta); state.mealMonth=monthKeyFromDate(d); saveState(); document.body.classList.add('meal-calendar-switching'); if(window.__mealCalendarRaf) cancelAnimationFrame(window.__mealCalendarRaf); window.__mealCalendarRaf=requestAnimationFrame(()=>{renderMealCalendar(); requestAnimationFrame(()=>document.body.classList.remove('meal-calendar-switching'));});}
-function openMealCalendar(dateKey=null){ensureMealPlan(); if(!state.mealMonth) state.mealMonth=monthKeyFromDate(new Date()); if(dateKey) state.selectedMealDate=dateKey; showView('mealview'); if(state.selectedMealDate) openMealDay(state.selectedMealDate,{scroll:!!dateKey}); vibe(12);}
+function setMealMonthOffset(delta){const d=currentMealMonthDate(); d.setMonth(d.getMonth()+delta); state.mealMonth=monthKeyFromDate(d); saveState({sync:false}); document.body.classList.add('meal-calendar-switching'); if(window.__mealCalendarRaf) cancelAnimationFrame(window.__mealCalendarRaf); window.__mealCalendarRaf=requestAnimationFrame(()=>{renderMealCalendar(); loadMealMonth(state.mealMonth).finally(()=>requestAnimationFrame(()=>document.body.classList.remove('meal-calendar-switching')));});}
+function openMealCalendar(dateKey=null){ensureMealPlan(); if(!state.mealMonth) state.mealMonth=monthKeyFromDate(new Date()); if(dateKey){state.selectedMealDate=dateKey;state.mealMonth=monthKeyFromDayKey(dateKey)||state.mealMonth;} showView('mealview'); loadMealMonth(state.mealMonth).then(()=>{if(state.selectedMealDate) openMealDay(state.selectedMealDate,{scroll:!!dateKey});}); vibe(12);}
 function mealDateSummary(dateKey,limit=3,plan=null){
   const sourcePlan=plan||ensureMealPlan();
   const raw=sourcePlan[dateKey];
@@ -11584,10 +11778,11 @@ function clearInactiveMealGrid(grid){
 }
 function renderMealCalendar(){
   ensureMealPlan();
-  const month=currentMealMonthDate();
-  const monthTitle=month.toLocaleDateString('ru-RU',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase());
   const homeActive=$('#home')?.classList.contains('active');
   const mealActive=$('#mealview')?.classList.contains('active');
+  const now=new Date();
+  const month=mealActive?currentMealMonthDate():new Date(now.getFullYear(),now.getMonth(),1);
+  const monthTitle=month.toLocaleDateString('ru-RU',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase());
   const fullTitle=$('#mealMonthTitle'), fullGrid=$('#mealCalendarGrid');
   const homeGrid=$('#homeMealCalendarGrid');
   if(fullTitle) fullTitle.textContent=monthTitle;
@@ -11752,15 +11947,18 @@ function persistMealDraft({sync=true,render=true,status=true}={}){
   if(mealPlanHasItems(compact)) plan[mealDraftDate]=compact;
   else delete plan[mealDraftDate];
   state.mealPlan=normalizeMealPlan(plan);
+  touchMealMonthCache(monthKeyFromDayKey(mealDraftDate));
+  trimMealMonthCache();
   const after=mealPlanSignature(state.mealPlan);
   const changed=before!==after;
-  if(changed){touchMealPlan(); saveState();}
+  if(changed){
+    touchMealPlan();
+    state.mealDirtyDays=[...new Set([...(Array.isArray(state.mealDirtyDays)?state.mealDirtyDays:[]),mealDraftDate])];
+    saveState({sync:false});
+  }
   else state.mealPlan=normalizeMealPlan(state.mealPlan);
   if(render && changed){renderMealCalendar(); updateHomeMeta();}
-  if(sync && changed && cloudUser){
-    clearTimeout(cloudSaveTimer);
-    saveCloudData({silent:true}).catch(e=>console.warn('Meal plan sync failed',e));
-  }
+  if(sync && changed && cloudUser) queueCloudMealDaySave(mealDraftDate,state.mealPlan[mealDraftDate]||normalizeMealDay(null));
   return changed;
 }
 function addMealDish(slot,source,id){
@@ -12097,8 +12295,6 @@ function cloudErrorMessage(error){
   return raw||'Неизвестная ошибка Supabase.';
 }
 function cloudSnapshot(){
-  const cleanMealPlan=normalizeMealPlan(state.mealPlan);
-  state.mealPlan=cleanMealPlan;
   const base=tableBookSnapshot();
   base.state={
     theme:state.theme||'light',
@@ -12108,8 +12304,7 @@ function cloudSnapshot(){
     editingId:null,
     selectedMealDate:null,
     mealEditorOpen:false,
-    mealPlan:cleanMealPlan,
-    mealPlanUpdatedAt:Object.keys(cleanMealPlan).length?(state.mealPlanUpdatedAt||null):null,
+    mealStorageVersion:2,
     profile:{email:cloudUser?.email||cloudProfile.email||'',nickname:userNickname()},
     likedRecipes:normalizeLikedRecipes(state.likedRecipes),
     encyTab:state.encyTab||'Все'
@@ -12149,21 +12344,13 @@ function applyCloudPayload(data,{replace=false,silent=true}={}){
       if(Array.isArray(data.app_state.likedRecipes)) state.likedRecipes=normalizeLikedRecipes(data.app_state.likedRecipes);
       if(data.app_state.encyTab) state.encyTab=data.app_state.encyTab;
       if(data.app_state.mealPlan && typeof data.app_state.mealPlan==='object'){
-        const cloudMealTime=Date.parse(data.app_state.mealPlanUpdatedAt||data.updated_at||0)||0;
-        const localMealTime=Date.parse(state.mealPlanUpdatedAt||0)||0;
-        if(replace || cloudMealTime>localMealTime){
-          state.mealPlan=normalizeMealPlan(data.app_state.mealPlan);
-          state.mealPlanUpdatedAt=data.app_state.mealPlanUpdatedAt||data.updated_at||state.mealPlanUpdatedAt||null;
-        }else if(!state.mealPlanUpdatedAt){
-          state.mealPlan=mergeMealPlans(state.mealPlan,data.app_state.mealPlan);
-          state.mealPlanUpdatedAt=data.app_state.mealPlanUpdatedAt||data.updated_at||new Date().toISOString();
-        }
+        legacyMealPlanPending=mergeMealPlans(legacyMealPlanPending,data.app_state.mealPlan);
       }
       if(data.app_state.mealMonth && !state.mealMonth) state.mealMonth=data.app_state.mealMonth;
     }
     if(replace) myRecipes=cloudRecipes;
     else if(cloudRecipes.length) myRecipes=mergeRecipeLists(myRecipes,cloudRecipes);
-    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
     localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
     localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
     persistBackup();
@@ -12189,11 +12376,19 @@ async function syncCloudDataAfterLogin({silent=true,reason='login'}={}){
     const {data,error}=await cloud.from(CLOUD_TABLE).select('app_state,my_recipes,updated_at').eq('user_id',cloudUser.id).maybeSingle();
     if(error) throw error;
     if(!data){
-      if(myRecipes.length) await saveCloudData({silent:true});
+      await saveCloudData({silent:true});
+      await migrateLegacyMealPlan();
+      await flushDirtyMealDays();
+      mealMonthCache.clear();
+      await loadMealMonth(relevantMealMonthKey(),{force:true,silent});
       if(!silent) cloudStatus(myRecipes.length?'Локальные рецепты сохранены в облако для этого аккаунта.':'Облачных рецептов для этого аккаунта пока нет.');
       return false;
     }
     const result=applyCloudPayload(data,{replace:false,silent});
+    await migrateLegacyMealPlan();
+    await flushDirtyMealDays();
+    mealMonthCache.clear();
+    await loadMealMonth(relevantMealMonthKey(),{force:true,silent});
     if(result.changed){
       if(!silent) cloudStatus(`Синхронизация выполнена: на устройстве ${result.localCount} ${plural(result.localCount,['рецепт','рецепта','рецептов'])}.`);
       saveCloudData({silent:true}).catch(e=>console.warn('Merged cloud save failed',e));
@@ -12238,8 +12433,10 @@ async function checkCloudConnection(){
     if(activeUser) setCloudUser(activeUser);
     const {error:tableError}=await cloud.from(CLOUD_TABLE).select('user_id',{head:true,count:'exact'}).limit(1);
     if(tableError) throw tableError;
+    const {error:mealTableError}=await cloud.from(CLOUD_MEAL_TABLE).select('meal_date',{head:true,count:'exact'}).limit(1);
+    if(mealTableError) throw mealTableError;
     if(activeUser) await syncCloudDataAfterLogin({silent:true,reason:'check'});
-    cloudStatus(activeUser?'Соединение есть. Авторизация, таблица user_app_state и синхронизация рецептов доступны. Никнейм: '+userDisplayName()+'. Рецептов на устройстве: '+myRecipes.length+'.':'Соединение есть. Таблица user_app_state доступна. Войдите, чтобы проверить пользовательскую запись.');
+    cloudStatus(activeUser?'Соединение есть. Профиль, рецепты и помесячный архив меню доступны. Никнейм: '+userDisplayName()+'. Рецептов на устройстве: '+myRecipes.length+'.':'Соединение есть. Облачные таблицы доступны. Войдите, чтобы проверить пользовательскую запись.');
     renderCloudUi();
     return true;
   }catch(error){console.warn(error); cloudStatus('Проверка Supabase: '+cloudErrorMessage(error)); return false;}
@@ -12274,22 +12471,29 @@ async function loadCloudData({silent=false}={}){
     try{
       myRecipes=Array.isArray(data.my_recipes)?data.my_recipes:[];
       if(data.app_state && typeof data.app_state==='object'){
-        Object.assign(state,data.app_state);
-        state.mealPlan=normalizeMealPlan(data.app_state.mealPlan);
+        const incomingState=Object.assign({},data.app_state);
+        if(incomingState.mealPlan && typeof incomingState.mealPlan==='object') legacyMealPlanPending=mergeMealPlans(legacyMealPlanPending,incomingState.mealPlan);
+        delete incomingState.mealPlan;
+        delete incomingState.mealPlanUpdatedAt;
+        Object.assign(state,incomingState);
+        state.mealStorageVersion=2;
         state.likedRecipes=normalizeLikedRecipes(data.app_state.likedRecipes);
         state.encyTab=data.app_state.encyTab||'Все';
-        state.mealPlanUpdatedAt=data.app_state.mealPlanUpdatedAt||data.updated_at||state.mealPlanUpdatedAt||null;
         if(data.app_state.profile && typeof data.app_state.profile==='object') rememberCloudProfile(data.app_state.profile);
         if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская';
         state.route='myview';
         state.editingId=null;
       }
-      localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(state));
+      localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
       localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
       localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
       persistBackup();
       if(data.updated_at) rememberCloudSyncedAt(data.updated_at);
     }finally{cloudSyncApplying=false;}
+    await migrateLegacyMealPlan();
+    await flushDirtyMealDays();
+    mealMonthCache.clear();
+    await loadMealMonth(relevantMealMonthKey(),{force:true,silent:true});
     setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderMealCalendar(); renderLikedRecipes(false); renderEncyclopedia(); resetMyForm(); showView('myview');
     cloudStatus('Данные загружены из облака и сохранены на этом устройстве.');
     vibe(16);
