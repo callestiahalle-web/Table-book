@@ -10820,6 +10820,7 @@ const typeVisuals={"Завтраки":{icon:"breakfast",bg:"linear-gradient(135d
 if(window.TABLE_BOOK_RECIPE_QUALITY) window.TABLE_BOOK_RECIPE_QUALITY.apply(recipes);
 if(window.TABLE_BOOK_CAUCASUS_RECIPES) window.TABLE_BOOK_CAUCASUS_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_DETAILED_RECIPES) window.TABLE_BOOK_DETAILED_RECIPES.apply(recipes);
+if(window.TABLE_BOOK_MEDITERRANEAN_RECIPES) window.TABLE_BOOK_MEDITERRANEAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_KOREAN_RECIPES) window.TABLE_BOOK_KOREAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_RUSSIAN_RECIPES) window.TABLE_BOOK_RUSSIAN_RECIPES.apply(recipes);
 const categoryOrder=["Завтраки","Закуски","Салаты","Супы","Горячие блюда","Гарниры","Выпечка","Десерты","Морепродукты","Соусы"];
