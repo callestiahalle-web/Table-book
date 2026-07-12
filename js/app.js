@@ -10819,6 +10819,7 @@ const cuisineThemes={"Италия":{emoji:"italy",accent:"#2f7d56",bg:"linear-g
 const typeVisuals={"Завтраки":{icon:"breakfast",bg:"linear-gradient(135deg,#d7ad58,#f0d18e)"},"Закуски":{icon:"snack",bg:"linear-gradient(135deg,#bc7048,#e8aa78)"},"Салаты":{icon:"salad",bg:"linear-gradient(135deg,#4f8d5f,#a5c985)"},"Супы":{icon:"soup",bg:"linear-gradient(135deg,#b8693d,#dfaa72)"},"Горячие блюда":{icon:"hot",bg:"linear-gradient(135deg,#6c5c8e,#b39ad5)"},"Гарниры":{icon:"side",bg:"linear-gradient(135deg,#778d4f,#c8d99a)"},"Выпечка":{icon:"bread",bg:"linear-gradient(135deg,#9d6b3b,#d3ad77)"},"Десерты":{icon:"dessert",bg:"linear-gradient(135deg,#ad6882,#edbed0)"},"Соусы":{icon:"sauce",bg:"linear-gradient(135deg,#8a6a4d,#c6ab83)"},"Морепродукты":{icon:"seafood",bg:"linear-gradient(135deg,#3e8da5,#95d4df)"}};
 if(window.TABLE_BOOK_RECIPE_QUALITY) window.TABLE_BOOK_RECIPE_QUALITY.apply(recipes);
 if(window.TABLE_BOOK_CAUCASUS_RECIPES) window.TABLE_BOOK_CAUCASUS_RECIPES.apply(recipes);
+if(window.TABLE_BOOK_DETAILED_RECIPES) window.TABLE_BOOK_DETAILED_RECIPES.apply(recipes);
 const categoryOrder=["Завтраки","Закуски","Салаты","Супы","Горячие блюда","Гарниры","Выпечка","Десерты","Морепродукты","Соусы"];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 
