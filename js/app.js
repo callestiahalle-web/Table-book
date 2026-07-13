@@ -11331,7 +11331,30 @@ const encyclopediaItems=[
   {type:'Термины',name:'Альбумин',text:'Белок, который может выступать белыми каплями на поверхности рыбы при сильном или длительном нагреве. Умеренная температура уменьшает его выделение.'},
   {type:'Термины',name:'Автолиз',text:'Отдых смеси муки и воды до активного замеса. За это время мука увлажняется, а тесто становится более растяжимым.'}
 ];
-function setTheme(){const isDark=state.theme==='dark'; document.body.classList.toggle('dark',isDark); const tb=$('#themeBtn'); if(tb){tb.innerHTML=ambientThemeIcon(state.theme); tb.setAttribute('aria-label', isDark?'Светлая тема':'Тёмная тема'); tb.setAttribute('title', isDark?'Светлая тема':'Тёмная тема');} const themeMeta=document.querySelector('meta[name="theme-color"]'); if(themeMeta) themeMeta.setAttribute('content', isDark?'#0c1a33':'#FAF4E6'); const iconPng=document.querySelector('link[rel="icon"][type="image/png"]'); if(iconPng) iconPng.setAttribute('href', isDark?'./assets/icons/favicon-dark-32.png':'./assets/icons/favicon-32.png'); const appleIcon=document.querySelector('link[rel="apple-touch-icon"]'); if(appleIcon) appleIcon.setAttribute('href', isDark?'./assets/icons/apple-touch-icon-dark.png':'./assets/icons/apple-touch-icon.png'); updateHomeActionIcons();}
+function setTheme(){
+  const isDark=state.theme==='dark';
+  document.body.classList.toggle('dark',isDark);
+  const tb=$('#themeBtn');
+  if(tb){
+    if(!tb.querySelector('.room-switch')) tb.innerHTML=ambientThemeIcon(state.theme);
+    const switcher=tb.querySelector('.room-switch');
+    if(switcher){
+      switcher.classList.toggle('is-on',isDark);
+      switcher.classList.toggle('is-off',!isDark);
+    }
+    tb.classList.toggle('is-dark',isDark);
+    tb.setAttribute('aria-pressed',String(isDark));
+    tb.setAttribute('aria-label', isDark?'Включить светлую тему':'Включить тёмную тему');
+    tb.setAttribute('title', isDark?'Светлая тема':'Тёмная тема');
+  }
+  const themeMeta=document.querySelector('meta[name="theme-color"]');
+  if(themeMeta) themeMeta.setAttribute('content', isDark?'#0c1a33':'#FAF4E6');
+  const iconPng=document.querySelector('link[rel="icon"][type="image/png"]');
+  if(iconPng) iconPng.setAttribute('href', isDark?'./assets/icons/favicon-dark-32.png':'./assets/icons/favicon-32.png');
+  const appleIcon=document.querySelector('link[rel="apple-touch-icon"]');
+  if(appleIcon) appleIcon.setAttribute('href', isDark?'./assets/icons/apple-touch-icon-dark.png':'./assets/icons/apple-touch-icon.png');
+  updateHomeActionIcons();
+}
 function dishEmoji(r){return dishIconKey(r);}
 function nutritionOf(r){if(r.nutrition) return r.nutrition; const d={"Завтраки":{kcal:290,protein:13,fat:12,carbs:31},"Закуски":{kcal:220,protein:8,fat:10,carbs:24},"Салаты":{kcal:180,protein:6,fat:10,carbs:16},"Супы":{kcal:210,protein:11,fat:7,carbs:24},"Горячие блюда":{kcal:430,protein:24,fat:17,carbs:39},"Выпечка":{kcal:340,protein:8,fat:12,carbs:48},"Десерты":{kcal:360,protein:6,fat:15,carbs:49},"Морепродукты":{kcal:280,protein:25,fat:11,carbs:13},"Гарниры":{kcal:250,protein:5,fat:6,carbs:42},"Соусы":{kcal:95,protein:2,fat:7,carbs:6}}; return d[r.category]||{kcal:300,protein:10,fat:10,carbs:30};}
 recipes.forEach(r=>{r.dishEmoji=r.dishEmoji||dishEmoji(r); r.nutrition=nutritionOf(r);});
@@ -11850,12 +11873,14 @@ function openMealDishPicker(slot,category=null){
   mealPickerDialog={slot,category:category||null,country:null,step:category?'country':'category'};
   const modal=$('#mealPickerModal');
   if(modal) modal.hidden=false;
+  document.body.classList.add('meal-picker-open');
   renderMealDishPicker();
   vibe(10);
 }
 function closeMealDishPicker(){
   const modal=$('#mealPickerModal');
   if(modal) modal.hidden=true;
+  document.body.classList.remove('meal-picker-open');
   mealPickerDialog={slot:null,category:null,country:null,step:'category'};
 }
 function mealPickerBackToCountries(){

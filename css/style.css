@@ -5730,3 +5730,251 @@ main.page {
   padding-top: env(safe-area-inset-top, 0px) !important;
   box-sizing: border-box;
 }
+
+/* Matte theme surfaces: a single soft grain layer without woven/grid patterns. */
+:root {
+  --texture-image: url('../assets/textures/paper-light-canvas.webp') !important;
+  --texture-opacity: .16 !important;
+}
+
+body.dark {
+  --texture-image: url('../assets/textures/paper-dark-canvas.webp') !important;
+  --texture-opacity: .14 !important;
+}
+
+body::before,
+body.dark::before {
+  background-image: var(--texture-image) !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+  opacity: var(--texture-opacity) !important;
+  mix-blend-mode: soft-light !important;
+  filter: none !important;
+}
+
+body::after,
+body.dark::after {
+  background-image: linear-gradient(180deg, rgba(255,255,255,.025), rgba(0,0,0,.018)) !important;
+  background-size: auto !important;
+  opacity: 1 !important;
+}
+
+.meal-picker-dialog,
+.meal-picker-head,
+.meal-picker-body,
+.meal-type-card,
+.meal-pick-card,
+.meal-picker-card,
+.meal-country-card,
+.meal-recipe-card,
+.meal-day,
+.meal-slot {
+  background-color: var(--paper) !important;
+  background-image: linear-gradient(180deg, var(--surface-grad-1), var(--surface-grad-2) 72%, var(--surface-grad-3)) !important;
+  background-size: auto !important;
+  background-repeat: no-repeat !important;
+  background-blend-mode: normal !important;
+  filter: none !important;
+}
+
+body.dark .meal-picker-dialog,
+body.dark .meal-picker-head,
+body.dark .meal-picker-body,
+body.dark .meal-type-card,
+body.dark .meal-pick-card,
+body.dark .meal-picker-card,
+body.dark .meal-country-card,
+body.dark .meal-recipe-card,
+body.dark .meal-day,
+body.dark .meal-slot {
+  background-color: var(--paper) !important;
+  background-image: linear-gradient(180deg, var(--surface-grad-1), var(--surface-grad-2) 72%, var(--surface-grad-3)) !important;
+  background-size: auto !important;
+  background-repeat: no-repeat !important;
+  background-blend-mode: normal !important;
+  filter: none !important;
+}
+
+/* Animated theme switch. The persistent thumb moves left-to-right instead of being redrawn. */
+.theme-btn,
+body.dark .theme-btn {
+  width: 72px !important;
+  height: 40px !important;
+  min-width: 72px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.theme-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+}
+
+.theme-btn:active,
+.theme-btn.tapped {
+  transform: scale(.97) !important;
+  box-shadow: none !important;
+}
+
+.room-switch {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  border-radius: 999px !important;
+}
+
+.switch-plate {
+  box-sizing: border-box !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(186,140,67,.62) !important;
+  background: linear-gradient(180deg, rgba(255,252,244,.98), rgba(234,219,189,.96)) !important;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.9), inset 0 -2px 5px rgba(111,83,43,.14), 0 5px 13px rgba(93,69,39,.12) !important;
+  transition: background .42s ease, border-color .42s ease, box-shadow .42s ease !important;
+}
+
+.switch-rocker {
+  box-sizing: border-box !important;
+  left: 4px !important;
+  top: 4px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(197,151,76,.48) !important;
+  background: radial-gradient(circle at 34% 30%, #fffdf7 0 18%, #f9e7b8 58%, #d9ac5d 100%) !important;
+  box-shadow: 0 3px 8px rgba(90,62,27,.2), 0 0 12px rgba(255,211,126,.32), inset 0 1px 1px rgba(255,255,255,.9) !important;
+  transform: translate3d(0,0,0) !important;
+  transition: transform .44s cubic-bezier(.2,.9,.18,1), background .4s ease, border-color .4s ease, box-shadow .4s ease !important;
+  will-change: transform !important;
+}
+
+.room-switch.is-on .switch-plate {
+  border-color: rgba(235,195,117,.66) !important;
+  background: linear-gradient(180deg, #203f72, #0d2245) !important;
+  box-shadow: inset 0 2px 5px rgba(255,239,201,.08), inset 0 -3px 8px rgba(0,0,0,.36), 0 0 15px rgba(112,157,235,.18) !important;
+}
+
+.room-switch.is-on .switch-rocker {
+  left: 4px !important;
+  transform: translate3d(32px,0,0) !important;
+  border-color: rgba(224,238,255,.62) !important;
+  background: radial-gradient(circle at 35% 30%, #f8fbff 0 16%, #b9d2f4 55%, #739bd5 100%) !important;
+  box-shadow: 0 0 11px rgba(186,217,255,.78), 0 0 22px rgba(106,160,238,.36), 0 4px 8px rgba(0,0,0,.25) !important;
+}
+
+.theme-btn.theme-morph .switch-rocker,
+body.dark .theme-btn.theme-morph .switch-rocker {
+  animation: themeThumbPulse .48s ease both !important;
+}
+
+@keyframes themeThumbPulse {
+  0%,100% { filter: brightness(1); }
+  48% { filter: brightness(1.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-rocker,
+  .switch-plate,
+  .switch-glow {
+    transition-duration: .01ms !important;
+    animation: none !important;
+  }
+}
+
+/* Keep the page fixed while the meal picker is active and make every category reachable. */
+body.meal-picker-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+.meal-picker-modal {
+  box-sizing: border-box !important;
+  padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px)) !important;
+  overscroll-behavior: contain !important;
+}
+
+.meal-picker-dialog {
+  width: min(680px, calc(100vw - 24px)) !important;
+  max-height: min(760px, calc(100dvh - max(24px, env(safe-area-inset-top, 0px)) - max(24px, env(safe-area-inset-bottom, 0px)))) !important;
+}
+
+.meal-picker-body {
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 12px 14px max(18px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.meal-type-grid-modal,
+.meal-pick-grid-modal {
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-gutter: stable !important;
+  padding: 3px 5px 12px 3px !important;
+  margin: 0 !important;
+}
+
+@media(max-width: 560px) {
+  .theme-btn,
+  body.dark .theme-btn {
+    width: 62px !important;
+    min-width: 62px !important;
+    height: 34px !important;
+  }
+
+  .switch-rocker {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .room-switch.is-on .switch-rocker {
+    transform: translate3d(28px,0,0) !important;
+  }
+
+  .meal-picker-dialog {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top, 0px)) - max(16px, env(safe-area-inset-bottom, 0px))) !important;
+    border-radius: 24px !important;
+  }
+
+  .meal-picker-head {
+    padding: 12px 14px 10px !important;
+  }
+
+  .meal-picker-head h3 {
+    font-size: clamp(22px, 7vw, 28px) !important;
+  }
+
+  .meal-type-grid-modal {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: minmax(58px, auto) !important;
+    gap: 8px !important;
+  }
+
+  .meal-type-grid-modal .meal-type-card {
+    min-width: 0 !important;
+    min-height: 58px !important;
+    padding: 8px 6px !important;
+  }
+}
+
+@media(max-width: 340px) {
+  .meal-type-grid-modal {
+    grid-template-columns: 1fr !important;
+  }
+}
