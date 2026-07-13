@@ -11114,7 +11114,7 @@ function createRestCloudClient(){
       async signInWithPassword({email,password}){try{const payload=await request('/auth/v1/token?grant_type=password',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password})}); const next=normalizeSession(payload); saveSession(next); if(next?.access_token && (!next.user || !next.user.id)){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});saveSession(next);}catch(e){console.warn('REST login user fetch failed',e)}} return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async signUp({email,password,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const path='/auth/v1/signup?redirect_to='+encodeURIComponent(redirect); const payload=await request(path,{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password,data:options.data||{},options:{email_redirect_to:redirect}})}); const next=payload.access_token?normalizeSession(payload):null; if(next) saveSession(next); return {data:{session:next,user:next?.user||payload.user||payload},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async resend({type,email,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const payload=await request('/auth/v1/resend',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({type,email,options:{email_redirect_to:redirect}})}); return {data:payload,error:null}}catch(error){return {data:null,error}}},
-      async signOut(){try{if(session?.access_token) await request('/auth/v1/logout',{method:'POST',token:session.access_token,body:'{}'})}catch(e){} saveSession(null); return {error:null}},
+      async signOut({scope='local'}={}){try{if(session?.access_token) await request(`/auth/v1/logout?scope=${encodeURIComponent(scope)}`,{method:'POST',token:session.access_token,body:'{}'})}catch(e){} saveSession(null); return {error:null}},
       async updateUser(payload){try{await refreshSession(); const data=await request('/auth/v1/user',{method:'PUT',token:session?.access_token,body:JSON.stringify(payload)}); if(session){session.user=data; saveSession(session)} return {data:{user:data},error:null}}catch(error){return {data:{user:null},error}}},
       async setSession(tokens){try{const next=normalizeSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token,expires_in:tokens.expires_in||3600,token_type:'bearer'}); saveSession(next); if(next?.access_token){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});saveSession(next);}catch(e){console.warn('REST setSession user fetch failed',e)}} return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async exchangeCodeForSession(){return {data:{session:null,user:null},error:new Error('Для ссылки с code нужен Supabase SDK. Перезагрузите страницу с интернетом или запросите новое письмо подтверждения.')}} ,
@@ -12588,12 +12588,13 @@ async function cloudSignOut(){
   }
   try{
     setCloudBusy(true,'Выхожу из аккаунта...');
-    const {error}=await cloud.auth.signOut();
+    const {error}=await cloud.auth.signOut({scope:'local'});
     if(error) throw error;
     setCloudUser(null);
     resetLocalPersonalDataAfterLogout();
     renderCloudUi();
     closeTopAuth();
+    cloudStatus('Вы вышли только на этом устройстве. Сессии на других устройствах сохранены.');
   }
   catch(error){console.warn(error); cloudStatus('Не удалось выйти: '+cloudErrorMessage(error));}
   finally{setCloudBusy(false);}
