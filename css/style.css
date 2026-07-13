@@ -5724,3 +5724,9 @@ main.page {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Keep the interactive header below native status bars and display cutouts. */
+.topbar {
+  padding-top: env(safe-area-inset-top, 0px) !important;
+  box-sizing: border-box;
+}
