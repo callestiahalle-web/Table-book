@@ -1,0 +1,8 @@
+{
+  "appId": "ru.tablebook.app",
+  "appName": "Table book",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

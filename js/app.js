@@ -10947,6 +10947,8 @@ const CLOUD_LAST_SYNC_KEY_PREFIX="tableBookCloudLastSync:";
 const CLOUD_PENDING_CONFIRM_KEY="tableBookPendingConfirmEmail";
 function getAuthRedirectUrl(){
   try{
+    const isNative=!!(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform());
+    if(isNative) return 'https://www.table-book.ru/';
     const u=new URL(window.location.href);
     u.hash='';
     u.search='';
