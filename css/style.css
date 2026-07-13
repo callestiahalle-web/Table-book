@@ -2071,10 +2071,8 @@ body:before{
   background-image:
     radial-gradient(circle at 12% 18%,rgba(92,72,54,.18) 0 1px,transparent 1.4px),
     radial-gradient(circle at 76% 30%,rgba(255,255,255,.38) 0 .8px,transparent 1.3px),
-    radial-gradient(circle at 42% 70%,rgba(142,111,75,.13) 0 1.1px,transparent 1.6px),
-    repeating-linear-gradient(12deg,rgba(138,108,78,.045) 0 1px,transparent 1px 6px),
-    repeating-linear-gradient(96deg,rgba(255,255,255,.12) 0 1px,transparent 1px 8px) !important;
-  background-size:18px 18px,24px 24px,29px 29px,100% 100%,100% 100% !important;
+    radial-gradient(circle at 42% 70%,rgba(142,111,75,.13) 0 1.1px,transparent 1.6px) !important;
+  background-size:18px 18px,24px 24px,29px 29px !important;
   mask-image:none !important;
   mix-blend-mode:multiply;
 }
@@ -2083,10 +2081,8 @@ body.dark:before{
   background-image:
     radial-gradient(circle at 16% 20%,rgba(255,255,255,.105) 0 1px,transparent 1.55px),
     radial-gradient(circle at 74% 36%,rgba(0,0,0,.38) 0 1px,transparent 1.8px),
-    radial-gradient(circle at 42% 72%,rgba(255,255,255,.06) 0 1px,transparent 1.7px),
-    repeating-linear-gradient(12deg,rgba(255,255,255,.035) 0 1px,transparent 1px 6px),
-    repeating-linear-gradient(96deg,rgba(0,0,0,.16) 0 1px,transparent 1px 8px) !important;
-  background-size:19px 19px,26px 26px,31px 31px,100% 100%,100% 100% !important;
+    radial-gradient(circle at 42% 72%,rgba(255,255,255,.06) 0 1px,transparent 1.7px) !important;
+  background-size:19px 19px,26px 26px,31px 31px !important;
   mix-blend-mode:screen;
 }
 .hero,.country-card,.tab-card,.cat-tile,.recipe-card,.panel,.dialog,.country-head,.custom-head,.stat,.my-item,.meal-day,.meal-slot,.account-settings-card,.auth-popover,.account-info,.input,.select,textarea,.btn,.auth-chip,.theme-btn,.meal-month-btn,.meal-dish-open,.meal-remove,.country-art,.cemoji,.tab-icon,.cat-icon,.dish-icon,.brand-mark,.meal-picker-card,.meal-step-card,.meal-country-card,.meal-recipe-card{
@@ -2354,9 +2350,8 @@ body:before{
     radial-gradient(circle at 22% 32%,var(--paper-grain-a) 0 .78px,transparent .92px),
     radial-gradient(circle at 68% 58%,var(--paper-grain-b) 0 .62px,transparent .8px),
     radial-gradient(circle at 42% 84%,rgba(164,130,83,.11) 0 .92px,transparent 1.1px),
-    repeating-linear-gradient(7deg,rgba(118,94,58,.035) 0 1px,transparent 1px 7px),
     linear-gradient(135deg,rgba(255,255,255,.09),rgba(0,0,0,.028)) !important;
-  background-size:4px 4px,6px 6px,10px 10px,100% 100%,100% 100% !important;
+  background-size:4px 4px,6px 6px,10px 10px,100% 100% !important;
 }
 body.dark:before{
   opacity:.38 !important;
@@ -2365,9 +2360,8 @@ body.dark:before{
     radial-gradient(circle at 22% 32%,rgba(255,255,255,.18) 0 .75px,transparent .92px),
     radial-gradient(circle at 68% 58%,rgba(0,0,0,.36) 0 .72px,transparent .9px),
     radial-gradient(circle at 42% 84%,rgba(255,255,255,.075) 0 .92px,transparent 1.1px),
-    repeating-linear-gradient(7deg,rgba(255,255,255,.035) 0 1px,transparent 1px 7px),
     linear-gradient(135deg,rgba(255,255,255,.04),rgba(0,0,0,.13)) !important;
-  background-size:4px 4px,6px 6px,10px 10px,100% 100%,100% 100% !important;
+  background-size:4px 4px,6px 6px,10px 10px,100% 100% !important;
 }
 .topbar{
   background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(250,244,230,.76)) !important;
@@ -2563,14 +2557,10 @@ body.dark #clearCat{background:linear-gradient(145deg,rgba(255,255,255,.055),rgb
 
 /* final rough paper texture override for both themes */
 :root{
-  --rough-line-a:rgba(121,104,81,.050);
-  --rough-line-b:rgba(255,255,255,.22);
   --rough-dot-a:rgba(105,84,58,.050);
   --rough-dot-b:rgba(255,255,255,.12);
 }
 body.dark{
-  --rough-line-a:rgba(255,255,255,.060);
-  --rough-line-b:rgba(0,0,0,.28);
   --rough-dot-a:rgba(255,255,255,.050);
   --rough-dot-b:rgba(0,0,0,.18);
 }
@@ -2583,11 +2573,9 @@ body::after{
   opacity:.38;
   mix-blend-mode:multiply;
   background-image:
-    repeating-linear-gradient(18deg,var(--rough-line-a) 0 1px,transparent 1px 13px),
-    repeating-linear-gradient(102deg,var(--rough-line-b) 0 1px,transparent 1px 17px),
     radial-gradient(circle at 25% 20%,var(--rough-dot-a) 0 .8px,transparent 1.1px),
     radial-gradient(circle at 70% 75%,var(--rough-dot-b) 0 .7px,transparent 1.0px);
-  background-size:22px 22px,26px 26px,8px 8px,10px 10px;
+  background-size:8px 8px,10px 10px;
 }
 body.dark::after{
   opacity:.24;
@@ -2599,12 +2587,9 @@ body.dark::after{
 .meal-type-card,.meal-saved-link,.meal-country-card,.meal-picker-back,.meal-calendar-panel,.meal-day,
 .home-menu-card,.my-folder-card,.my-item-compact,.product-calc,.manual-kbju,.empty-box,
 .brand-mark,.arrow,.tab-icon,.cat-icon,.dish-icon,.cemoji,.close,.meal-add-btn,.meal-save-btn,.meal-clear-btn{
-  background-image:
-    linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02)),
-    repeating-linear-gradient(18deg,rgba(120,103,82,.030) 0 1px,transparent 1px 10px),
-    repeating-linear-gradient(103deg,rgba(255,255,255,.18) 0 1px,transparent 1px 13px) !important;
-  background-size:auto,16px 16px,20px 20px !important;
-  background-blend-mode:soft-light,normal,screen !important;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02)) !important;
+  background-size:auto !important;
+  background-blend-mode:soft-light !important;
 }
 body.dark .hero,body.dark .country-card,body.dark .tab-card,body.dark .cat-tile,body.dark .recipe-card,
 body.dark .panel,body.dark .dialog,body.dark .country-head,body.dark .custom-head,body.dark .stat,
@@ -2616,12 +2601,9 @@ body.dark .meal-day,body.dark .home-menu-card,body.dark .my-folder-card,body.dar
 body.dark .product-calc,body.dark .manual-kbju,body.dark .empty-box,body.dark .brand-mark,
 body.dark .arrow,body.dark .tab-icon,body.dark .cat-icon,body.dark .dish-icon,body.dark .cemoji,
 body.dark .close,body.dark .meal-add-btn,body.dark .meal-save-btn,body.dark .meal-clear-btn{
-  background-image:
-    linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.10)),
-    repeating-linear-gradient(18deg,rgba(255,255,255,.035) 0 1px,transparent 1px 10px),
-    repeating-linear-gradient(103deg,rgba(0,0,0,.22) 0 1px,transparent 1px 14px) !important;
-  background-size:auto,16px 16px,20px 20px !important;
-  background-blend-mode:screen,normal,multiply !important;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.10)) !important;
+  background-size:auto !important;
+  background-blend-mode:screen !important;
 }
 
 /* --- rough paper theme refinement --- */
@@ -2747,23 +2729,15 @@ body.dark{
 }
 body:before{
   opacity:var(--rough-paper-opacity) !important;
-  background-image:
-    var(--texture-image),
-    repeating-linear-gradient(0deg,rgba(80,62,36,.055) 0 1px,transparent 1px 5px),
-    repeating-linear-gradient(90deg,rgba(255,255,255,.34) 0 1px,transparent 1px 7px),
-    repeating-linear-gradient(27deg,rgba(135,112,72,.045) 0 1px,transparent 1px 9px) !important;
-  background-size:360px auto,9px 9px,11px 11px,17px 17px !important;
-  background-blend-mode:multiply,normal,screen,multiply !important;
+  background-image:var(--texture-image) !important;
+  background-size:360px auto !important;
+  background-blend-mode:multiply !important;
   filter:contrast(1.18) saturate(.82) !important;
 }
 body.dark:before{
-  background-image:
-    var(--texture-image),
-    repeating-linear-gradient(0deg,rgba(255,255,255,.055) 0 1px,transparent 1px 5px),
-    repeating-linear-gradient(90deg,rgba(0,0,0,.34) 0 1px,transparent 1px 8px),
-    repeating-linear-gradient(31deg,rgba(189,199,206,.045) 0 1px,transparent 1px 11px) !important;
-  background-size:360px auto,9px 9px,12px 12px,18px 18px !important;
-  background-blend-mode:screen,screen,multiply,screen !important;
+  background-image:var(--texture-image) !important;
+  background-size:360px auto !important;
+  background-blend-mode:screen !important;
   filter:contrast(1.26) saturate(.74) !important;
 }
 body:after{
@@ -2797,11 +2771,9 @@ body.dark:after{
     inset 0 -1px 0 rgba(122,91,48,.08) !important;
   background-image:
     linear-gradient(180deg, var(--surface-grad-1), var(--surface-grad-2) 72%, var(--surface-grad-3)),
-    var(--texture-image),
-    repeating-linear-gradient(0deg,rgba(90,70,42,var(--rough-paper-surface)) 0 .6px,transparent .6px 7px),
-    repeating-linear-gradient(90deg,rgba(255,255,255,.20) 0 .6px,transparent .6px 9px) !important;
-  background-size:auto,260px auto,12px 12px,16px 16px !important;
-  background-blend-mode:normal,multiply,multiply,screen !important;
+    var(--texture-image) !important;
+  background-size:auto,260px auto !important;
+  background-blend-mode:normal,multiply !important;
 }
 body.dark .topbar,
 body.dark .hero,body.dark .country-card,body.dark .tab-card,body.dark .cat-tile,body.dark .recipe-card,body.dark .panel,body.dark .dialog,body.dark .country-head,body.dark .custom-head,body.dark .stat,body.dark .my-item,
