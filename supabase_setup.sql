@@ -98,3 +98,51 @@ set meal_day = excluded.meal_day,
 update public.user_app_state
 set app_state = app_state - 'mealPlan' - 'mealPlanUpdatedAt'
 where app_state ? 'mealPlan' or app_state ? 'mealPlanUpdatedAt';
+
+-- User edits of built-in recipes are stored separately from the catalogue.
+-- The application always keeps the built-in recipe as the immutable original
+-- and deletes this row when the user chooses "Reset to original".
+create table if not exists public.user_recipe_overrides (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  recipe_id text not null,
+  recipe_data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, recipe_id),
+  constraint user_recipe_overrides_recipe_id_not_blank check (length(btrim(recipe_id)) > 0),
+  constraint user_recipe_overrides_recipe_data_object check (jsonb_typeof(recipe_data) = 'object')
+);
+
+alter table public.user_recipe_overrides enable row level security;
+
+revoke all on table public.user_recipe_overrides from anon, authenticated;
+grant select, insert, update, delete on table public.user_recipe_overrides to authenticated;
+
+drop policy if exists "Users can read own recipe overrides" on public.user_recipe_overrides;
+drop policy if exists "Users can insert own recipe overrides" on public.user_recipe_overrides;
+drop policy if exists "Users can update own recipe overrides" on public.user_recipe_overrides;
+drop policy if exists "Users can delete own recipe overrides" on public.user_recipe_overrides;
+
+create policy "Users can read own recipe overrides"
+on public.user_recipe_overrides
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+create policy "Users can insert own recipe overrides"
+on public.user_recipe_overrides
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can update own recipe overrides"
+on public.user_recipe_overrides
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can delete own recipe overrides"
+on public.user_recipe_overrides
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);

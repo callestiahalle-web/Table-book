@@ -2608,7 +2608,7 @@ body.dark .close,body.dark .meal-add-btn,body.dark .meal-save-btn,body.dark .mea
 
 /* --- rough paper theme refinement --- */
 :root{
-  --texture-image:url('../assets/textures/paper-light.webp');
+  --texture-image:url('../assets/textures/paper-light-canvas.webp');
   --texture-opacity:.30;
   --surface-texture-opacity:.16;
   --surface-grad-1:rgba(255,255,255,.70);
@@ -2616,7 +2616,7 @@ body.dark .close,body.dark .meal-add-btn,body.dark .meal-save-btn,body.dark .mea
   --surface-grad-3:rgba(245,215,205,.18);
 }
 body.dark{
-  --texture-image:url('../assets/textures/paper-dark.webp');
+  --texture-image:url('../assets/textures/paper-dark-canvas.webp');
   --texture-opacity:.20;
   --surface-texture-opacity:.12;
   --surface-grad-1:rgba(74,81,86,.82);
@@ -3024,7 +3024,7 @@ body.dark .country-card .cemoji{
 
 /* --- final rough paper theme refinement --- */
 :root{
-  --texture-image:url('../assets/textures/rough-paper-light.webp') !important;
+  --texture-image:url('../assets/textures/paper-light-canvas.webp') !important;
   --texture-opacity:.82;
   --paper-frame-main:rgba(184,137,61,.72);
   --paper-frame-soft:rgba(218,180,109,.52);
@@ -3035,7 +3035,7 @@ body.dark .country-card .cemoji{
   --surface-grad-3:rgba(247,237,220,.82);
 }
 body.dark{
-  --texture-image:url('../assets/textures/rough-paper-dark.webp') !important;
+  --texture-image:url('../assets/textures/paper-dark-canvas.webp') !important;
   --texture-opacity:.72;
   --paper-frame-main:rgba(5,5,5,.86);
   --paper-frame-soft:rgba(189,199,206,.18);
@@ -3151,7 +3151,7 @@ body.dark .meal-country-img{
 
 /* --- FINAL THEME FIX: luxury rough paper + clean controls + dark country art --- */
 :root{
-  --texture-image:url('../assets/textures/luxury-rough-paper-light.webp') !important;
+  --texture-image:url('../assets/textures/paper-light-canvas.webp') !important;
   --texture-opacity:.92 !important;
   --bg:#ffffff !important;
   --bg2:#FAF4E6 !important;
@@ -3171,7 +3171,7 @@ body.dark .meal-country-img{
   --surface-shadow:0 10px 22px rgba(116,89,47,.10),0 2px 7px rgba(116,89,47,.065) !important;
 }
 body.dark{
-  --texture-image:url('../assets/textures/luxury-rough-paper-dark.webp') !important;
+  --texture-image:url('../assets/textures/paper-dark-canvas.webp') !important;
   --texture-opacity:.84 !important;
   --bg:#bdc7ce !important;
   --bg2:#24292e !important;
@@ -6063,7 +6063,7 @@ html {
 }
 
 html.dark {
-  background-color: #24292e;
+  background-color: #0b1730;
 }
 
 body,
@@ -6083,7 +6083,9 @@ body {
 }
 
 body.dark {
-  background-image: linear-gradient(180deg, #bdc7ce 0%, #808a92 28%, #4a5156 58%, #24292e 100%) !important;
+  background-image:
+    radial-gradient(ellipse at 50% -4%, rgba(255,197,107,.12) 0%, rgba(255,197,107,.05) 18%, transparent 42%),
+    linear-gradient(180deg, #1f4b93 0%, #102445 36%, #0b1730 100%) !important;
 }
 
 body::before,
@@ -6176,5 +6178,179 @@ body.dark::after {
 
   #modalTags .tag {
     padding-inline: 10px;
+  }
+}
+
+/* Account recipe versions and complete country category lists. */
+#categoryChoice {
+  grid-auto-flow: row !important;
+}
+
+.recipe-version-actions {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: var(--softShadow), var(--inner);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.recipe-version-actions strong {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.recipe-version-actions p,
+.base-editor-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.recipe-version-buttons,
+.base-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.recipe-version-buttons .btn {
+  min-height: 42px;
+  padding: 0 15px;
+  border-radius: 15px;
+  white-space: nowrap;
+}
+
+.recipe-reset-btn:disabled {
+  opacity: .42;
+  cursor: default;
+  transform: none !important;
+}
+
+.base-recipe-editor {
+  display: grid;
+  gap: 16px;
+}
+
+.base-editor-grid,
+.base-editor-nutrition {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.base-editor-nutrition {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.base-recipe-editor label {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.base-recipe-editor label > span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.base-editor-wide textarea {
+  width: 100%;
+  min-height: 132px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.base-editor-wide:nth-of-type(2) textarea {
+  min-height: 180px;
+}
+
+.base-editor-country .input[readonly] {
+  opacity: .72;
+}
+
+.base-editor-actions {
+  padding-top: 4px;
+}
+
+.base-editor-actions .btn {
+  min-height: 44px;
+  padding-inline: 18px;
+}
+
+/* The dark header icon uses the same replaced element and geometry as light. */
+body.dark .brand-app-icon {
+  opacity: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: scale(1.035) !important;
+  object-fit: cover !important;
+}
+
+body.dark .brand-mark::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Prevent Android/WebView from drawing a blue tap or text-selection rectangle. */
+.theme-btn,
+.theme-btn *,
+.room-switch,
+.switch-plate,
+.switch-rocker,
+.switch-glow {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+.theme-btn {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  touch-action: manipulation !important;
+}
+
+.theme-btn:focus,
+.theme-btn:focus-visible {
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+@media(max-width: 720px) {
+  .recipe-version-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .recipe-version-buttons,
+  .base-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-version-buttons .btn,
+  .base-editor-actions .btn {
+    width: 100%;
+  }
+
+  .base-editor-grid,
+  .base-editor-nutrition {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media(max-width: 420px) {
+  .base-editor-grid,
+  .base-editor-nutrition {
+    grid-template-columns: 1fr;
   }
 }

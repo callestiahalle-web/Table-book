@@ -10857,7 +10857,7 @@ function homeActionIconSrc(name,variant=homeActionIconVariant()){return `./asset
 function homeActionIconHtml(name,label){return `<img class="home-action-icon" data-home-action-name="${name}" src="${homeActionIconSrc(name)}" alt="${label}" loading="eager" decoding="async">`;}
 function setHomeActionIcon(id,name,label){const el=$('#'+id); if(el) el.innerHTML=homeActionIconHtml(name,label);}
 function updateHomeActionIcons(){$$('.home-action-icon[data-home-action-name]').forEach(img=>{const name=img.dataset.homeActionName; const src=homeActionIconSrc(name); if(img.getAttribute('src')!==src) img.setAttribute('src',src);});}
-function preloadHomeActionIcons(){if(!window.Image) return; HOME_ACTION_ICON_NAMES.forEach(name=>['light','dark'].forEach(variant=>{const img=new Image(); img.decoding='async'; img.src=homeActionIconSrc(name,variant);}));}
+function preloadHomeActionIcons(){if(!window.Image) return; HOME_ACTION_ICON_NAMES.forEach(name=>['light','dark'].forEach(variant=>{const img=new Image(); img.decoding='async'; img.src=homeActionIconSrc(name,variant);})); ['./assets/icons/icon-192.png','./assets/icons/icon-dark-192.png'].forEach(src=>{const img=new Image(); img.decoding='async'; img.src=src;});}
 function ambientThemeIcon(theme){
   const on=theme==='dark';
   return `<span class="room-switch ${on?'is-on':'is-off'}" aria-hidden="true"><span class="switch-plate"><span class="switch-rocker"></span><span class="switch-glow"></span></span></span>`;
@@ -10938,10 +10938,12 @@ const STORAGE_STATE_KEY="tableBookState";
 const STORAGE_RECIPES_KEY="tableBookUserRecipes";
 const STORAGE_BACKUP_KEY="tableBookBackup";
 const STORAGE_MEAL_LEGACY_KEY="tableBookLegacyMealPlan";
+const STORAGE_PERSONAL_KEY_PREFIX="tableBookPersonalState:";
 const SUPABASE_URL="https://qshwxcxhxkchpdjaecdk.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaHd4Y3hoeGtjaHBkamFlY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjM3NTYsImV4cCI6MjA5OTA5OTc1Nn0.aQM03By8cL4VkFsI4NiVugWtSKU1bcZkHfErK_4PMB4";
 const CLOUD_TABLE="user_app_state";
 const CLOUD_MEAL_TABLE="user_meal_days";
+const CLOUD_RECIPE_OVERRIDE_TABLE="user_recipe_overrides";
 const MEAL_MONTH_CACHE_LIMIT=3;
 const CLOUD_SESSION_KEY="tableBookSupabaseSession";
 const CLOUD_PROFILE_KEY_PREFIX="tableBookCloudProfile:";
@@ -11130,8 +11132,14 @@ function createRestCloudClient(){
 function safeJson(value,fallback){try{return value?JSON.parse(value):fallback}catch(e){return fallback}}
 const storedState=safeJson(localStorage.getItem(STORAGE_STATE_KEY)||localStorage.getItem("maisonState"),{});
 const state=Object.assign({theme:"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealMonth:null,selectedMealDate:null,likedRecipes:[],encyTab:"Все",mealStorageVersion:2,mealDirtyDays:[]},storedState);
-let myRecipes=safeJson(localStorage.getItem(STORAGE_RECIPES_KEY)||localStorage.getItem("maisonMyRecipes"),[]);
-let legacyMealPlanPending=Object.assign({},safeJson(localStorage.getItem(STORAGE_MEAL_LEGACY_KEY),{}),storedState?.mealStorageVersion===2?{}:(storedState?.mealPlan||{}));
+// Personal data is intentionally not hydrated until Supabase confirms a user.
+// This prevents recipes, likes and calendar history from a previous account
+// appearing during a guest session on the same phone.
+Object.assign(state,{route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealMonth:null,selectedMealDate:null,likedRecipes:[],mealStorageVersion:2,mealDirtyDays:[]});
+let myRecipes=[];
+let recipeOverrides={};
+let legacyMealPlanPending={};
+let localPersonalHydratedForUser=null;
 function stateForStorage(){
   const s=Object.assign({},state);
   s.mealPlan=compactCachedMealPlan(s.mealPlan);
@@ -11144,7 +11152,75 @@ function stateForStorage(){
   return s;
 }
 function tableBookSnapshot(){return {app:"Table book",version:2,savedAt:new Date().toISOString(),state:stateForStorage(),myRecipes:myRecipes};}
-function persistBackup(){try{localStorage.setItem(STORAGE_BACKUP_KEY,JSON.stringify(tableBookSnapshot()))}catch(e){console.warn("Backup save failed",e)}}
+function publicStateForStorage(){
+  return {
+    theme:state.theme||"light",
+    route:"home",
+    country:null,
+    filterCat:null,
+    editingId:null,
+    encyTab:state.encyTab||"Все",
+    mealPlan:{},
+    mealMonth:null,
+    selectedMealDate:null,
+    likedRecipes:[],
+    mealStorageVersion:2,
+    mealDirtyDays:[]
+  };
+}
+function personalCacheKey(user=cloudUser){return user?.id?STORAGE_PERSONAL_KEY_PREFIX+user.id:null;}
+function personalCacheSnapshot(){
+  return {
+    likedRecipes:normalizeLikedRecipes(state.likedRecipes),
+    myRecipes:Array.isArray(myRecipes)?myRecipes:[],
+    recipeOverrides:recipeOverrides&&typeof recipeOverrides==='object'?recipeOverrides:{},
+    mealPlan:compactCachedMealPlan(state.mealPlan),
+    mealMonth:state.mealMonth||null,
+    selectedMealDate:state.selectedMealDate||null,
+    mealDirtyDays:Array.isArray(state.mealDirtyDays)?state.mealDirtyDays:[],
+    savedAt:new Date().toISOString()
+  };
+}
+function persistPersonalCache(){
+  const key=personalCacheKey();
+  if(!key) return false;
+  try{localStorage.setItem(key,JSON.stringify(personalCacheSnapshot())); return true;}
+  catch(e){console.warn('Personal cache save failed',e); return false;}
+}
+function clearInMemoryPersonalData(){
+  myRecipes=[];
+  recipeOverrides={};
+  state.likedRecipes=[];
+  state.mealPlan={};
+  state.mealMonth=null;
+  state.selectedMealDate=null;
+  state.mealDirtyDays=[];
+  legacyMealPlanPending={};
+}
+function hydratePersonalCacheForUser(user=cloudUser){
+  if(!user?.id || localPersonalHydratedForUser===user.id) return false;
+  clearInMemoryPersonalData();
+  const cached=safeJson(localStorage.getItem(personalCacheKey(user)),{});
+  myRecipes=Array.isArray(cached.myRecipes)?cached.myRecipes:[];
+  recipeOverrides=cached.recipeOverrides&&typeof cached.recipeOverrides==='object'?cached.recipeOverrides:{};
+  state.likedRecipes=normalizeLikedRecipes(cached.likedRecipes);
+  state.mealPlan=normalizeMealPlan(cached.mealPlan);
+  state.mealMonth=cached.mealMonth||monthKeyFromDate(new Date());
+  state.selectedMealDate=cached.selectedMealDate||null;
+  state.mealDirtyDays=Array.isArray(cached.mealDirtyDays)?cached.mealDirtyDays:[];
+  localPersonalHydratedForUser=user.id;
+  return true;
+}
+function clearPersonalCacheForUser(userId){
+  if(!userId) return;
+  try{localStorage.removeItem(STORAGE_PERSONAL_KEY_PREFIX+userId);}catch(e){}
+}
+function persistBackup(){
+  try{
+    if(cloudUser) localStorage.setItem(STORAGE_BACKUP_KEY,JSON.stringify(tableBookSnapshot()));
+    else localStorage.removeItem(STORAGE_BACKUP_KEY);
+  }catch(e){console.warn("Backup save failed",e)}
+}
 
 function cloudQueueStateSignature(){
   return JSON.stringify({theme:state.theme||'light',likedRecipes:normalizeLikedRecipes(state.likedRecipes),encyTab:state.encyTab||'Все'});
@@ -11153,7 +11229,8 @@ function updateBackupStatus(text){const el=$("#backupStatus"); if(el) el.textCon
 function saveState({sync=true}={}){
   try{
     state.mealPlan=normalizeMealPlan(state.mealPlan);
-    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(publicStateForStorage()));
+    if(cloudUser) persistPersonalCache();
     persistBackup();
     if(sync && !cloudSyncApplying){
       const sig=cloudQueueStateSignature();
@@ -11164,11 +11241,12 @@ function saveState({sync=true}={}){
     }
   }catch(e){console.warn("State save failed",e)}
 }
-function saveMyRecipes(){try{localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));localStorage.setItem("maisonMyRecipes",JSON.stringify(myRecipes));persistBackup();updateBackupStatus("Автосохранение выполнено.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные в браузере.");console.warn("Recipe save failed",e)} updateHomeMeta();}
+function saveMyRecipes(){try{if(cloudUser) persistPersonalCache();persistBackup();updateBackupStatus(cloudUser?"Автосохранение выполнено.":"Войдите, чтобы рецепты сохранялись после закрытия приложения.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные.");console.warn("Recipe save failed",e)} updateHomeMeta();}
 function defaultUserState(themeValue=state?.theme||"light"){
   return {theme:themeValue||"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealPlanUpdatedAt:null,mealMonth:monthKeyFromDate(new Date()),selectedMealDate:null,mealEditorOpen:false,myCat:null,likedRecipes:[],encyTab:"Все",mealStorageVersion:2,mealDirtyDays:[]};
 }
 function resetLocalPersonalDataAfterLogout({silent=false}={}){
+  const previousUserId=cloudUser?.id||localPersonalHydratedForUser;
   const keepTheme=state?.theme||"light";
   clearTimeout(cloudSaveTimer);
   cloudMealSaveTimers.forEach(timer=>clearTimeout(timer));
@@ -11178,8 +11256,7 @@ function resetLocalPersonalDataAfterLogout({silent=false}={}){
   legacyMealPlanPending={};
   cloudSyncApplying=true;
   try{
-    myRecipes=[];
-    state.likedRecipes=[];
+    clearInMemoryPersonalData();
     Object.keys(state).forEach(k=>delete state[k]);
     Object.assign(state,defaultUserState(keepTheme));
     mealDraftDate=null;
@@ -11189,7 +11266,10 @@ function resetLocalPersonalDataAfterLogout({silent=false}={}){
     localStorage.removeItem(STORAGE_MEAL_LEGACY_KEY);
     localStorage.removeItem("maisonMyRecipes");
     localStorage.removeItem("maisonState");
-    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
+    localStorage.removeItem(STORAGE_BACKUP_KEY);
+    clearPersonalCacheForUser(previousUserId);
+    localPersonalHydratedForUser=null;
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(publicStateForStorage()));
     persistBackup();
   }catch(e){console.warn('Local account data reset failed',e)}
   finally{cloudSyncApplying=false;}
@@ -11205,7 +11285,16 @@ function resetLocalPersonalDataAfterLogout({silent=false}={}){
 function vibe(ms=12){try{if(navigator.vibrate) navigator.vibrate(ms)}catch(e){}}
 function theme(name){return cuisineThemes[name]||{emoji:"book",accent:"#b99a5d",bg:"linear-gradient(135deg,#8e714a,#b99a5d)",note:"Коллекция рецептов."}}
 function visual(cat){return typeVisuals[cat]||{icon:"hot",bg:"linear-gradient(135deg,#8e714a,#d2b47d)"}}
-function uniqueCountries(){return [...new Set(recipes.map(r=>r.country))].sort((a,b)=>a.localeCompare(b,'ru'))}
+function recipeOverrideFor(id){return recipeOverrides?.[canonicalRecipeId(id,'base')]||null;}
+function effectiveBaseRecipe(id){
+  const canonicalId=canonicalRecipeId(id,'base');
+  const original=recipes.find(r=>String(r.id)===canonicalId);
+  if(!original) return null;
+  const edited=recipeOverrideFor(canonicalId);
+  return edited?Object.assign({},original,edited,{id:original.id,country:original.country,source:'base',userEdited:true}):original;
+}
+function catalogRecipes(){return recipes.map(r=>effectiveBaseRecipe(r.id)||r);}
+function uniqueCountries(){return [...new Set(catalogRecipes().map(r=>r.country))].sort((a,b)=>a.localeCompare(b,'ru'))}
 function orderedCategories(list){const set=[...new Set(list.map(r=>r.category))]; return [...categoryOrder.filter(c=>set.includes(c)), ...set.filter(c=>!categoryOrder.includes(c)).sort((a,b)=>a.localeCompare(b,'ru'))]}
 function originLabel(r){return r&&r.country==='Средиземноморская'&&r.origin?`Происхождение: ${r.origin}`:''}
 function canonicalRecipeId(id,source='base'){
@@ -11334,8 +11423,9 @@ function isRecipeLiked(id,source='base'){
 function resolveRecipeRef(ref){
   if(!ref) return null;
   const source=ref.source==='custom'?'custom':'base';
-  const list=source==='custom'?myRecipes:recipes;
-  const recipe=list.find(item=>String(item.id)===canonicalRecipeId(ref.id,source));
+  const recipe=source==='custom'
+    ?myRecipes.find(item=>String(item.id)===canonicalRecipeId(ref.id,source))
+    :effectiveBaseRecipe(ref.id);
   return recipe?Object.assign({source},recipe):null;
 }
 function refreshLikeButtons(root=document){
@@ -11374,6 +11464,8 @@ function renderRecipeInteractions(root=document){
   root.querySelectorAll('[data-open]').forEach(btn=>btn.onclick=()=>openRecipe(btn.dataset.open,btn.dataset.source||'base'));
   root.querySelectorAll('[data-like-id]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();toggleRecipeLike(btn.dataset.likeId,btn.dataset.likeSource||'base');});
   root.querySelectorAll('[data-share-id]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();copyRecipeLink(btn.dataset.shareId,btn.dataset.shareSource||'base');});
+  root.querySelectorAll('[data-edit-base]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();openBaseRecipeEditor(btn.dataset.editBase);});
+  root.querySelectorAll('[data-reset-base]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();resetBaseRecipeToOriginal(btn.dataset.resetBase);});
   refreshLikeButtons(root);
 }
 
@@ -11458,6 +11550,11 @@ function setTheme(){
   if(iconPng) iconPng.setAttribute('href', isDark?'./assets/icons/favicon-dark-32.png':'./assets/icons/favicon-32.png');
   const appleIcon=document.querySelector('link[rel="apple-touch-icon"]');
   if(appleIcon) appleIcon.setAttribute('href', isDark?'./assets/icons/apple-touch-icon-dark.png':'./assets/icons/apple-touch-icon.png');
+  const brandIcon=$('.brand-app-icon');
+  if(brandIcon){
+    const brandSrc=isDark?'./assets/icons/icon-dark-192.png':'./assets/icons/icon-192.png';
+    if(brandIcon.getAttribute('src')!==brandSrc) brandIcon.setAttribute('src',brandSrc);
+  }
   updateHomeActionIcons();
 }
 function dishEmoji(r){return dishIconKey(r);}
@@ -11474,7 +11571,7 @@ function updateHomeMeta(){
   const lc=$('#likedRecipesCount'); if(lc) lc.textContent=`${liked} ${plural(liked,['блюдо','блюда','блюд'])}`;
   const lm=$('#likedMetaCount'); if(lm) lm.textContent=`${liked} ${plural(liked,['блюдо','блюда','блюд'])}`;
 }
-function updateStats(){const sr=$('#statRecipes'); if(sr) sr.textContent=recipes.length+myRecipes.length; const sc=$('#statCountries'); if(sc) sc.textContent=uniqueCountries().length; const st=$('#statTypes'); if(st) st.textContent=categoryOrder.slice(0,8).length; const sh=$('#statHealthy'); if(sh) sh.textContent=recipes.filter(r=>r.healthy).length; updateHomeMeta();}
+function updateStats(){const catalogue=catalogRecipes(); const sr=$('#statRecipes'); if(sr) sr.textContent=catalogue.length+myRecipes.length; const sc=$('#statCountries'); if(sc) sc.textContent=uniqueCountries().length; const st=$('#statTypes'); if(st) st.textContent=categoryOrder.length; const sh=$('#statHealthy'); if(sh) sh.textContent=catalogue.filter(r=>r.healthy).length; updateHomeMeta();}
 function flushMealDraftBeforeNavigation(){
   if(mealDraftDate&&mealDraft){
     try{persistMealDraft({sync:true,render:false,status:false});}catch(e){console.warn('Meal draft flush failed',e)}
@@ -11513,7 +11610,7 @@ function renderCountries(){
   const previousCountry=g.dataset.activeCountry||'';
   g.innerHTML='';
   uniqueCountries().forEach(c=>{
-    const th=theme(c), list=recipes.filter(r=>r.country===c), cats=orderedCategories(list).length;
+    const th=theme(c), list=catalogRecipes().filter(r=>r.country===c), cats=orderedCategories(list).length;
     const b=document.createElement('button');
     b.className='country-card country-card-uniform country-slide';
     b.style.setProperty('--country-bg', th.bg);
@@ -11568,9 +11665,9 @@ function setupCountryCarousel(previousCountry=''){
   requestAnimationFrame(updateFocus);
 }
 function refreshCountryCategory(country,anchorTop){renderCountry(country); const pinMenu=()=>{const choice=$('#categoryChoice'); if(!choice) return; const delta=choice.getBoundingClientRect().top-anchorTop; if(Math.abs(delta)>.5) window.scrollTo({top:Math.max(0,window.scrollY+delta),left:0,behavior:'auto'});}; pinMenu(); requestAnimationFrame(pinMenu);}
-function renderCategoryTiles(country){const list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.slice(0,8).forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); const anchorTop=choice.getBoundingClientRect().top; state.filterCat = state.filterCat===cat ? null : cat; saveState(); refreshCountryCategory(country,anchorTop);}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
+function renderCategoryTiles(country){const list=catalogRecipes().filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); const anchorTop=choice.getBoundingClientRect().top; state.filterCat = state.filterCat===cat ? null : cat; saveState(); refreshCountryCategory(country,anchorTop);}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
 function recipeCard(r){const badge=r.healthy?'<span class="recipe-badge">Полезный</span>':''; const origin=originLabel(r); const source=r.source==='custom'?'custom':'base'; return `<article class="recipe-card recipe-card-with-like">${badge}<button class="recipe-open-card" data-open="${esc(r.id)}" data-source="${source}" type="button"><h3>${esc(r.title)}</h3>${origin?`<div class="recipe-origin">${esc(origin)}</div>`:''}<div class="recipe-meta"><span>${esc(r.time||'—')}</span><span>${r.servings||1} порц.</span><span>${esc(r.difficulty||'легко')}</span></div></button>${likeButtonHtml(r.id,source,'')}</article>`}
-function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=recipes.filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); renderRecipeInteractions(wrap); const countryView=$('#country'); if(state.route!=='country' || !countryView?.classList.contains('active')) showView('country');}
+function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=catalogRecipes().filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); renderRecipeInteractions(wrap); const countryView=$('#country'); if(state.route!=='country' || !countryView?.classList.contains('active')) showView('country');}
 function slug(s){return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'')}
 function showCountry(c){vibe(12); renderCountry(c);}
 function goHomeWithFlip(){flushMealDraftBeforeNavigation(); routeHistory=[]; const current=$('#'+(state.route||'home'))||$('.view.active')||$('#home'); if(current.id==='home'){showView('home');return;} current.classList.remove('active'); current.style.display='block'; current.classList.add('page-leave'); const home=$('#home'); home.style.display='block'; home.classList.add('active','page-enter'); vibe(16); setTimeout(()=>{current.classList.remove('page-leave'); current.style.display='none'; home.classList.remove('page-enter'); showView('home');},560)}
@@ -11794,9 +11891,9 @@ function mergeMealPlans(localPlan,cloudPlan){
   });
   return merged;
 }
-function getRecipeByRef(ref){const source=ref?.source==='custom'?'custom':'base'; return (source==='custom'?myRecipes:recipes).find(r=>String(r.id)===canonicalRecipeId(ref?.id,source))||null;}
+function getRecipeByRef(ref){const source=ref?.source==='custom'?'custom':'base'; return source==='custom'?myRecipes.find(r=>String(r.id)===canonicalRecipeId(ref?.id,source))||null:effectiveBaseRecipe(ref?.id);}
 function recipeToMealRef(recipe){return {id:String(recipe.id),source:recipe.source==='custom'?'custom':'base',title:recipe.title||'Без названия'};}
-function allRecipeOptions(){return recipes.map(r=>Object.assign({source:'base'},r)).concat(myRecipes.map(r=>Object.assign({source:'custom'},r))).sort((a,b)=>(a.category||'').localeCompare(b.category||'','ru') || (a.title||'').localeCompare(b.title||'','ru'));}
+function allRecipeOptions(){return catalogRecipes().map(r=>Object.assign({source:'base'},r)).concat(myRecipes.map(r=>Object.assign({source:'custom'},r))).sort((a,b)=>(a.category||'').localeCompare(b.category||'','ru') || (a.title||'').localeCompare(b.title||'','ru'));}
 function mealCountryLabel(recipe){
   const source=recipe?.source==='custom'?'custom':'base';
   const origin=String(recipe?.origin||'').trim();
@@ -12229,7 +12326,13 @@ function syncCloudProfileFromUser(){
   }
   if(key){try{localStorage.setItem(key,JSON.stringify(cloudProfile));}catch(e){console.warn('Profile cache save failed',e)}}
 }
-function setCloudUser(user){const prevId=cloudUser?.id||null; cloudUser=user||null; if(prevId && cloudUser?.id!==prevId) cloudAutoSyncDoneForUser=null; syncCloudProfileFromUser();}
+function setCloudUser(user){
+  const prevId=cloudUser?.id||null;
+  cloudUser=user||null;
+  if(prevId && cloudUser?.id!==prevId) cloudAutoSyncDoneForUser=null;
+  if(cloudUser?.id) hydratePersonalCacheForUser(cloudUser);
+  syncCloudProfileFromUser();
+}
 function rememberCloudProfile(next={}){
   if(!cloudUser) return;
   cloudProfile=Object.assign({},cloudProfile,next,{email:cloudUser.email||next.email||cloudProfile.email||''});
@@ -12441,8 +12544,8 @@ function cloudErrorMessage(error){
   const raw=error?.message||String(error||'');
   const msg=raw.toLowerCase();
   if(msg.includes('failed to fetch') || msg.includes('network')) return 'Нет соединения с Supabase. Проверьте интернет, VPN/блокировки и что приложение открыто по обычной ссылке, а не из закрытого предпросмотра.';
-  if(msg.includes('relation') || msg.includes('does not exist')) return 'Таблица user_app_state ещё не создана в Supabase. Выполните SQL для таблицы и RLS-политик.';
-  if(msg.includes('row-level') || msg.includes('policy') || msg.includes('permission') || msg.includes('rls')) return 'Нет доступа к таблице. Проверьте RLS-политики user_app_state.';
+  if(msg.includes('relation') || msg.includes('does not exist')) return 'Одна из таблиц Table book ещё не создана в Supabase. Выполните актуальный supabase_setup.sql.';
+  if(msg.includes('row-level') || msg.includes('policy') || msg.includes('permission') || msg.includes('rls')) return 'Нет доступа к пользовательским данным. Проверьте RLS-политики Table book.';
   if(msg.includes('invalid login')) return 'Неверный email или пароль, либо email ещё не подтверждён.';
   if(msg.includes('email not confirmed')) return 'Email ещё не подтверждён. Откройте письмо от Supabase и подтвердите регистрацию.';
   if(msg.includes('signup disabled')) return 'Регистрация отключена в Supabase Authentication → Providers → Email.';
@@ -12487,6 +12590,51 @@ function mergeRecipeLists(localList,cloudList){
   return Array.from(map.values()).sort((a,b)=>recipeStamp(b)-recipeStamp(a));
 }
 function recipeListsSignature(list){return JSON.stringify((Array.isArray(list)?list:[]).map(r=>[r.id,r.updatedAt||'',r.title||'']));}
+async function loadRecipeOverridesFromCloud({silent=true}={}){
+  if(!cloud||!cloudUser) return false;
+  try{
+    const {data,error}=await cloud.from(CLOUD_RECIPE_OVERRIDE_TABLE).select('recipe_id,recipe_data,updated_at').eq('user_id',cloudUser.id);
+    if(error) throw error;
+    const next={};
+    (Array.isArray(data)?data:[]).forEach(row=>{
+      const id=canonicalRecipeId(row?.recipe_id,'base');
+      if(!id||!recipes.some(recipe=>String(recipe.id)===id)||!row?.recipe_data||typeof row.recipe_data!=='object') return;
+      next[id]=Object.assign({},row.recipe_data,{updatedAt:row.recipe_data.updatedAt||row.updated_at||null});
+    });
+    recipeOverrides=next;
+    persistPersonalCache();
+    renderCountries();
+    if(state.route==='country'&&state.country) renderCountry(state.country);
+    renderLikedRecipes(false);
+    if(!silent) cloudStatus(`Загружено пользовательских версий рецептов: ${Object.keys(next).length}.`);
+    return true;
+  }catch(error){console.warn('Recipe overrides load failed',error); if(!silent) cloudStatus('Не удалось загрузить изменённые рецепты: '+cloudErrorMessage(error)); return false;}
+}
+async function saveRecipeOverrideToCloud(recipeId,recipeData){
+  if(!cloud||!cloudUser) return false;
+  const id=canonicalRecipeId(recipeId,'base');
+  try{
+    const row={user_id:cloudUser.id,recipe_id:id,recipe_data:recipeData,updated_at:new Date().toISOString()};
+    const {error}=await cloud.from(CLOUD_RECIPE_OVERRIDE_TABLE).upsert(row,{onConflict:'user_id,recipe_id'});
+    if(error) throw error;
+    recipeOverrides[id]=recipeData;
+    persistPersonalCache();
+    persistBackup();
+    return true;
+  }catch(error){console.warn('Recipe override save failed',error); cloudStatus('Не удалось сохранить изменённый рецепт: '+cloudErrorMessage(error)); return false;}
+}
+async function deleteRecipeOverrideFromCloud(recipeId){
+  if(!cloud||!cloudUser) return false;
+  const id=canonicalRecipeId(recipeId,'base');
+  try{
+    const {error}=await cloud.from(CLOUD_RECIPE_OVERRIDE_TABLE).delete().eq('user_id',cloudUser.id).eq('recipe_id',id);
+    if(error) throw error;
+    delete recipeOverrides[id];
+    persistPersonalCache();
+    persistBackup();
+    return true;
+  }catch(error){console.warn('Recipe override delete failed',error); cloudStatus('Не удалось сбросить рецепт: '+cloudErrorMessage(error)); return false;}
+}
 function applyCloudPayload(data,{replace=false,silent=true}={}){
   if(!data) return {changed:false,cloudCount:0,localCount:myRecipes.length};
   const beforeSig=recipeListsSignature(myRecipes);
@@ -12506,9 +12654,8 @@ function applyCloudPayload(data,{replace=false,silent=true}={}){
     }
     if(replace) myRecipes=cloudRecipes;
     else if(cloudRecipes.length) myRecipes=mergeRecipeLists(myRecipes,cloudRecipes);
-    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
-    localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
-    localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
+    localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(publicStateForStorage()));
+    persistPersonalCache();
     persistBackup();
   }finally{cloudSyncApplying=false;}
   renderMyRecipes();
@@ -12533,6 +12680,7 @@ async function syncCloudDataAfterLogin({silent=true,reason='login'}={}){
     if(error) throw error;
     if(!data){
       await saveCloudData({silent:true});
+      await loadRecipeOverridesFromCloud({silent:true});
       await migrateLegacyMealPlan();
       await flushDirtyMealDays();
       mealMonthCache.clear();
@@ -12541,6 +12689,7 @@ async function syncCloudDataAfterLogin({silent=true,reason='login'}={}){
       return false;
     }
     const result=applyCloudPayload(data,{replace:false,silent});
+    await loadRecipeOverridesFromCloud({silent:true});
     await migrateLegacyMealPlan();
     await flushDirtyMealDays();
     mealMonthCache.clear();
@@ -12591,6 +12740,8 @@ async function checkCloudConnection(){
     if(tableError) throw tableError;
     const {error:mealTableError}=await cloud.from(CLOUD_MEAL_TABLE).select('meal_date',{head:true,count:'exact'}).limit(1);
     if(mealTableError) throw mealTableError;
+    const {error:overrideTableError}=await cloud.from(CLOUD_RECIPE_OVERRIDE_TABLE).select('recipe_id',{head:true,count:'exact'}).limit(1);
+    if(overrideTableError) throw overrideTableError;
     if(activeUser) await syncCloudDataAfterLogin({silent:true,reason:'check'});
     cloudStatus(activeUser?'Соединение есть. Профиль, рецепты и помесячный архив меню доступны. Никнейм: '+userDisplayName()+'. Рецептов на устройстве: '+myRecipes.length+'.':'Соединение есть. Облачные таблицы доступны. Войдите, чтобы проверить пользовательскую запись.');
     renderCloudUi();
@@ -12640,9 +12791,8 @@ async function loadCloudData({silent=false}={}){
         state.route='myview';
         state.editingId=null;
       }
-      localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(stateForStorage()));
-      localStorage.setItem(STORAGE_RECIPES_KEY,JSON.stringify(myRecipes));
-      localStorage.setItem('maisonMyRecipes',JSON.stringify(myRecipes));
+      localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(publicStateForStorage()));
+      persistPersonalCache();
       persistBackup();
       if(data.updated_at) rememberCloudSyncedAt(data.updated_at);
     }finally{cloudSyncApplying=false;}
@@ -12650,6 +12800,7 @@ async function loadCloudData({silent=false}={}){
     await flushDirtyMealDays();
     mealMonthCache.clear();
     await loadMealMonth(relevantMealMonthKey(),{force:true,silent:true});
+    await loadRecipeOverridesFromCloud({silent:true});
     setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderMealCalendar(); renderLikedRecipes(false); renderEncyclopedia(); resetMyForm(); showView('myview');
     cloudStatus('Данные загружены из облака и сохранены на этом устройстве.');
     vibe(16);
@@ -13099,11 +13250,85 @@ function renderEncyclopedia(){
   grid.innerHTML=items.map(item=>`<article class="encyclopedia-card"><small>${esc(item.type)}</small><h3>${esc(item.name)}</h3><p>${esc(item.text)}</p></article>`).join('');
 }
 function openEncyclopediaView(){showView('encyclopediaview','page'); renderEncyclopedia();}
+function recipeVersionActionsHtml(recipeId){
+  const edited=!!recipeOverrideFor(recipeId);
+  return `<section class="recipe-version-actions"><div><strong>${edited?'Показывается ваша версия':'Оригинальный рецепт'}</strong><p>${cloudUser?'Изменения хранятся в вашем аккаунте и доступны на других устройствах.':'Войдите в аккаунт, чтобы редактировать и сохранять свою версию рецепта.'}</p></div><div class="recipe-version-buttons"><button class="btn primary" type="button" data-edit-base="${esc(recipeId)}">Редактировать рецепт</button><button class="btn ghost recipe-reset-btn" type="button" data-reset-base="${esc(recipeId)}" ${edited?'':'disabled'}>Сбросить до оригинала</button></div></section>`;
+}
+function requireRecipeEditingAccount(){
+  if(cloudUser) return true;
+  closeModalInstant();
+  openTopAuth('login');
+  setAuthPlaque('Войдите в аккаунт, чтобы редактировать рецепты и хранить изменения в Supabase.');
+  return false;
+}
+function openBaseRecipeEditor(id){
+  if(!requireRecipeEditingAccount()) return;
+  const canonicalId=canonicalRecipeId(id,'base');
+  const original=recipes.find(item=>String(item.id)===canonicalId);
+  const r=effectiveBaseRecipe(canonicalId);
+  if(!original||!r) return;
+  clearRecipeStepTimers();
+  const categoryOptions=Array.from(new Set([...categoryOrder,r.category])).map(cat=>`<option value="${esc(cat)}" ${cat===r.category?'selected':''}>${esc(cat)}</option>`).join('');
+  const nutrition=r.nutrition||nutritionOf(r);
+  $('#modalTags').innerHTML=`<span class="tag">${esc(original.country)}</span><span class="tag">Редактирование</span>`;
+  $('#modalTitle').textContent=r.title;
+  $('#modalBody').innerHTML=`<form class="base-recipe-editor" id="baseRecipeEditor"><div class="base-editor-grid"><label><span>Название</span><input class="input" id="baseEditTitle" maxlength="220" value="${esc(r.title||'')}"></label><label><span>Категория</span><select class="select" id="baseEditCategory">${categoryOptions}</select></label><label><span>Время</span><input class="input" id="baseEditTime" maxlength="80" value="${esc(r.time||'')}"></label><label><span>Порции</span><input class="input" id="baseEditServings" type="number" min="1" max="100" step="1" value="${Math.max(1,Number(r.servings)||1)}"></label><label><span>Сложность</span><select class="select" id="baseEditDifficulty"><option value="легко" ${r.difficulty==='легко'?'selected':''}>легко</option><option value="средне" ${r.difficulty==='средне'?'selected':''}>средне</option><option value="сложно" ${r.difficulty==='сложно'?'selected':''}>сложно</option></select></label><label class="base-editor-country"><span>Страна</span><input class="input" value="${esc(original.country)}" readonly></label></div><div class="base-editor-nutrition"><label><span>Ккал / порцию</span><input class="input" id="baseEditKcal" type="number" min="0" step="0.1" value="${esc(nutrition.kcal??0)}"></label><label><span>Белки, г</span><input class="input" id="baseEditProtein" type="number" min="0" step="0.1" value="${esc(nutrition.protein??0)}"></label><label><span>Жиры, г</span><input class="input" id="baseEditFat" type="number" min="0" step="0.1" value="${esc(nutrition.fat??0)}"></label><label><span>Углеводы, г</span><input class="input" id="baseEditCarbs" type="number" min="0" step="0.1" value="${esc(nutrition.carbs??0)}"></label></div><label class="base-editor-wide"><span>Ингредиенты — каждый с новой строки</span><textarea class="textarea" id="baseEditIngredients" rows="10">${esc((r.ingredients||[]).join('\n'))}</textarea></label><label class="base-editor-wide"><span>Шаги приготовления — каждый с новой строки</span><textarea class="textarea" id="baseEditSteps" rows="12">${esc((r.steps||[]).join('\n'))}</textarea></label><label class="base-editor-wide"><span>Заметка</span><textarea class="textarea" id="baseEditTips" rows="4">${esc(r.tips||'')}</textarea></label><div class="base-editor-actions"><button class="btn ghost" type="button" id="cancelBaseRecipeEdit">Отмена</button><button class="btn primary" type="submit" id="saveBaseRecipeEdit">Сохранить изменения</button></div><p class="base-editor-status" id="baseRecipeEditStatus">Оригинальная версия останется в приложении и не будет изменена.</p></form>`;
+  $('#cancelBaseRecipeEdit').onclick=()=>openRecipe(canonicalId,'base');
+  $('#baseRecipeEditor').onsubmit=event=>{event.preventDefault(); saveBaseRecipeEdit(canonicalId);};
+  openModal();
+  setTimeout(()=>$('#baseEditTitle')?.focus(),30);
+}
+async function saveBaseRecipeEdit(id){
+  if(!requireRecipeEditingAccount()) return false;
+  const original=recipes.find(item=>String(item.id)===canonicalRecipeId(id,'base'));
+  if(!original) return false;
+  const lines=selector=>(($(selector)?.value)||'').split('\n').map(value=>value.trim()).filter(Boolean);
+  const title=($('#baseEditTitle')?.value||'').trim();
+  const ingredients=lines('#baseEditIngredients');
+  const steps=lines('#baseEditSteps');
+  const status=$('#baseRecipeEditStatus');
+  if(!title||!ingredients.length||!steps.length){if(status) status.textContent='Заполните название, ингредиенты и шаги приготовления.'; return false;}
+  const now=new Date().toISOString();
+  const recipeData={
+    title,
+    category:$('#baseEditCategory')?.value||original.category,
+    time:($('#baseEditTime')?.value||'').trim()||'—',
+    servings:Math.max(1,Number($('#baseEditServings')?.value)||1),
+    difficulty:$('#baseEditDifficulty')?.value||'легко',
+    ingredients,
+    steps,
+    tips:($('#baseEditTips')?.value||'').trim(),
+    nutrition:{kcal:Math.max(0,Number($('#baseEditKcal')?.value)||0),protein:Math.max(0,Number($('#baseEditProtein')?.value)||0),fat:Math.max(0,Number($('#baseEditFat')?.value)||0),carbs:Math.max(0,Number($('#baseEditCarbs')?.value)||0)},
+    updatedAt:now
+  };
+  const button=$('#saveBaseRecipeEdit');
+  if(button){button.disabled=true;button.textContent='Сохраняю…';}
+  if(status) status.textContent='Сохраняю пользовательскую версию в Supabase…';
+  const saved=await saveRecipeOverrideToCloud(original.id,recipeData);
+  if(!saved){if(button){button.disabled=false;button.textContent='Сохранить изменения';} if(status) status.textContent='Не удалось сохранить изменения. Проверьте подключение и повторите попытку.'; return false;}
+  renderCountries();
+  if(state.country===original.country) renderCountry(original.country);
+  openRecipe(original.id,'base');
+  return true;
+}
+async function resetBaseRecipeToOriginal(id){
+  if(!requireRecipeEditingAccount()) return false;
+  const canonicalId=canonicalRecipeId(id,'base');
+  if(!recipeOverrideFor(canonicalId)) return true;
+  if(!confirm('Удалить вашу версию и вернуть оригинальный рецепт?')) return false;
+  const reset=await deleteRecipeOverrideFromCloud(canonicalId);
+  if(!reset){alert('Не удалось сбросить рецепт. Проверьте подключение к интернету.'); return false;}
+  const original=recipes.find(item=>String(item.id)===canonicalId);
+  renderCountries();
+  if(original&&state.country===original.country) renderCountry(original.country);
+  openRecipe(canonicalId,'base');
+  return true;
+}
 function openRecipe(id,source='base',recipeOverride=null){
   clearRecipeStepTimers();
   const normalizedSource=source==='custom'?'custom':source==='shared'?'shared':'base';
   const canonicalId=normalizedSource==='shared'?String(id||'shared'):canonicalRecipeId(id,normalizedSource);
-  const r=recipeOverride||(normalizedSource==='custom'?myRecipes.find(x=>x.id===canonicalId):recipes.find(x=>x.id===canonicalId)); if(!r) return;
+  const r=recipeOverride||(normalizedSource==='custom'?myRecipes.find(x=>x.id===canonicalId):effectiveBaseRecipe(canonicalId)); if(!r) return;
   activeSharedRecipe=normalizedSource==='shared'?r:null;
   const likeAction=normalizedSource==='shared'?'':likeButtonHtml(r.id,normalizedSource,'');
   $('#modalTags').innerHTML=`<span class="tag">${esc(r.country||'Мои рецепты')}</span><span class="tag">${esc(r.category||'Без категории')}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}${likeAction}${shareButtonHtml(r.id||canonicalId,normalizedSource)}`;
@@ -13113,7 +13338,7 @@ function openRecipe(id,source='base',recipeOverride=null){
   const ingredients=(list,m)=>(Array.isArray(list)?list:[]).map(x=>`<li><span>${esc(scaledIngredientText(x,m))}</span></li>`).join('');
   const nutritionHtml=(n,s)=>`<div class="nutrition"><div class="ncard"><strong>${fmt(n.kcal*s)}</strong><span>ккал</span></div><div class="ncard"><strong>${fmt(n.protein*s)} г</strong><span>белки</span></div><div class="ncard"><strong>${fmt(n.fat*s)} г</strong><span>жиры</span></div><div class="ncard"><strong>${fmt(n.carbs*s)} г</strong><span>углеводы</span></div></div><div class="nnote">На 1 порцию: ${fmt(n.kcal)} ккал • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</div>`;
   const stepsHtml=(r.steps||[]).map(step=>{const sec=extractStepTimerSeconds(step); return `<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${esc(step)}</span></label>${sec?timerHtml(sec):''}</div>`;}).join('');
-  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul><div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>`;
+  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul><div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>${normalizedSource==='base'?recipeVersionActionsHtml(canonicalId):''}`;
   function rerender(){
     const raw=Number($('#portionInput').value); const s=Number.isFinite(raw)&&raw>0?raw:baseServings;
     $('#portionInput').value=s;

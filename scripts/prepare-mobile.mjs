@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, rm } from 'node:fs/promises';
+import { cp, mkdir, rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,12 +16,6 @@ for (const directory of directories) {
 
 for (const file of requiredFiles) {
   await cp(join(root, file), join(output, file));
-}
-
-const rootFiles = await readdir(root, { withFileTypes: true });
-for (const entry of rootFiles) {
-  if (!entry.isFile() || !/^(?:country-.+|apple-touch-icon|favicon-32|icon-(?:192|512|maskable-512))\.png$/u.test(entry.name)) continue;
-  await cp(join(root, entry.name), join(output, entry.name));
 }
 
 console.log(`Mobile web assets prepared in ${output}`);
