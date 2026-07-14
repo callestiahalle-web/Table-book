@@ -5950,3 +5950,152 @@ body.meal-picker-open {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Recipe actions: one balanced matte control family for like and share. */
+#modalTags {
+  align-items: center;
+}
+
+.like-btn,
+.share-btn {
+  box-sizing: border-box;
+  min-height: 40px;
+  border: 1px solid color-mix(in srgb, var(--gold) 56%, var(--line));
+  border-radius: 999px;
+  background-color: var(--paper);
+  background-image: linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.025));
+  color: var(--ink);
+  box-shadow: 0 5px 13px rgba(68,52,37,.10), inset 0 1px 0 rgba(255,255,255,.24);
+  cursor: pointer;
+  transition: transform .16s ease, border-color .2s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.like-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  color: color-mix(in srgb, #a65a62 78%, var(--ink));
+}
+
+.like-btn .line-icon,
+.share-btn .line-icon {
+  width: 19px;
+  height: 19px;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.like-btn .line-icon {
+  fill: transparent;
+}
+
+.like-btn.active {
+  color: #b34f5a;
+  border-color: color-mix(in srgb, #b34f5a 58%, var(--gold));
+  background-color: color-mix(in srgb, #f3d9dc 54%, var(--paper));
+  background-image: none;
+}
+
+.like-btn.active .line-icon {
+  fill: currentColor;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: .01em;
+}
+
+.share-btn:hover,
+.like-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--gold);
+}
+
+.share-btn:active,
+.like-btn:active {
+  transform: translateY(1px) scale(.98);
+  box-shadow: inset 0 2px 5px rgba(41,31,23,.14);
+}
+
+.share-btn:focus-visible,
+.like-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--gold) 72%, transparent);
+  outline-offset: 3px;
+}
+
+#modalTags .like-btn {
+  width: 40px;
+  height: 40px;
+}
+
+body.dark .like-btn,
+body.dark .share-btn {
+  background-color: var(--paper);
+  background-image: linear-gradient(180deg, rgba(255,255,255,.045), rgba(0,0,0,.08));
+  box-shadow: 0 6px 15px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.07);
+}
+
+body.dark .like-btn.active {
+  color: #ef9ca5;
+  background-color: color-mix(in srgb, #7d3440 35%, var(--paper));
+  background-image: none;
+}
+
+.meal-type-card-personal {
+  border: 1px solid color-mix(in srgb, var(--gold) 66%, var(--line)) !important;
+  box-shadow: 0 8px 20px rgba(122,91,44,.13), inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+.copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 18px));
+  z-index: 120;
+  max-width: min(88vw, 360px);
+  padding: 11px 17px;
+  border: 1px solid color-mix(in srgb, var(--gold) 54%, var(--line));
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 12px 32px rgba(42,31,22,.20), inset 0 1px 0 rgba(255,255,255,.22);
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 10px) scale(.96);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.copy-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.copy-toast[hidden] {
+  display: none !important;
+}
+
+@media(max-width: 480px) {
+  .dialog-head {
+    padding-inline: 14px;
+  }
+
+  .tags {
+    gap: 7px;
+  }
+
+  .share-btn {
+    padding-inline: 12px;
+  }
+}

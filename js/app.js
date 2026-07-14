@@ -10833,6 +10833,8 @@ const iconPaths={
  moon:'<path d="M22 19.5A10 10 0 0 1 12.5 6a8 8 0 1 0 9.5 13.5Z"/>', sun:'<circle cx="16" cy="16" r="5"/><path d="M16 3.5v3M16 25.5v3M3.5 16h3M25.5 16h3M7.2 7.2l2.1 2.1M22.7 22.7l2.1 2.1M24.8 7.2l-2.1 2.1M9.3 22.7l-2.1 2.1"/>', custom:'<path d="M8 22h16"/><path d="M10 20 21.5 8.5a2.1 2.1 0 0 1 3 3L13 23l-5 1 1-4Z"/><path d="m20 10 3 3"/>', italy:'<path d="M6 24h20"/><path d="M8 24v-7c0-3 2-5 5-5h6c3 0 5 2 5 5v7"/><path d="M10 24v-5M14 24v-5M18 24v-5M22 24v-5"/><path d="M10 17h12"/><path d="M12 11V8h8v3"/>', spain:'<path d="M6 24h20"/><path d="M10 24V12l3-3 3 3v12"/><path d="M18 24V10l2-2 2 2v14"/><path d="M8 16h10"/><path d="M13 9V6M20 8V5"/>', japan:'<path d="M7 24h18"/><path d="M10 24V12M22 24V12"/><path d="M7 12h18"/><path d="M9 9h14"/><path d="M12 24v-7h8v7"/>', korea:'<path d="M6 24h20"/><path d="M9 24v-8h14v8"/><path d="M8 16h16"/><path d="M10 12l6-4 6 4"/><path d="M12 20h2M18 20h2"/>', russia:'<path d="M6 24h20"/><path d="M10 24v-6c0-2 1-4 3-5"/><path d="M22 24v-6c0-2-1-4-3-5"/><path d="M16 24V14"/><path d="M13 13c0-2 1.5-3.5 3-5 1.5 1.5 3 3 3 5"/><path d="M10 18h12"/><path d="M16 8V5"/>', med:'<path d="M7 24h18"/><path d="M11 24V11h10v13"/><path d="M9 11h14"/><path d="M10 8h12"/><path d="M13 14h6M13 18h6"/><path d="M24 9c1 2 1 4 0 6"/>', china:'<path d="M5 23c2-2 4-2 6 0s4 2 6 0 4-2 6 0 4 2 4 2"/><path d="M7 19c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M10 16V12l3-2 2 2 3-2 2 2 3-2v6"/><path d="M13 12V8M20 12V8"/>', thai:'<path d="M6 24h20"/><path d="M10 24v-8h12v8"/><path d="M8 16h16"/><path d="M11 12h10"/><path d="M13 9h6"/><path d="M16 9V5"/>',
  breakfast:'<path d="M8 20h12a4 4 0 0 1 0 8H12a4 4 0 0 1-4-4v-4Z"/><path d="M20 21h2a3 3 0 0 1 0 6h-2"/><path d="M12 16c-2-3 1-4 0-7M17 16c-2-3 1-4 0-7"/>', snack:'<path d="M8 24h16"/><path d="M10 20h12"/><path d="M12 16h8"/><path d="M10 24l-2 3M22 24l2 3"/><path d="M16 10v10"/>', salad:'<path d="M8 22c0 3 3 5 8 5s8-2 8-5"/><path d="M8 22c0-2 3-4 8-4s8 2 8 4"/><path d="M13 18c1-3 3-5 6-6"/><path d="M18 17c2-1 4-1 6 0"/><path d="M12 19c-2-1-4-1-6 0"/>', soup:'<path d="M8 22c0 3 3 5 8 5s8-2 8-5"/><path d="M8 22h16"/><path d="M12 10c-2 2-2 4 0 6M17 8c-2 2-2 4 0 6M22 10c-2 2-2 4 0 6"/>', hot:'<path d="M8 22h16"/><path d="M10 22a6 6 0 0 1 12 0"/><path d="M11 16h10"/><path d="M16 8v6"/><path d="M14 11c-1-2 1-3 0-5M18 11c-1-2 1-3 0-5"/>', side:'<path d="M9 22c0 3 3 5 7 5s7-2 7-5"/><path d="M9 22c0-2 3-4 7-4s7 2 7 4"/><path d="M12 17c1-2 3-3 5-3s4 1 5 3"/>', bread:'<path d="M8 23c0-5 4-8 9-8 3 0 6 2 7 5 1 2 0 3-1 3H8Z"/><path d="M13 19h1M17 18h1M21 19h1"/>', dessert:'<path d="M8 24h16"/><path d="M10 24l2-10h8l2 10"/><path d="M11 18h10"/><path d="M16 11v3"/><circle cx="16" cy="9" r="1.4"/>', seafood:'<path d="M8 18c4-4 9-5 14-2-2 4-7 6-14 4l3-2-3-2Z"/><circle cx="20.2" cy="15" r=".9"/><path d="M22 18c2 1 3 3 3 5"/>', sauce:'<path d="M12 12h8"/><path d="M13 12v11h6V12"/><path d="M15 12V8h2v4"/><path d="M13 17h6"/>', healthy:'<path d="M8 20c8 0 13-5 15-13-8 0-13 5-15 13Z"/><path d="M8 20c4-1 8-4 12-9"/>', calendar:'<rect x="7" y="8" width="18" height="17" rx="4"/><path d="M11 6v5M21 6v5M7 14h18M11 18h2M15 18h2M19 18h2M11 22h2M15 22h2"/>', homeBook:'<path d="M7.5 7.5h7.2c1.7 0 3.3.7 4.3 2 1-1.3 2.6-2 4.3-2h1.2v17h-6.2c-1.4 0-2.7.5-3.6 1.5-.9-1-2.2-1.5-3.6-1.5H7.5v-17Z"/><path d="M16 10.2v15.5M10.8 12.5h3.3M10.8 16h3.3M20.2 12.5h2.5M20.2 16h2.5"/><path d="M22.8 5.5l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3 1-2Z"/>', weekMenu:'<rect x="6.8" y="7.8" width="18.4" height="17.4" rx="4.4"/><path d="M11 5.8v4.5M21 5.8v4.5M6.8 13.4h18.4"/><path d="M11.2 18.1h2.4M15.2 18.1h2.4M19.2 18.1h2.4M11.2 22h2.4M15.2 22h2.4"/><path d="M21.2 20.4c1.9-1.6 2.8-3.1 2.8-4.4"/><path d="M21.2 20.4h2.5v-2.5"/>', favoriteGem:'<path d="M16 26.2S6 20.4 4.2 14.5C3 10.5 5.3 7 9.1 7c2.5 0 4.3 1.3 5.2 3.1C15.2 8.3 17 7 19.5 7c3.8 0 6.1 3.5 4.9 7.5C22.6 20.4 16 26.2 16 26.2Z"/><path d="M11.2 13.4h9.6M13.2 10.2l-2 3.2 4.8 7.4 4.8-7.4-2-3.2"/><path d="M13.5 13.4 16 20.8l2.5-7.4"/>', encyclopedia:'<path d="M8 7.2h11.2c2.6 0 4.8 2.1 4.8 4.8v12.8H11.5A3.5 3.5 0 0 0 8 28.3V7.2Z"/><path d="M11.5 24.8V7.2M14.2 12h5.8M14.2 15.8h6.8M14.2 19.6h4.6"/><circle cx="23.2" cy="9.2" r="2.8"/><path d="m25.2 11.2 2.2 2.2"/>', heart:'<path d="M16 26s-9-5.6-11.5-11C2.6 10.8 5.1 6.5 9.3 6.5c2.4 0 4.3 1.3 5.2 3.1.9-1.8 2.8-3.1 5.2-3.1 4.2 0 6.7 4.3 4.8 8.5C25 20.4 16 26 16 26Z"/>', arrow:'<path d="M11 8l8 8-8 8"/>'
 };
+iconPaths.heart='<path d="M16 26S5 20 5 12.5c0-3.6 2.5-6 5.8-6 2.2 0 4 1.2 5.2 3 1.2-1.8 3-3 5.2-3 3.3 0 5.8 2.4 5.8 6C27 20 16 26 16 26Z"/>';
+iconPaths.share='<circle cx="10" cy="16" r="2.5"/><circle cx="22" cy="9" r="2.5"/><circle cx="22" cy="23" r="2.5"/><path d="m12.2 14.8 7.6-4.5M12.2 17.2l7.6 4.5"/>';
 iconPaths.arrow='<path d="m12 8.5 7.5 7.5-7.5 7.5"/>';
 iconPaths.arrowLeft='<path d="m20 8.5-7.5 7.5 7.5 7.5"/>';
 function iconSvg(name){return `<svg class="line-icon" viewBox="0 0 32 32" aria-hidden="true">${iconPaths[name]||iconPaths.book}</svg>`;}
@@ -11212,6 +11214,116 @@ function canonicalRecipeId(id,source='base'){
   return String(window.TABLE_BOOK_RECIPE_QUALITY?.aliases?.[value]||value);
 }
 
+const PUBLIC_APP_URL='https://www.table-book.ru/';
+const SHARED_RECIPE_HASH_KEY='shared-recipe';
+let activeSharedRecipe=null;
+let copyToastTimer=0;
+function isNativeApp(){
+  return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform());
+}
+function recipeShareBaseUrl(){
+  try{
+    const url=new URL(isNativeApp()?PUBLIC_APP_URL:window.location.href);
+    url.search='';
+    url.hash='';
+    if(isNativeApp()) url.pathname='/';
+    return url;
+  }catch(e){return new URL(PUBLIC_APP_URL);}
+}
+function sharedRecipePayload(recipe){
+  const text=(value,max=800)=>String(value??'').slice(0,max);
+  const list=value=>(Array.isArray(value)?value:[]).slice(0,120).map(item=>text(item,1200));
+  return {
+    v:1,
+    title:text(recipe?.title,220)||'Рецепт',
+    category:text(recipe?.category,80)||'Без категории',
+    country:text(recipe?.country,100)||'Мои рецепты',
+    origin:text(recipe?.origin,100),
+    time:text(recipe?.time,80)||'—',
+    servings:Math.max(1,Number(recipe?.servings)||1),
+    difficulty:text(recipe?.difficulty,40)||'легко',
+    ingredients:list(recipe?.ingredients),
+    steps:list(recipe?.steps),
+    tips:text(recipe?.tips,1800),
+    healthy:!!recipe?.healthy,
+    weight:Math.max(0,Number(recipe?.weight)||0),
+    nutrition:recipe?.nutrition||null,
+    nutrition100:recipe?.nutrition100||null
+  };
+}
+function encodeSharedRecipe(recipe){
+  const bytes=new TextEncoder().encode(JSON.stringify(sharedRecipePayload(recipe)));
+  let binary='';
+  bytes.forEach(byte=>{binary+=String.fromCharCode(byte);});
+  return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeSharedRecipe(value){
+  try{
+    if(!value || value.length>120000) return null;
+    const padded=value.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((value.length+3)%4);
+    const binary=atob(padded);
+    const bytes=Uint8Array.from(binary,char=>char.charCodeAt(0));
+    const parsed=JSON.parse(new TextDecoder().decode(bytes));
+    if(parsed?.v!==1 || !parsed.title || !Array.isArray(parsed.ingredients) || !Array.isArray(parsed.steps)) return null;
+    return Object.assign(sharedRecipePayload(parsed),{id:'shared-'+Date.now(),source:'shared'});
+  }catch(e){return null;}
+}
+function recipeShareUrl(recipe,source='base'){
+  const url=recipeShareBaseUrl();
+  if(source==='custom' || source==='shared'){
+    url.hash=`${SHARED_RECIPE_HASH_KEY}=${encodeURIComponent(encodeSharedRecipe(recipe))}`;
+  }else{
+    url.searchParams.set('recipe',canonicalRecipeId(recipe?.id,'base'));
+  }
+  return url.toString();
+}
+function recipeRequestFromUrl(){
+  try{
+    const url=new URL(window.location.href);
+    const baseId=url.searchParams.get('recipe');
+    if(baseId) return {id:canonicalRecipeId(baseId,'base'),source:'base',recipe:null};
+    const hash=new URLSearchParams(url.hash.replace(/^#/,''));
+    const shared=decodeSharedRecipe(hash.get(SHARED_RECIPE_HASH_KEY));
+    return shared?{id:shared.id,source:'shared',recipe:shared}:null;
+  }catch(e){return null;}
+}
+function showCopyToast(message='Ссылка скопирована'){
+  const toast=$('#copyToast');
+  if(!toast) return;
+  clearTimeout(copyToastTimer);
+  toast.textContent=message;
+  toast.hidden=false;
+  requestAnimationFrame(()=>toast.classList.add('show'));
+  copyToastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>{if(!toast.classList.contains('show')) toast.hidden=true;},220);
+  },1800);
+}
+async function copyText(value){
+  try{
+    if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value); return true;}
+  }catch(e){}
+  const field=document.createElement('textarea');
+  field.value=value;
+  field.setAttribute('readonly','');
+  field.style.cssText='position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(field);
+  field.select();
+  field.setSelectionRange(0,field.value.length);
+  let copied=false;
+  try{copied=document.execCommand('copy');}catch(e){}
+  field.remove();
+  return copied;
+}
+async function copyRecipeLink(id,source='base'){
+  const normalized=source==='custom'?'custom':source==='shared'?'shared':'base';
+  const recipe=normalized==='shared'?activeSharedRecipe:resolveRecipeRef({id,source:normalized});
+  if(!recipe){showCopyToast('Не удалось создать ссылку'); return;}
+  const copied=await copyText(recipeShareUrl(recipe,normalized));
+  showCopyToast(copied?'Ссылка скопирована':'Не удалось скопировать ссылку');
+  if(copied) vibe(10);
+}
+
 function normalizeLikedRecipes(list){
   const arr=Array.isArray(list)?list:[];
   const seen=new Set();
@@ -11267,9 +11379,14 @@ function likeButtonHtml(id,source='base',label='Нравится'){
   const active=isRecipeLiked(id,source);
   return `<button class="like-btn ${active?'active':''}" type="button" data-like-id="${esc(id)}" data-like-source="${source==='custom'?'custom':'base'}" aria-pressed="${active?'true':'false'}" aria-label="${active?'Убрать из «Мне нравится»':'Добавить в «Мне нравится»'}">${iconSvg('heart')}<span>${label}</span></button>`;
 }
+function shareButtonHtml(id,source='base'){
+  const normalized=source==='custom'?'custom':source==='shared'?'shared':'base';
+  return `<button class="share-btn" type="button" data-share-id="${esc(id)}" data-share-source="${normalized}" aria-label="Скопировать ссылку на рецепт">${iconSvg('share')}<span>Поделиться</span></button>`;
+}
 function renderRecipeInteractions(root=document){
   root.querySelectorAll('[data-open]').forEach(btn=>btn.onclick=()=>openRecipe(btn.dataset.open,btn.dataset.source||'base'));
   root.querySelectorAll('[data-like-id]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();toggleRecipeLike(btn.dataset.likeId,btn.dataset.likeSource||'base');});
+  root.querySelectorAll('[data-share-id]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();copyRecipeLink(btn.dataset.shareId,btn.dataset.shareSource||'base');});
   refreshLikeButtons(root);
 }
 
@@ -11473,6 +11590,7 @@ function goHomeWithFlip(){flushMealDraftBeforeNavigation(); routeHistory=[]; con
 
 const MEAL_SLOTS=[['breakfast','Завтрак'],['lunch','Обед'],['dinner','Ужин']];
 let mealDraftDate=null, mealDraft=null, mealDayEditMode=true;
+const MEAL_MY_RECIPES_CATEGORY='__my_recipes__';
 let mealPickerDialog={slot:null,category:null,country:null,step:'category'};
 let mealPlanCleanedOnce=false;
 const mealMonthCache=new Map();
@@ -11703,6 +11821,7 @@ function mealCountryList(slot,category){
   const selected=new Set((mealDraft?.[slot]||[]).map(item=>item.source+':'+item.id));
   const map=new Map();
   allRecipeOptions()
+    .filter(r=>r.source!=='custom')
     .filter(r=>(r.category||'Без категории')===category)
     .filter(r=>!selected.has((r.source==='custom'?'custom':'base')+':'+r.id))
     .forEach(r=>{const c=mealCountryLabel(r); map.set(c,(map.get(c)||0)+1);});
@@ -11859,13 +11978,13 @@ function mealRecipeMatches(recipe,q){
 }
 function mealTypeList(slot){
   const selected=new Set((mealDraft?.[slot]||[]).map(item=>item.source+':'+item.id));
-  const available=allRecipeOptions().filter(r=>!selected.has((r.source==='custom'?'custom':'base')+':'+r.id));
+  const available=allRecipeOptions().filter(r=>r.source!=='custom').filter(r=>!selected.has('base:'+r.id));
   const cats=orderedCategories(available);
   return cats.map(cat=>({category:cat,count:available.filter(r=>(r.category||'Без категории')===cat).length})).filter(x=>x.count>0);
 }
 function mealPickerHtml(slot){
-  const cats=mealTypeList(slot);
-  const count=cats.reduce((sum,x)=>sum+x.count,0);
+  const selected=new Set((mealDraft?.[slot]||[]).map(item=>item.source+':'+item.id));
+  const count=allRecipeOptions().filter(r=>!selected.has((r.source==='custom'?'custom':'base')+':'+r.id)).length;
   return `<button class="meal-add-btn" type="button" data-add-meal="${slot}" aria-label="Добавить блюдо">+<span>Добавить</span></button><p class="meal-picker-note">${count?`Доступно ${count} ${plural(count,['блюдо','блюда','блюд'])}`:'Все блюда уже добавлены.'}</p>`;
 }
 function openMealDishPicker(slot,category=null){
@@ -11885,7 +12004,8 @@ function closeMealDishPicker(){
 }
 function mealPickerBackToCountries(){
   if(mealPickerDialog.step==='dish'){
-    mealPickerDialog.step='country';
+    mealPickerDialog.step=mealPickerDialog.category===MEAL_MY_RECIPES_CATEGORY?'category':'country';
+    if(mealPickerDialog.category===MEAL_MY_RECIPES_CATEGORY) mealPickerDialog.category=null;
     mealPickerDialog.country=null;
   }else if(mealPickerDialog.step==='country'){
     mealPickerDialog.step='category';
@@ -11905,12 +12025,16 @@ function renderMealDishPicker(){
   const selected=new Set((mealDraft?.[slot]||[]).map(item=>item.source+':'+item.id));
   if(step==='category' || !category){
     const cats=mealTypeList(slot);
+    const myCount=myRecipes.filter(r=>!selected.has('custom:'+r.id)).length;
     if(title) title.textContent='Выберите категорию';
     if(slotLabel) slotLabel.textContent=slotName;
     if(back) back.hidden=true;
     grid.className='meal-type-grid meal-type-grid-modal';
-    grid.innerHTML=cats.length?cats.map(x=>`<button class="meal-type-card" type="button" data-pick-category="${esc(x.category)}"><b>${esc(x.category)}</b><span>${x.count} ${plural(x.count,['блюдо','блюда','блюд'])}</span></button>`).join(''):'<div class="meal-empty">Все доступные блюда уже добавлены в этот приём пищи.</div>';
+    const myRecipesCard=`<button class="meal-type-card meal-type-card-personal" type="button" data-pick-my-recipes><b>Мои рецепты</b><span>${myCount} ${plural(myCount,['блюдо','блюда','блюд'])}</span></button>`;
+    const catalogCards=cats.map(x=>`<button class="meal-type-card" type="button" data-pick-category="${esc(x.category)}"><b>${esc(x.category)}</b><span>${x.count} ${plural(x.count,['блюдо','блюда','блюд'])}</span></button>`).join('');
+    grid.innerHTML=myRecipesCard+catalogCards;
     if(note) note.textContent='';
+    grid.querySelector('[data-pick-my-recipes]').onclick=()=>{mealPickerDialog.category=MEAL_MY_RECIPES_CATEGORY; mealPickerDialog.country='Мои рецепты'; mealPickerDialog.step='dish'; renderMealDishPicker();};
     grid.querySelectorAll('[data-pick-category]').forEach(btn=>btn.onclick=()=>{mealPickerDialog.category=btn.dataset.pickCategory; mealPickerDialog.step='country'; mealPickerDialog.country=null; renderMealDishPicker();});
     return;
   }
@@ -11925,20 +12049,20 @@ function renderMealDishPicker(){
     grid.querySelectorAll('[data-pick-country]').forEach(btn=>btn.onclick=()=>{mealPickerDialog.country=btn.dataset.pickCountry; mealPickerDialog.step='dish'; renderMealDishPicker();});
     return;
   }
-  if(title) title.textContent=country||category;
-  if(slotLabel) slotLabel.textContent=`${slotName} • ${category}`;
-  if(back){back.hidden=false; setNavBackButton(back,'К кухням');}
+  const myRecipesOnly=category===MEAL_MY_RECIPES_CATEGORY;
+  if(title) title.textContent=myRecipesOnly?'Мои рецепты':country||category;
+  if(slotLabel) slotLabel.textContent=`${slotName} • ${myRecipesOnly?'Мои рецепты':category}`;
+  if(back){back.hidden=false; setNavBackButton(back,myRecipesOnly?'К категориям':'К кухням');}
   grid.className='meal-pick-grid meal-pick-grid-modal';
   const all=allRecipeOptions()
-    .filter(r=>(r.category||'Без категории')===category)
-    .filter(r=>mealCountryLabel(r)===country)
+    .filter(r=>myRecipesOnly?r.source==='custom':r.source!=='custom' && (r.category||'Без категории')===category && mealCountryLabel(r)===country)
     .filter(r=>!selected.has((r.source==='custom'?'custom':'base')+':'+r.id));
   const shown=all.slice(0,80);
   grid.innerHTML=shown.length?shown.map(r=>{
     const source=r.source==='custom'?'custom':'base';
     const origin=mealCountryLabel(r);
     return `<button class="meal-pick-card" type="button" data-pick-slot="${slot}" data-pick-source="${source}" data-pick-id="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc((source==='custom'?'Мои рецепты':'Каталог')+' • '+origin)}</span></button>`;
-  }).join(''):'<div class="meal-empty">В этой кухне ничего не найдено.</div>';
+  }).join(''):`<div class="meal-empty">${myRecipesOnly?'Здесь пока нет доступных личных рецептов. Создайте рецепт в разделе «Мои рецепты».':'В этой кухне ничего не найдено.'}</div>`;
   if(note) note.textContent='';
   grid.querySelectorAll('[data-pick-slot]').forEach(btn=>btn.onclick=()=>addMealDish(btn.dataset.pickSlot,btn.dataset.pickSource,btn.dataset.pickId));
 }
@@ -12987,19 +13111,21 @@ function renderEncyclopedia(){
   grid.innerHTML=items.map(item=>`<article class="encyclopedia-card"><small>${esc(item.type)}</small><h3>${esc(item.name)}</h3><p>${esc(item.text)}</p></article>`).join('');
 }
 function openEncyclopediaView(){showView('encyclopediaview','page'); renderEncyclopedia();}
-function openRecipe(id,source='base'){
+function openRecipe(id,source='base',recipeOverride=null){
   clearRecipeStepTimers();
-  const normalizedSource=source==='custom'?'custom':'base';
-  const canonicalId=canonicalRecipeId(id,normalizedSource);
-  const r=normalizedSource==='custom'?myRecipes.find(x=>x.id===canonicalId):recipes.find(x=>x.id===canonicalId); if(!r) return;
-  $('#modalTags').innerHTML=`<span class="tag">${r.country||'Мои рецепты'}</span><span class="tag">${r.category}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}${likeButtonHtml(r.id,source,'')}`;
-  $('#modalTitle').innerHTML=`<span>${r.title}</span>${originLabel(r)?`<small>${originLabel(r)}</small>`:''}`;
+  const normalizedSource=source==='custom'?'custom':source==='shared'?'shared':'base';
+  const canonicalId=normalizedSource==='shared'?String(id||'shared'):canonicalRecipeId(id,normalizedSource);
+  const r=recipeOverride||(normalizedSource==='custom'?myRecipes.find(x=>x.id===canonicalId):recipes.find(x=>x.id===canonicalId)); if(!r) return;
+  activeSharedRecipe=normalizedSource==='shared'?r:null;
+  const likeAction=normalizedSource==='shared'?'':likeButtonHtml(r.id,normalizedSource,'');
+  $('#modalTags').innerHTML=`<span class="tag">${esc(r.country||'Мои рецепты')}</span><span class="tag">${esc(r.category||'Без категории')}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}${likeAction}${shareButtonHtml(r.id||canonicalId,normalizedSource)}`;
+  $('#modalTitle').innerHTML=`<span>${esc(r.title)}</span>${originLabel(r)?`<small>${esc(originLabel(r))}</small>`:''}`;
   const nut=r.nutrition||nutritionOf(r);
   const baseServings=r.servings||1;
-  const ingredients=(list,m)=>list.map(x=>`<li><span>${scaledIngredientText(x,m)}</span></li>`).join('');
+  const ingredients=(list,m)=>(Array.isArray(list)?list:[]).map(x=>`<li><span>${esc(scaledIngredientText(x,m))}</span></li>`).join('');
   const nutritionHtml=(n,s)=>`<div class="nutrition"><div class="ncard"><strong>${fmt(n.kcal*s)}</strong><span>ккал</span></div><div class="ncard"><strong>${fmt(n.protein*s)} г</strong><span>белки</span></div><div class="ncard"><strong>${fmt(n.fat*s)} г</strong><span>жиры</span></div><div class="ncard"><strong>${fmt(n.carbs*s)} г</strong><span>углеводы</span></div></div><div class="nnote">На 1 порцию: ${fmt(n.kcal)} ккал • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</div>`;
-  const stepsHtml=(r.steps||[]).map(step=>{const sec=extractStepTimerSeconds(step); return `<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${step}</span></label>${sec?timerHtml(sec):''}</div>`;}).join('');
-  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul><div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${r.tips}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>`;
+  const stepsHtml=(r.steps||[]).map(step=>{const sec=extractStepTimerSeconds(step); return `<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${esc(step)}</span></label>${sec?timerHtml(sec):''}</div>`;}).join('');
+  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul><div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>`;
   function rerender(){
     const raw=Number($('#portionInput').value); const s=Number.isFinite(raw)&&raw>0?raw:baseServings;
     $('#portionInput').value=s;
@@ -13014,6 +13140,13 @@ function openRecipe(id,source='base'){
   $('#portionInput').oninput=rerender;
   $$('[data-check]').forEach(c=>c.onchange=()=>{progress(); vibe(8); handleStepCheckChange(c);});
   progress(); initStepTimers(); renderRecipeInteractions($('#modal')); openModal(); vibe(12);
+}
+function openRecipeFromUrl(){
+  const request=recipeRequestFromUrl();
+  if(!request) return false;
+  if(request.source==='shared') openRecipe(request.id,'shared',request.recipe);
+  else openRecipe(request.id,'base');
+  return true;
 }
 const modalEls={modal:$('#modal'),dialog:$('#dialog'),body:document.body};
 function resetDialogPosition(animate=true){const d=modalEls.dialog;if(animate)d.classList.remove('dragging','drag-ready');d.style.transform='translate3d(0,0,0) rotateX(0deg) scale(1)';modalEls.modal.style.background='rgba(70,46,33,.28)';}
@@ -13213,5 +13346,5 @@ if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); bac
 document.addEventListener('click',e=>{const panel=$('#topAuthPanel'), wrap=$('#topAuth'); if(panel && wrap && !panel.hidden && !wrap.contains(e.target)) closeTopAuth();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTopAuth(); closeModalInstant(); closeMealDishPicker();}});
 initializeNavigationIcons();
-function boot(){const brand=$('#brandMark'); if(brand && !brand.querySelector('.brand-app-icon')) brand.innerHTML='<img class="brand-app-icon" src="./assets/icons/icon-192.png" alt="" loading="eager">'; persistBackup(); preloadHomeActionIcons(); initCloudAuth(); setHomeActionIcon('myRecipesIcon','my-recipes','Мои рецепты'); setHomeActionIcon('mealCalendarIcon','menu-week','Меню на неделю'); setHomeActionIcon('likedRecipesIcon','liked','Мне нравится'); setHomeActionIcon('encyclopediaIcon','encyclopedia','Энциклопедия'); ensureMealPlan(); fillMyCategory(); const myCatSelect=$('#myCategory'); if(myCatSelect) myCatSelect.onchange=()=>{state.myCat=myCatSelect.value; saveState();}; renderProductRows([{name:'',weight:'',kcal:'',protein:'',fat:'',carbs:''}]); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderLikedRecipes(false); renderEncyclopedia(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview'){state.editingId=null; showView('myview'); showMyLibrary();} else if(state.route==='mealview') openMealCalendar(); else if(state.route==='likedview') openLikedView(); else if(state.route==='encyclopediaview') openEncyclopediaView(); else showView('home');}
+function boot(){const brand=$('#brandMark'); if(brand && !brand.querySelector('.brand-app-icon')) brand.innerHTML='<img class="brand-app-icon" src="./assets/icons/icon-192.png" alt="" loading="eager">'; persistBackup(); preloadHomeActionIcons(); initCloudAuth(); setHomeActionIcon('myRecipesIcon','my-recipes','Мои рецепты'); setHomeActionIcon('mealCalendarIcon','menu-week','Меню на неделю'); setHomeActionIcon('likedRecipesIcon','liked','Мне нравится'); setHomeActionIcon('encyclopediaIcon','encyclopedia','Энциклопедия'); ensureMealPlan(); fillMyCategory(); const myCatSelect=$('#myCategory'); if(myCatSelect) myCatSelect.onchange=()=>{state.myCat=myCatSelect.value; saveState();}; renderProductRows([{name:'',weight:'',kcal:'',protein:'',fat:'',carbs:''}]); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderLikedRecipes(false); renderEncyclopedia(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview'){state.editingId=null; showView('myview'); showMyLibrary();} else if(state.route==='mealview') openMealCalendar(); else if(state.route==='likedview') openLikedView(); else if(state.route==='encyclopediaview') openEncyclopediaView(); else showView('home'); requestAnimationFrame(openRecipeFromUrl);}
 try{boot();}catch(error){console.warn('Boot failed',error); try{cloudStatus('Ошибка запуска приложения: '+(error?.message||error)+'. Авторизация доступна, попробуйте войти снова.');}catch(e){} try{renderCloudUi();}catch(e){}}
