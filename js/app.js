@@ -11217,7 +11217,6 @@ function canonicalRecipeId(id,source='base'){
 const PUBLIC_APP_URL='https://www.table-book.ru/';
 const SHARED_RECIPE_HASH_KEY='shared-recipe';
 let activeSharedRecipe=null;
-let copyToastTimer=0;
 function isNativeApp(){
   return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform());
 }
@@ -11287,18 +11286,6 @@ function recipeRequestFromUrl(){
     return shared?{id:shared.id,source:'shared',recipe:shared}:null;
   }catch(e){return null;}
 }
-function showCopyToast(message='Ссылка скопирована'){
-  const toast=$('#copyToast');
-  if(!toast) return;
-  clearTimeout(copyToastTimer);
-  toast.textContent=message;
-  toast.hidden=false;
-  requestAnimationFrame(()=>toast.classList.add('show'));
-  copyToastTimer=setTimeout(()=>{
-    toast.classList.remove('show');
-    setTimeout(()=>{if(!toast.classList.contains('show')) toast.hidden=true;},220);
-  },1800);
-}
 async function copyText(value){
   try{
     if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value); return true;}
@@ -11318,10 +11305,10 @@ async function copyText(value){
 async function copyRecipeLink(id,source='base'){
   const normalized=source==='custom'?'custom':source==='shared'?'shared':'base';
   const recipe=normalized==='shared'?activeSharedRecipe:resolveRecipeRef({id,source:normalized});
-  if(!recipe){showCopyToast('Не удалось создать ссылку'); return;}
+  if(!recipe) return false;
   const copied=await copyText(recipeShareUrl(recipe,normalized));
-  showCopyToast(copied?'Ссылка скопирована':'Не удалось скопировать ссылку');
   if(copied) vibe(10);
+  return copied;
 }
 
 function normalizeLikedRecipes(list){
@@ -11451,6 +11438,7 @@ const encyclopediaItems=[
 function setTheme(){
   const isDark=state.theme==='dark';
   document.body.classList.toggle('dark',isDark);
+  document.documentElement.classList.toggle('dark',isDark);
   const tb=$('#themeBtn');
   if(tb){
     if(!tb.querySelector('.room-switch')) tb.innerHTML=ambientThemeIcon(state.theme);

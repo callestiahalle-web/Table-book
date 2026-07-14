@@ -6056,34 +6056,109 @@ body.dark .like-btn.active {
   box-shadow: 0 8px 20px rgba(122,91,44,.13), inset 0 1px 0 rgba(255,255,255,.22) !important;
 }
 
-.copy-toast {
-  position: fixed;
-  left: 50%;
-  bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 18px));
-  z-index: 120;
-  max-width: min(88vw, 360px);
-  padding: 11px 17px;
-  border: 1px solid color-mix(in srgb, var(--gold) 54%, var(--line));
-  border-radius: 999px;
-  background: var(--paper);
-  color: var(--ink);
-  box-shadow: 0 12px 32px rgba(42,31,22,.20), inset 0 1px 0 rgba(255,255,255,.22);
-  font-size: 13px;
-  line-height: 1.25;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, 10px) scale(.96);
-  transition: opacity .2s ease, transform .2s ease;
+/* Stable document background: no fixed layers that can split while the viewport scrolls. */
+html {
+  min-height: 100%;
+  background-color: #faf4e6;
 }
 
-.copy-toast.show {
-  opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+html.dark {
+  background-color: #24292e;
 }
 
-.copy-toast[hidden] {
+body,
+body.dark {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-attachment: scroll !important;
+  background-repeat: no-repeat !important;
+  background-position: top center !important;
+  background-size: 100% 100% !important;
+}
+
+body {
+  background-image: linear-gradient(180deg, #ffffff 0%, #faf4e6 100%) !important;
+}
+
+body.dark {
+  background-image: linear-gradient(180deg, #bdc7ce 0%, #808a92 28%, #4a5156 58%, #24292e 100%) !important;
+}
+
+body::before,
+body.dark::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  min-height: 100% !important;
+  z-index: -1 !important;
+  background-image: var(--texture-image) !important;
+  background-attachment: scroll !important;
+  background-repeat: repeat-y !important;
+  background-position: top center !important;
+  background-size: 100% auto !important;
+  opacity: var(--texture-opacity) !important;
+  mix-blend-mode: soft-light !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+body::after,
+body.dark::after {
+  content: none !important;
   display: none !important;
+}
+
+/* Compact recipe header controls with one visual size. */
+#modalTags {
+  gap: 7px;
+}
+
+#modalTags .tag,
+#modalTags .like-btn,
+#modalTags .share-btn,
+#dialog .close {
+  box-sizing: border-box;
+  min-height: 40px;
+  height: 40px;
+}
+
+#modalTags .tag {
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#modalTags .like-btn,
+#modalTags .share-btn,
+#dialog .close {
+  width: 40px;
+  min-width: 40px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+#modalTags .share-btn {
+  gap: 0;
+}
+
+#modalTags .share-btn span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+#dialog .close {
+  font-size: 22px;
 }
 
 @media(max-width: 480px) {
@@ -6091,11 +6166,15 @@ body.dark .like-btn.active {
     padding-inline: 14px;
   }
 
-  .tags {
-    gap: 7px;
+  .dialog-title {
+    gap: 8px;
   }
 
-  .share-btn {
-    padding-inline: 12px;
+  #modalTags {
+    justify-content: center;
+  }
+
+  #modalTags .tag {
+    padding-inline: 10px;
   }
 }
