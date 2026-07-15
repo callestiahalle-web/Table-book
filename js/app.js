@@ -13592,7 +13592,13 @@ function initDialogDrag(){
   const finish=()=>endDialogDrag();
   d.addEventListener('pointerup',finish); d.addEventListener('pointercancel',finish); d.addEventListener('lostpointercapture',finish);
 }
-let pageSwipe={active:false,tracking:false,startX:0,startY:0,lastX:0,lastT:0,dx:0,dy:0,view:null,blocked:false};
+function emptyPageSwipe(){
+  return {active:false,tracking:false,pointerId:null,pointerType:'',startX:0,startY:0,lastX:0,lastT:0,dx:0,dy:0,view:null,blocked:false};
+}
+let pageSwipe=emptyPageSwipe();
+function pageSwipeMatchesPointer(event){
+  return pageSwipe.pointerId===null || event?.pointerId===pageSwipe.pointerId;
+}
 function swipeBackBlockedTarget(target){return !!(target?.closest?.('#mealPickerModal,.dialog,.auth-popover,input,textarea,select,[contenteditable="true"],.cuisine-carousel-shell,#countryGrid.cuisine-carousel,#mealCalendarPanel,#mealCalendarGrid,.meal-picker-dialog'))}
 function canSwipeBack(){return state.route!=='home' || $('#modal')?.classList.contains('open') || ($('#mealPickerModal') && !$('#mealPickerModal').hidden);}
 function currentSwipeView(){return $('#'+(state.route||'home')) || $('.view.active');}
@@ -13625,20 +13631,21 @@ function cancelPageSwipeBack(view){
   resetPageSwipeView(view,{returning:true});
 }
 document.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='pen' || e.isPrimary===false || pageSwipe.tracking) return;
   if(e.pointerType==='mouse' && e.button!==0) return;
   if(!canSwipeBack() || swipeBackBlockedTarget(e.target)) return;
   if(e.clientX>window.innerWidth-18) return;
-  pageSwipe={active:false,tracking:true,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastT:performance.now(),dx:0,dy:0,view:currentSwipeView(),blocked:false};
+  pageSwipe={active:false,tracking:true,pointerId:e.pointerId,pointerType:e.pointerType,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastT:performance.now(),dx:0,dy:0,view:currentSwipeView(),blocked:false};
 },{passive:true});
 document.addEventListener('pointermove',e=>{
-  if(!pageSwipe.tracking || !canSwipeBack()) return;
+  if(!pageSwipe.tracking || !pageSwipeMatchesPointer(e) || !canSwipeBack()) return;
   const dx=e.clientX-pageSwipe.startX;
   const dy=e.clientY-pageSwipe.startY;
   pageSwipe.dx=dx; pageSwipe.dy=dy;
   const adx=Math.abs(dx), ady=Math.abs(dy);
   if(!pageSwipe.active){
-    if(dy>34 && ady>adx*1.05){pageSwipe.tracking=false; return;}
-    if(dx<0 || adx<12 || ady>54) return;
+    if(ady>14 && ady>adx*.72){pageSwipe=emptyPageSwipe(); return;}
+    if(dx<=0 || adx<22 || ady>44) return;
     pageSwipe.active=true;
     document.body.classList.add('page-swipe-active');
     pageSwipe.view=currentSwipeView();
@@ -13658,19 +13665,25 @@ document.addEventListener('pointermove',e=>{
   }
 },{passive:false});
 function endPageSwipe(e){
-  if(!pageSwipe.tracking){pageSwipe={active:false,tracking:false,startX:0,startY:0,lastX:0,lastT:0,dx:0,dy:0,view:null,blocked:false}; return;}
+  if(!pageSwipe.tracking || !pageSwipeMatchesPointer(e)) return;
   const dx=(e?.clientX??pageSwipe.lastX)-pageSwipe.startX;
   const dy=Math.abs((e?.clientY??pageSwipe.startY)-pageSwipe.startY);
   const view=pageSwipe.view;
   const active=pageSwipe.active;
-  pageSwipe={active:false,tracking:false,startX:0,startY:0,lastX:0,lastT:0,dx:0,dy:0,view:null,blocked:false};
+  pageSwipe=emptyPageSwipe();
   if(!active){$('#swipeCue')?.classList.remove('show'); return;}
   const shouldGo=dx>Math.min(145,window.innerWidth*.34) && dy<96;
   if(shouldGo){vibe(12); finishPageSwipeBack(view);} else cancelPageSwipeBack(view);
 }
+function abortPageSwipe(e){
+  if(!pageSwipe.tracking || !pageSwipeMatchesPointer(e)) return;
+  const view=pageSwipe.view;
+  pageSwipe=emptyPageSwipe();
+  cancelPageSwipeBack(view);
+}
 document.addEventListener('pointerup',endPageSwipe,{passive:true});
-document.addEventListener('pointercancel',()=>cancelPageSwipeBack(pageSwipe.view),{passive:true});
-document.addEventListener('lostpointercapture',()=>cancelPageSwipeBack(pageSwipe.view),{passive:true});
+document.addEventListener('pointercancel',abortPageSwipe,{passive:true});
+document.addEventListener('lostpointercapture',abortPageSwipe,{passive:true});
 
 function bindClick(id,handler){const el=$('#'+id); if(el) el.onclick=handler; return el;}
 function bindInput(id,handler){const el=$('#'+id); if(el) el.oninput=handler; return el;}
