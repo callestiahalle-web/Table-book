@@ -6392,3 +6392,89 @@ button::-moz-focus-inner {
     grid-template-columns: 1fr;
   }
 }
+
+/* Ingredient-led sections keep every cuisine category easy to scan. */
+.ingredient-group-block {
+  display: grid;
+  gap: 13px;
+  width: 100%;
+  margin: 0;
+}
+
+.cat-section > .ingredient-group-block + .ingredient-group-block {
+  margin-top: 28px;
+}
+
+.ingredient-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 36px;
+  text-align: center;
+}
+
+.ingredient-group-head::before,
+.ingredient-group-head::after {
+  content: "";
+  flex: 1 1 70px;
+  max-width: 150px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line) 72%, transparent));
+}
+
+.ingredient-group-head::after {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--line) 72%, transparent), transparent);
+}
+
+.ingredient-group-head h3 {
+  margin: 0;
+  font-size: clamp(18px, 1.45vw, 23px);
+  line-height: 1.15;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.ingredient-group-head span {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--paper);
+  box-shadow: var(--pressed);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.my-ingredient-group {
+  grid-column: 1 / -1;
+}
+
+.my-ingredient-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media(max-width: 720px) {
+  .cat-section > .ingredient-group-block + .ingredient-group-block {
+    margin-top: 22px;
+  }
+
+  .ingredient-group-head::before,
+  .ingredient-group-head::after {
+    max-width: 42px;
+  }
+
+  .ingredient-group-head {
+    gap: 7px;
+  }
+
+  .ingredient-group-head span {
+    font-size: 10px;
+  }
+
+  .my-ingredient-grid {
+    grid-template-columns: 1fr;
+  }
+}

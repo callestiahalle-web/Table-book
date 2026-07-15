@@ -10816,7 +10816,7 @@ const recipes = [
   }
 ];
 const cuisineThemes={"Италия":{emoji:"italy",accent:"#2f7d56",bg:"linear-gradient(135deg,#2f7d56,#bb5f45)",note:"Паста, сыр, томаты."},"Испания":{emoji:"spain",accent:"#c87535",bg:"linear-gradient(135deg,#c87535,#8f352f)",note:"Тапас, паэлья, оливки."},"Япония":{emoji:"japan",accent:"#596ca8",bg:"linear-gradient(135deg,#596ca8,#b76586)",note:"Баланс, рис, лапша."},"Корея":{emoji:"korea",accent:"#b74b4b",bg:"linear-gradient(135deg,#b74b4b,#71375c)",note:"Кимчи, рис, супы."},"Россия":{emoji:"russia",accent:"#4d79a8",bg:"linear-gradient(135deg,#4d79a8,#4d8b75)",note:"Супы, каши, выпечка."},"Средиземноморская":{emoji:"med",accent:"#4d8b62",bg:"linear-gradient(135deg,#4d8b62,#3d78a8)",note:"Италия, Испания и блюда Средиземноморья."},"Средиземноморская...":{emoji:"med",accent:"#4d8b62",bg:"linear-gradient(135deg,#4d8b62,#3d78a8)",note:"Овощи, рыба, травы."},"Китай":{emoji:"china",accent:"#9b473e",bg:"linear-gradient(135deg,#9b473e,#d38a58)",note:"Лапша, димсам, вок."},"Таиланд":{emoji:"thai",accent:"#4d8a5c",bg:"linear-gradient(135deg,#4d8a5c,#d38850)",note:"Карри, рис, свежесть."},"Кавказская":{emoji:"caucasus",accent:"#8c6a3e",bg:"linear-gradient(135deg,#8c6a3e,#4f7c5d)",note:"Хачапури, хинкали, зелень и специи."},"Мои рецепты":{emoji:"custom",accent:"#8d6b48",bg:"linear-gradient(135deg,#8d6b48,#b9975b)",note:"Ваши личные рецепты."}};
-const typeVisuals={"Завтраки":{icon:"breakfast",bg:"linear-gradient(135deg,#d7ad58,#f0d18e)"},"Закуски":{icon:"snack",bg:"linear-gradient(135deg,#bc7048,#e8aa78)"},"Салаты":{icon:"salad",bg:"linear-gradient(135deg,#4f8d5f,#a5c985)"},"Супы":{icon:"soup",bg:"linear-gradient(135deg,#b8693d,#dfaa72)"},"Горячие блюда":{icon:"hot",bg:"linear-gradient(135deg,#6c5c8e,#b39ad5)"},"Гарниры":{icon:"side",bg:"linear-gradient(135deg,#778d4f,#c8d99a)"},"Выпечка":{icon:"bread",bg:"linear-gradient(135deg,#9d6b3b,#d3ad77)"},"Десерты":{icon:"dessert",bg:"linear-gradient(135deg,#ad6882,#edbed0)"},"Соусы":{icon:"sauce",bg:"linear-gradient(135deg,#8a6a4d,#c6ab83)"},"Морепродукты":{icon:"seafood",bg:"linear-gradient(135deg,#3e8da5,#95d4df)"}};
+const typeVisuals={"Завтраки":{icon:"breakfast",bg:"linear-gradient(135deg,#d7ad58,#f0d18e)"},"Закуски":{icon:"snack",bg:"linear-gradient(135deg,#bc7048,#e8aa78)"},"Салаты":{icon:"salad",bg:"linear-gradient(135deg,#4f8d5f,#a5c985)"},"Супы":{icon:"soup",bg:"linear-gradient(135deg,#b8693d,#dfaa72)"},"Горячие блюда":{icon:"hot",bg:"linear-gradient(135deg,#6c5c8e,#b39ad5)"},"Су-вид":{icon:"hot",bg:"linear-gradient(135deg,#435f83,#9d7b53)"},"Гарниры":{icon:"side",bg:"linear-gradient(135deg,#778d4f,#c8d99a)"},"Выпечка":{icon:"bread",bg:"linear-gradient(135deg,#9d6b3b,#d3ad77)"},"Десерты":{icon:"dessert",bg:"linear-gradient(135deg,#ad6882,#edbed0)"},"Соусы":{icon:"sauce",bg:"linear-gradient(135deg,#8a6a4d,#c6ab83)"},"Морепродукты":{icon:"seafood",bg:"linear-gradient(135deg,#3e8da5,#95d4df)"}};
 if(window.TABLE_BOOK_RECIPE_QUALITY) window.TABLE_BOOK_RECIPE_QUALITY.apply(recipes);
 if(window.TABLE_BOOK_CAUCASUS_RECIPES) window.TABLE_BOOK_CAUCASUS_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_DETAILED_RECIPES) window.TABLE_BOOK_DETAILED_RECIPES.apply(recipes);
@@ -10826,7 +10826,8 @@ if(window.TABLE_BOOK_JAPANESE_RECIPES) window.TABLE_BOOK_JAPANESE_RECIPES.apply(
 if(window.TABLE_BOOK_KOREAN_RECIPES) window.TABLE_BOOK_KOREAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_RUSSIAN_RECIPES) window.TABLE_BOOK_RUSSIAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_SOUS_VIDE_RECIPES) window.TABLE_BOOK_SOUS_VIDE_RECIPES.apply(recipes);
-const categoryOrder=["Завтраки","Закуски","Салаты","Супы","Горячие блюда","Гарниры","Выпечка","Десерты","Морепродукты","Соусы"];
+const categoryOrder=["Завтраки","Закуски","Салаты","Супы","Горячие блюда","Су-вид","Гарниры","Выпечка","Десерты","Морепродукты","Соусы"];
+const ingredientGroupOrder=["Мясо","Птица","Рыба и морепродукты","Овощи и грибы","Крупы, бобовые и макароны","Яйца и молочные продукты","Тесто и выпечка","Фрукты и ягоды","Орехи и семена","Бульоны","Каши","Йогурт","Десерты","Другие продукты"];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 
 const iconPaths={
@@ -11313,6 +11314,36 @@ function effectiveBaseRecipe(id){
 function catalogRecipes(){return recipes.map(r=>effectiveBaseRecipe(r.id)||r);}
 function uniqueCountries(){return [...new Set(catalogRecipes().map(r=>r.country))].sort((a,b)=>a.localeCompare(b,'ru'))}
 function orderedCategories(list){const set=[...new Set(list.map(r=>r.category))]; return [...categoryOrder.filter(c=>set.includes(c)), ...set.filter(c=>!categoryOrder.includes(c)).sort((a,b)=>a.localeCompare(b,'ru'))]}
+const ingredientGroupRules=[
+  ['Птица',['куриц','курин','цыпл','индей','утк','гус','перепел']],
+  ['Рыба и морепродукты',['рыб','лосос','сёмг','семг','форел','тунец','треск','судак','скумбр','сельд','кревет','кальмар','миди','осьмин','морепродукт','краб','угор','красная икра','лососевая икра','икра минтая','анчоус','сардин','шпрот','дорад','сибас','палтус','карп','хек','минтай','гребеш','суши','ролл']],
+  ['Мясо',['говя','телят','свинин','порос','баранин','ягн','бекон','ветчин','колбас','мяс','стейк','беф','рёбр','ребр','корейк','карбонад','хаш','печёноч','печеноч','печень гов','фарш мяс','голубц']],
+  ['Крупы, бобовые и макароны',['рис','греч','овся','овёс','пшен','перлов','киноа','булгур','кускус','макарон','паста','спагет','лапш','рамэн','рамен','нут','чечев','фасол','горох','боб','тофу','полент','кукурузн круп','каша','плов']],
+  ['Фрукты и ягоды',['яблок','груш','персик','абрикос','слив','вишн','черешн','клубник','малин','черник','смород','ягод','виноград','апельсин','мандарин','лимон','лайм','манго','ананас','банан','гранат','инжир','финик','айв']],
+  ['Овощи и грибы',['картоф','капуст','свёкл','свекл','морков','томат','помидор','огур','баклаж','кабач','цуккин','перец','тыкв','шпинат','брокколи','цветн','гриб','шампин','лук','чеснок','редис','реп','спарж','авокадо','овощ']],
+  ['Яйца и молочные продукты',['яйц','омлет','сыр','творог','молок','йогурт','сливк','сметан','кефир','мацон','ряжен','брынз','сулугун']],
+  ['Тесто и выпечка',['мук','тест','хлеб','лаваш','пирог','пирож','булоч','блин','олад','вафл','печень','кекс','торт','хачапур','пельмен','вареник','манты','самс','штруд','галет']],
+  ['Орехи и семена',['орех','миндал','фисташ','арахис','кунжут','семеч','маков']]
+];
+function detectedIngredientGroup(text){const value=String(text||'').toLocaleLowerCase('ru-RU'); if(value.includes('кабачковая икра')||value.includes('баклажанная икра')) return 'Овощи и грибы'; return ingredientGroupRules.find(([,tokens])=>tokens.some(token=>value.includes(token)))?.[0]||'';}
+function recipeIngredientGroup(recipe){
+  if(recipe?.ingredientGroup) return recipe.ingredientGroup;
+  const titleGroup=detectedIngredientGroup(recipe?.title);
+  if(titleGroup) return titleGroup;
+  const ingredientTexts=[...(Array.isArray(recipe?.ingredients)?recipe.ingredients:[]),...(Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition.map(product=>product?.name||''):[])];
+  for(const ingredient of ingredientTexts.slice(0,6)){
+    const group=detectedIngredientGroup(ingredient);
+    if(group) return group;
+  }
+  const fallback={"Выпечка":"Тесто и выпечка","Морепродукты":"Рыба и морепродукты","Десерты":"Яйца и молочные продукты","Завтраки":"Яйца и молочные продукты","Салаты":"Овощи и грибы","Супы":"Овощи и грибы","Гарниры":"Овощи и грибы","Соусы":"Овощи и грибы"};
+  return fallback[recipe?.category]||'Другие продукты';
+}
+function recipesByIngredientGroup(items){
+  const buckets=new Map();
+  items.forEach(recipe=>{const group=recipeIngredientGroup(recipe); if(!buckets.has(group)) buckets.set(group,[]); buckets.get(group).push(recipe);});
+  const order=[...ingredientGroupOrder.filter(group=>buckets.has(group)),...Array.from(buckets.keys()).filter(group=>!ingredientGroupOrder.includes(group)).sort((a,b)=>a.localeCompare(b,'ru'))];
+  return order.map(group=>({group,recipes:buckets.get(group)}));
+}
 function originLabel(r){return r&&r.country==='Средиземноморская'&&r.origin?`Происхождение: ${r.origin}`:''}
 function canonicalRecipeId(id,source='base'){
   const value=String(id||'');
@@ -11770,7 +11801,8 @@ function setupCountryCarousel(previousCountry=''){
 function refreshCountryCategory(country,anchorTop){renderCountry(country); const pinMenu=()=>{const choice=$('#categoryChoice'); if(!choice) return; const delta=choice.getBoundingClientRect().top-anchorTop; if(Math.abs(delta)>.5) window.scrollTo({top:Math.max(0,window.scrollY+delta),left:0,behavior:'auto'});}; pinMenu(); requestAnimationFrame(pinMenu);}
 function renderCategoryTiles(country){const list=catalogRecipes().filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); const anchorTop=choice.getBoundingClientRect().top; state.filterCat = state.filterCat===cat ? null : cat; saveState(); refreshCountryCategory(country,anchorTop);}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
 function recipeCard(r){const badge=r.healthy?'<span class="recipe-badge">Полезный</span>':''; const origin=originLabel(r); const source=r.source==='custom'?'custom':'base'; return `<article class="recipe-card recipe-card-with-like">${badge}<button class="recipe-open-card" data-open="${esc(r.id)}" data-source="${source}" type="button"><h3>${esc(r.title)}</h3>${origin?`<div class="recipe-origin">${esc(origin)}</div>`:''}<div class="recipe-meta"><span>${esc(r.time||'—')}</span><span>${r.servings||1} порц.</span><span>${esc(r.difficulty||'легко')}</span></div></button>${likeButtonHtml(r.id,source,'')}</article>`}
-function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=catalogRecipes().filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div><div class="recipe-grid">${items.map(recipeCard).join('')}</div>`; wrap.appendChild(sec);}); renderRecipeInteractions(wrap); const countryView=$('#country'); if(state.route!=='country' || !countryView?.classList.contains('active')) showView('country');}
+function ingredientGroupedRecipeCards(items){return recipesByIngredientGroup(items).map(({group,recipes:groupRecipes})=>`<section class="ingredient-group-block"><div class="ingredient-group-head"><h3>${esc(group)}</h3><span>${groupRecipes.length} ${plural(groupRecipes.length,['блюдо','блюда','блюд'])}</span></div><div class="recipe-grid">${groupRecipes.map(recipeCard).join('')}</div></section>`).join('');}
+function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=catalogRecipes().filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div>${ingredientGroupedRecipeCards(items)}`; wrap.appendChild(sec);}); renderRecipeInteractions(wrap); const countryView=$('#country'); if(state.route!=='country' || !countryView?.classList.contains('active')) showView('country');}
 function slug(s){return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'')}
 function showCountry(c){vibe(12); renderCountry(c);}
 function goHomeWithFlip(){flushMealDraftBeforeNavigation(); routeHistory=[]; const current=$('#'+(state.route||'home'))||$('.view.active')||$('#home'); if(current.id==='home'){showView('home');return;} current.classList.remove('active'); current.style.display='block'; current.classList.add('page-leave'); const home=$('#home'); home.style.display='block'; home.classList.add('active','page-enter'); vibe(16); setTimeout(()=>{current.classList.remove('page-leave'); current.style.display='none'; home.classList.remove('page-enter'); showView('home');},560)}
@@ -13074,6 +13106,12 @@ function renderMyCategoryTiles(){
     vibe(10);
   });
 }
+function myRecipeCard(r){
+  const n=r.nutrition100;
+  const productCount=(r.ingredientNutrition||[]).length;
+  const kbju=n?`<div class="mini-kbju compact-kbju"><span><b>${fmt(n.kcal)}</b><em>ккал / 100 г</em></span><span><b>${fmt(n.protein)} г</b><em>Б</em></span><span><b>${fmt(n.fat)} г</b><em>Ж</em></span><span><b>${fmt(n.carbs)} г</b><em>У</em></span></div>`:'';
+  return `<article class="my-item my-item-compact"><div class="my-item-top"><div class="my-item-main"><h4>${esc(r.title)}</h4><div class="mini-meta"><span>${esc(r.time||'—')}</span><span>${r.servings||1} порц.</span>${r.weight?`<span>${fmt(r.weight)} г</span>`:''}${productCount?`<span>${productCount} прод.</span>`:''}</div>${kbju}</div><div class="row-actions compact-actions"><button class="btn" data-open-custom="${r.id}">Открыть</button><button class="btn ghost" data-edit-custom="${r.id}">Изменить</button><button class="btn ghost danger-btn" data-del-custom="${r.id}">Удалить</button></div></div></article>`;
+}
 function renderMyRecipes(){
   const box=$('#myRecipesList'), empty=$('#myEmpty');
   renderMyCategoryTiles();
@@ -13094,12 +13132,8 @@ function renderMyRecipes(){
     return;
   }
   empty.hidden=true;
-  box.innerHTML=`<div class="my-folder-title"><h3>${esc(selected)}</h3><span>${list.length} ${plural(list.length,['рецепт','рецепта','рецептов'])}</span></div>`+list.map(r=>{
-    const n=r.nutrition100;
-    const productCount=(r.ingredientNutrition||[]).length;
-    const kbju=n?`<div class="mini-kbju compact-kbju"><span><b>${fmt(n.kcal)}</b><em>ккал / 100 г</em></span><span><b>${fmt(n.protein)} г</b><em>Б</em></span><span><b>${fmt(n.fat)} г</b><em>Ж</em></span><span><b>${fmt(n.carbs)} г</b><em>У</em></span></div>`:'';
-    return `<article class="my-item my-item-compact"><div class="my-item-top"><div class="my-item-main"><h4>${esc(r.title)}</h4><div class="mini-meta"><span>${esc(r.time||'—')}</span><span>${r.servings||1} порц.</span>${r.weight?`<span>${fmt(r.weight)} г</span>`:''}${productCount?`<span>${productCount} прод.</span>`:''}</div>${kbju}</div><div class="row-actions compact-actions"><button class="btn" data-open-custom="${r.id}">Открыть</button><button class="btn ghost" data-edit-custom="${r.id}">Изменить</button><button class="btn ghost danger-btn" data-del-custom="${r.id}">Удалить</button></div></div></article>`;
-  }).join('');
+  const groups=recipesByIngredientGroup(list).map(({group,recipes:groupRecipes})=>`<section class="ingredient-group-block my-ingredient-group"><div class="ingredient-group-head"><h3>${esc(group)}</h3><span>${groupRecipes.length} ${plural(groupRecipes.length,['блюдо','блюда','блюд'])}</span></div><div class="my-list-grid my-ingredient-grid">${groupRecipes.map(myRecipeCard).join('')}</div></section>`).join('');
+  box.innerHTML=`<div class="my-folder-title"><h3>${esc(selected)}</h3><span>${list.length} ${plural(list.length,['рецепт','рецепта','рецептов'])}</span></div>${groups}`;
   $$('[data-open-custom]').forEach(b=>b.onclick=()=>openRecipe(b.dataset.openCustom,'custom'));
   $$('[data-edit-custom]').forEach(b=>b.onclick=()=>editMyRecipe(b.dataset.editCustom));
   $$('[data-del-custom]').forEach(b=>b.onclick=()=>deleteMyRecipe(b.dataset.delCustom));
