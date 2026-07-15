@@ -430,10 +430,17 @@ create table if not exists public.product_portion_weights (
   sort_order integer not null default 0,
   updated_at timestamptz not null default now(),
   constraint product_portion_weights_name_not_blank check (length(btrim(canonical_name)) > 0),
-  constraint product_portion_weights_unit_allowed check (unit_code in ('piece','tablespoon','teaspoon','slice','clove')),
+  constraint product_portion_weights_unit_allowed check (unit_code in ('piece','tablespoon','teaspoon','slice','clove','milliliter','wedge')),
   constraint product_portion_weights_grams_positive check (grams > 0),
   constraint product_portion_weights_name_unit_unique unique (canonical_name, unit_code)
 );
+
+-- Keep an existing installation in sync when new household units are added.
+alter table public.product_portion_weights
+  drop constraint if exists product_portion_weights_unit_allowed;
+alter table public.product_portion_weights
+  add constraint product_portion_weights_unit_allowed
+  check (unit_code in ('piece','tablespoon','teaspoon','slice','clove','milliliter','wedge'));
 
 alter table public.product_portion_weights enable row level security;
 
@@ -507,7 +514,23 @@ with seed(canonical_name,aliases,unit_code,unit_label,grams,note,sort_order) as 
     ('творог',array[]::text[],'tablespoon','ст. л.',20,'',560),
     ('варёный рис',array['рис варёный']::text[],'tablespoon','ст. л.',25,'',570),
     ('картофельное пюре',array['пюре']::text[],'tablespoon','ст. л.',25,'',580),
-    ('рубленые орехи',array['орехи']::text[],'tablespoon','ст. л.',10,'',590)
+    ('рубленые орехи',array['орехи']::text[],'tablespoon','ст. л.',10,'',590),
+    ('вода',array['питьевая вода']::text[],'milliliter','мл',1,'приблизительная масса 1 мл',600),
+    ('молоко',array[]::text[],'milliliter','мл',1.03,'средняя плотность',610),
+    ('сливки',array[]::text[],'milliliter','мл',1,'зависит от жирности',620),
+    ('кефир',array[]::text[],'milliliter','мл',1.03,'средняя плотность',630),
+    ('растительное масло',array['подсолнечное масло','масло растительное']::text[],'milliliter','мл',0.92,'средняя плотность',640),
+    ('оливковое масло',array['масло оливковое']::text[],'milliliter','мл',0.91,'средняя плотность',650),
+    ('соевый соус',array[]::text[],'milliliter','мл',1.16,'средняя плотность',660),
+    ('мёд',array['мед']::text[],'milliliter','мл',1.42,'жидкий мёд',670),
+    ('уксус',array['столовый уксус','яблочный уксус']::text[],'milliliter','мл',1.01,'средняя плотность',680),
+    ('кокосовое молоко',array[]::text[],'milliliter','мл',1.01,'средняя плотность',690),
+    ('бульон',array['мясной бульон','куриный бульон','овощной бульон']::text[],'milliliter','мл',1,'приблизительная масса',700),
+    ('томатный сок',array[]::text[],'milliliter','мл',1.04,'средняя плотность',710),
+    ('лимон',array[]::text[],'wedge','долька',15,'примерно 1/8 среднего плода',720),
+    ('лайм',array[]::text[],'wedge','долька',9,'примерно 1/8 среднего плода',730),
+    ('яблоко',array[]::text[],'wedge','долька',22,'примерно 1/8 среднего плода без сердцевины',740),
+    ('томат',array['помидор']::text[],'wedge','долька',15,'примерно 1/8 среднего плода',750)
 )
 insert into public.product_portion_weights (
   canonical_name, aliases, unit_code, unit_label, grams, note, sort_order
