@@ -6348,6 +6348,34 @@ body.dark .brand-mark::after {
   }
 }
 
+/* Keep touch feedback matte and replace browser/WebView blue focus boxes. */
+body :is(button, a, [role="button"], summary) {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+body :is(button, a, [role="button"], summary):focus {
+  outline: 0 !important;
+}
+
+body :is(button, a, [role="button"], summary):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--gold) 72%, transparent) !important;
+  outline-offset: 2px !important;
+}
+
+body :is(.back-btn, .meal-picker-back, .close, .cuisine-carousel-arrow) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
 @media(max-width: 420px) {
   .base-editor-grid,
   .base-editor-nutrition {

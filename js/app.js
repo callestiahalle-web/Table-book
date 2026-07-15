@@ -11356,20 +11356,37 @@ function decodeSharedRecipe(value){
     return Object.assign(sharedRecipePayload(parsed),{id:'shared-'+Date.now(),source:'shared'});
   }catch(e){return null;}
 }
+function recipeShareCode(id){
+  const value=canonicalRecipeId(id,'base');
+  let hash=2166136261;
+  for(let index=0;index<value.length;index++){
+    hash^=value.charCodeAt(index);
+    hash=Math.imul(hash,16777619);
+  }
+  return (hash>>>0).toString(36);
+}
+function recipeIdFromShareCode(value){
+  const requested=String(value||'').trim();
+  if(!requested) return '';
+  const direct=canonicalRecipeId(requested,'base');
+  if(recipes.some(recipe=>canonicalRecipeId(recipe.id,'base')===direct)) return direct;
+  const matches=recipes.filter(recipe=>recipeShareCode(recipe.id)===requested);
+  return matches.length===1?canonicalRecipeId(matches[0].id,'base'):direct;
+}
 function recipeShareUrl(recipe,source='base'){
   const url=recipeShareBaseUrl();
   if(source==='custom' || source==='shared'){
     url.hash=`${SHARED_RECIPE_HASH_KEY}=${encodeURIComponent(encodeSharedRecipe(recipe))}`;
   }else{
-    url.searchParams.set('recipe',canonicalRecipeId(recipe?.id,'base'));
+    url.searchParams.set('r',recipeShareCode(recipe?.id));
   }
   return url.toString();
 }
 function recipeRequestFromUrl(){
   try{
     const url=new URL(window.location.href);
-    const baseId=url.searchParams.get('recipe');
-    if(baseId) return {id:canonicalRecipeId(baseId,'base'),source:'base',recipe:null};
+    const baseId=url.searchParams.get('r')||url.searchParams.get('recipe');
+    if(baseId) return {id:recipeIdFromShareCode(baseId),source:'base',recipe:null};
     const hash=new URLSearchParams(url.hash.replace(/^#/,''));
     const shared=decodeSharedRecipe(hash.get(SHARED_RECIPE_HASH_KEY));
     return shared?{id:shared.id,source:'shared',recipe:shared}:null;
@@ -11627,12 +11644,14 @@ function setupCountryCarousel(previousCountry=''){
   const cards=[...g.querySelectorAll('.country-card')];
   const updateFocus=()=>{
     if(!cards.length) return;
-    const mid=g.scrollLeft+g.clientWidth/2;
+    const viewport=g.getBoundingClientRect();
+    const mid=viewport.left+viewport.width/2;
     let active=null;
     cards.forEach(card=>{
-      const center=card.offsetLeft+card.offsetWidth/2;
+      const rect=card.getBoundingClientRect();
+      const center=rect.left+rect.width/2;
       const distance=Math.abs(center-mid);
-      const ratio=Math.min(1,distance/(card.offsetWidth*1.35));
+      const ratio=Math.min(1,distance/(Math.max(1,rect.width)*1.35));
       card.classList.toggle('is-near',ratio<.62);
       if(!active || distance<active.distance) active={card,distance};
     });
@@ -11644,17 +11663,19 @@ function setupCountryCarousel(previousCountry=''){
     const step=card?card.getBoundingClientRect().width+18:Math.max(260,g.clientWidth*.8);
     g.scrollBy({left:dir*step,behavior:'smooth'});
   };
-  if(prev && prev.dataset.bound!=='1'){prev.dataset.bound='1'; prev.onclick=()=>scrollByCard(-1);}
-  if(next && next.dataset.bound!=='1'){next.dataset.bound='1'; next.onclick=()=>scrollByCard(1);}
+  g._countryCarouselUpdateFocus=updateFocus;
+  g._countryCarouselScrollByCard=scrollByCard;
+  if(prev) prev.onclick=()=>g._countryCarouselScrollByCard?.(-1);
+  if(next) next.onclick=()=>g._countryCarouselScrollByCard?.(1);
   if(g.dataset.bound!=='1'){
     g.dataset.bound='1';
     g.addEventListener('scroll',()=>{
       if(window.__countryScrollRaf) cancelAnimationFrame(window.__countryScrollRaf);
-      window.__countryScrollRaf=requestAnimationFrame(updateFocus);
+      window.__countryScrollRaf=requestAnimationFrame(()=>g._countryCarouselUpdateFocus?.());
     },{passive:true});
     window.addEventListener('resize',()=>{
       if(window.__countryResizeRaf) cancelAnimationFrame(window.__countryResizeRaf);
-      window.__countryResizeRaf=requestAnimationFrame(updateFocus);
+      window.__countryResizeRaf=requestAnimationFrame(()=>g._countryCarouselUpdateFocus?.());
     },{passive:true});
   }
   if(previousCountry) requestAnimationFrame(()=>{
