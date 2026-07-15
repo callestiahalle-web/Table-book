@@ -1,6 +1,6 @@
 {
   "name": "table-book",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "description": "Table book web and Android application",
   "scripts": {

@@ -10835,6 +10835,7 @@ const iconPaths={
 };
 iconPaths.heart='<path d="M16 26S5 20 5 12.5c0-3.6 2.5-6 5.8-6 2.2 0 4 1.2 5.2 3 1.2-1.8 3-3 5.2-3 3.3 0 5.8 2.4 5.8 6C27 20 16 26 16 26Z"/>';
 iconPaths.share='<circle cx="10" cy="16" r="2.5"/><circle cx="22" cy="9" r="2.5"/><circle cx="22" cy="23" r="2.5"/><path d="m12.2 14.8 7.6-4.5M12.2 17.2l7.6 4.5"/>';
+iconPaths.unlink='<path d="M13.2 19.2 11 21.4a4 4 0 0 1-5.7-5.7l3.2-3.2a4 4 0 0 1 5.7 0"/><path d="m18.8 12.8 2.2-2.2a4 4 0 0 1 5.7 5.7l-3.2 3.2a4 4 0 0 1-5.7 0"/><path d="m12 20 8-8M6 6l20 20"/>';
 iconPaths.arrow='<path d="m12 8.5 7.5 7.5-7.5 7.5"/>';
 iconPaths.arrowLeft='<path d="m20 8.5-7.5 7.5 7.5 7.5"/>';
 function iconSvg(name){return `<svg class="line-icon" viewBox="0 0 32 32" aria-hidden="true">${iconPaths[name]||iconPaths.book}</svg>`;}
@@ -11114,6 +11115,17 @@ function createRestCloudClient(){
     }
     return api;
   }
+  async function restRpc(name,args={}){
+    try{
+      await refreshSession();
+      const data=await request(`/rest/v1/rpc/${encodeURIComponent(name)}`,{
+        method:'POST',
+        token:session?.access_token||SUPABASE_ANON_KEY,
+        body:JSON.stringify(args||{})
+      });
+      return {data,error:null};
+    }catch(error){return {data:null,error};}
+  }
   return {
     auth:{
       async getSession(){try{readUrlSession();await refreshSession();if(session?.access_token && (!session.user || !session.user.id)){try{const user=await request('/auth/v1/user',{method:'GET',token:session.access_token});session.user=user;saveSession(session);}catch(e){console.warn('REST user fetch failed',e)}}return {data:{session:session},error:null}}catch(error){saveSession(null);return {data:{session:null},error}}},
@@ -11126,7 +11138,8 @@ function createRestCloudClient(){
       async exchangeCodeForSession(){return {data:{session:null,user:null},error:new Error('Для ссылки с code нужен Supabase SDK. Перезагрузите страницу с интернетом или запросите новое письмо подтверждения.')}} ,
       onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}}
     },
-    from:restFrom
+    from:restFrom,
+    rpc:restRpc
   };
 }
 function safeJson(value,fallback){try{return value?JSON.parse(value):fallback}catch(e){return fallback}}
@@ -11305,6 +11318,7 @@ function canonicalRecipeId(id,source='base'){
 
 const PUBLIC_APP_URL='https://www.table-book.ru/';
 const SHARED_RECIPE_HASH_KEY='shared-recipe';
+const SHARED_RECIPE_QUERY_KEY='s';
 let activeSharedRecipe=null;
 function isNativeApp(){
   return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform());
@@ -11356,6 +11370,13 @@ function decodeSharedRecipe(value){
     return Object.assign(sharedRecipePayload(parsed),{id:'shared-'+Date.now(),source:'shared'});
   }catch(e){return null;}
 }
+function normalizeRemoteSharedRecipe(value,shareCode=''){
+  try{
+    const parsed=typeof value==='string'?JSON.parse(value):value;
+    if(parsed?.v!==1 || !parsed.title || !Array.isArray(parsed.ingredients) || !Array.isArray(parsed.steps)) return null;
+    return Object.assign(sharedRecipePayload(parsed),{id:'shared-'+shareCode,source:'shared',shareCode});
+  }catch(e){return null;}
+}
 function recipeShareCode(id){
   const value=canonicalRecipeId(id,'base');
   let hash=2166136261;
@@ -11375,7 +11396,9 @@ function recipeIdFromShareCode(value){
 }
 function recipeShareUrl(recipe,source='base'){
   const url=recipeShareBaseUrl();
-  if(source==='custom' || source==='shared'){
+  if(source==='shared' && recipe?.shareCode){
+    url.searchParams.set(SHARED_RECIPE_QUERY_KEY,recipe.shareCode);
+  }else if(source==='custom' || source==='shared'){
     url.hash=`${SHARED_RECIPE_HASH_KEY}=${encodeURIComponent(encodeSharedRecipe(recipe))}`;
   }else{
     url.searchParams.set('r',recipeShareCode(recipe?.id));
@@ -11385,12 +11408,27 @@ function recipeShareUrl(recipe,source='base'){
 function recipeRequestFromUrl(){
   try{
     const url=new URL(window.location.href);
+    const shareCode=String(url.searchParams.get(SHARED_RECIPE_QUERY_KEY)||'').trim();
+    if(/^[A-Za-z0-9_-]{12}$/.test(shareCode)) return {id:'shared-'+shareCode,source:'shared',shareCode,recipe:null};
     const baseId=url.searchParams.get('r')||url.searchParams.get('recipe');
     if(baseId) return {id:recipeIdFromShareCode(baseId),source:'base',recipe:null};
     const hash=new URLSearchParams(url.hash.replace(/^#/,''));
     const shared=decodeSharedRecipe(hash.get(SHARED_RECIPE_HASH_KEY));
     return shared?{id:shared.id,source:'shared',recipe:shared}:null;
   }catch(e){return null;}
+}
+function shortSharedRecipeUrl(shareCode){
+  const url=recipeShareBaseUrl();
+  url.searchParams.set(SHARED_RECIPE_QUERY_KEY,String(shareCode||''));
+  return url.toString();
+}
+async function createShortSharedRecipeLink(id,recipe){
+  if(!cloud?.rpc || !cloudUser?.id) return '';
+  const {data,error}=await cloud.rpc('create_shared_recipe',{p_recipe_id:String(id),p_recipe_data:sharedRecipePayload(recipe)});
+  if(error) throw error;
+  const code=String(data||'').trim();
+  if(!/^[A-Za-z0-9_-]{12}$/.test(code)) throw new Error('Supabase returned an invalid share code');
+  return shortSharedRecipeUrl(code);
 }
 async function copyText(value){
   try{
@@ -11412,7 +11450,13 @@ async function copyRecipeLink(id,source='base'){
   const normalized=source==='custom'?'custom':source==='shared'?'shared':'base';
   const recipe=normalized==='shared'?activeSharedRecipe:resolveRecipeRef({id,source:normalized});
   if(!recipe) return false;
-  const copied=await copyText(recipeShareUrl(recipe,normalized));
+  let shareUrl=recipeShareUrl(recipe,normalized);
+  if(normalized==='custom'){
+    try{shareUrl=await createShortSharedRecipeLink(id,recipe)||shareUrl;}
+    catch(error){console.warn('Short recipe link creation failed; using legacy link',error);}
+  }
+  const copied=await copyText(shareUrl);
+  if(copied && normalized==='custom') refreshShareLinkControls(document);
   if(copied) vibe(10);
   return copied;
 }
@@ -11477,13 +11521,47 @@ function shareButtonHtml(id,source='base'){
   const normalized=source==='custom'?'custom':source==='shared'?'shared':'base';
   return `<button class="share-btn" type="button" data-share-id="${esc(id)}" data-share-source="${normalized}" aria-label="Скопировать ссылку на рецепт">${iconSvg('share')}<span>Поделиться</span></button>`;
 }
+function revokeShareButtonHtml(id,source='base'){
+  if(source!=='custom') return '';
+  return `<button class="share-btn revoke-share-btn" type="button" data-revoke-share-id="${esc(id)}" hidden aria-label="Отозвать публичную ссылку на рецепт">${iconSvg('unlink')}<span>Отозвать ссылку</span></button>`;
+}
+async function refreshShareLinkControls(root=document){
+  const buttons=[...root.querySelectorAll('[data-revoke-share-id]')];
+  if(!buttons.length) return;
+  if(!cloud?.rpc || !cloudUser?.id){buttons.forEach(button=>button.hidden=true); return;}
+  await Promise.all(buttons.map(async button=>{
+    try{
+      const {data,error}=await cloud.rpc('get_my_shared_recipe_code',{p_recipe_id:String(button.dataset.revokeShareId)});
+      if(error) throw error;
+      button.hidden=!/^[A-Za-z0-9_-]{12}$/.test(String(data||''));
+    }catch(error){button.hidden=true; console.warn('Share link status check failed',error);}
+  }));
+}
+async function revokeShortRecipeLink(id,button=null){
+  if(!cloud?.rpc || !cloudUser?.id) return false;
+  if(!confirm('Отозвать публичную ссылку на этот рецепт? У получателей она перестанет открываться.')) return false;
+  try{
+    if(button) button.disabled=true;
+    const {data,error}=await cloud.rpc('revoke_shared_recipe',{p_recipe_id:String(id)});
+    if(error) throw error;
+    if(data){
+      document.querySelectorAll('[data-revoke-share-id]').forEach(item=>{if(item.dataset.revokeShareId===String(id)) item.hidden=true;});
+      vibe([10,18,10]);
+      return true;
+    }
+    return false;
+  }catch(error){console.warn('Share link revoke failed',error); return false;}
+  finally{if(button) button.disabled=false;}
+}
 function renderRecipeInteractions(root=document){
   root.querySelectorAll('[data-open]').forEach(btn=>btn.onclick=()=>openRecipe(btn.dataset.open,btn.dataset.source||'base'));
   root.querySelectorAll('[data-like-id]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();toggleRecipeLike(btn.dataset.likeId,btn.dataset.likeSource||'base');});
   root.querySelectorAll('[data-share-id]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();copyRecipeLink(btn.dataset.shareId,btn.dataset.shareSource||'base');});
+  root.querySelectorAll('[data-revoke-share-id]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();revokeShortRecipeLink(btn.dataset.revokeShareId,btn);});
   root.querySelectorAll('[data-edit-base]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();openBaseRecipeEditor(btn.dataset.editBase);});
   root.querySelectorAll('[data-reset-base]').forEach(btn=>btn.onclick=event=>{event.preventDefault();event.stopPropagation();resetBaseRecipeToOriginal(btn.dataset.resetBase);});
   refreshLikeButtons(root);
+  refreshShareLinkControls(root);
 }
 
 const encyclopediaItems=[
@@ -13352,7 +13430,7 @@ function openRecipe(id,source='base',recipeOverride=null){
   const r=recipeOverride||(normalizedSource==='custom'?myRecipes.find(x=>x.id===canonicalId):effectiveBaseRecipe(canonicalId)); if(!r) return;
   activeSharedRecipe=normalizedSource==='shared'?r:null;
   const likeAction=normalizedSource==='shared'?'':likeButtonHtml(r.id,normalizedSource,'');
-  $('#modalTags').innerHTML=`<span class="tag">${esc(r.country||'Мои рецепты')}</span><span class="tag">${esc(r.category||'Без категории')}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}${likeAction}${shareButtonHtml(r.id||canonicalId,normalizedSource)}`;
+  $('#modalTags').innerHTML=`<span class="tag">${esc(r.country||'Мои рецепты')}</span><span class="tag">${esc(r.category||'Без категории')}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}${likeAction}${shareButtonHtml(r.id||canonicalId,normalizedSource)}${revokeShareButtonHtml(r.id||canonicalId,normalizedSource)}`;
   $('#modalTitle').innerHTML=`<span>${esc(r.title)}</span>${originLabel(r)?`<small>${esc(originLabel(r))}</small>`:''}`;
   const nut=r.nutrition||nutritionOf(r);
   const baseServings=r.servings||1;
@@ -13375,10 +13453,26 @@ function openRecipe(id,source='base',recipeOverride=null){
   $$('[data-check]').forEach(c=>c.onchange=()=>{progress(); vibe(8); handleStepCheckChange(c);});
   progress(); initStepTimers(); renderRecipeInteractions($('#modal')); openModal(); vibe(12);
 }
-function openRecipeFromUrl(){
+async function openRecipeFromUrl(){
   const request=recipeRequestFromUrl();
   if(!request) return false;
-  if(request.source==='shared') openRecipe(request.id,'shared',request.recipe);
+  if(request.source==='shared' && request.shareCode){
+    try{
+      const {data,error}=await cloud.rpc('get_shared_recipe',{p_share_code:request.shareCode});
+      if(error) throw error;
+      const recipe=normalizeRemoteSharedRecipe(data,request.shareCode);
+      if(!recipe) throw new Error('Shared recipe was not found or has been revoked');
+      openRecipe(request.id,'shared',recipe);
+    }catch(error){
+      console.warn('Shared recipe loading failed',error);
+      $('#modalTags').innerHTML='<span class="tag">Публичная ссылка</span>';
+      $('#modalTitle').textContent='Рецепт недоступен';
+      $('#modalBody').innerHTML='<section class="panel"><p>Ссылка недействительна или владелец рецепта отозвал доступ.</p></section>';
+      openModal();
+      return false;
+    }
+  }
+  else if(request.source==='shared') openRecipe(request.id,'shared',request.recipe);
   else openRecipe(request.id,'base');
   return true;
 }
@@ -13580,5 +13674,5 @@ if(backupFile) backupFile.onchange=()=>{importUserData(backupFile.files[0]); bac
 document.addEventListener('click',e=>{const panel=$('#topAuthPanel'), wrap=$('#topAuth'); if(panel && wrap && !panel.hidden && !wrap.contains(e.target)) closeTopAuth();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTopAuth(); closeModalInstant(); closeMealDishPicker();}});
 initializeNavigationIcons();
-function boot(){const brand=$('#brandMark'); if(brand && !brand.querySelector('.brand-app-icon')) brand.innerHTML='<img class="brand-app-icon" src="./assets/icons/icon-192.png" alt="" loading="eager">'; persistBackup(); preloadHomeActionIcons(); initCloudAuth(); setHomeActionIcon('myRecipesIcon','my-recipes','Мои рецепты'); setHomeActionIcon('mealCalendarIcon','menu-week','Меню на неделю'); setHomeActionIcon('likedRecipesIcon','liked','Мне нравится'); setHomeActionIcon('encyclopediaIcon','encyclopedia','Энциклопедия'); ensureMealPlan(); fillMyCategory(); const myCatSelect=$('#myCategory'); if(myCatSelect) myCatSelect.onchange=()=>{state.myCat=myCatSelect.value; saveState();}; renderProductRows([{name:'',weight:'',kcal:'',protein:'',fat:'',carbs:''}]); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderLikedRecipes(false); renderEncyclopedia(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview'){state.editingId=null; showView('myview'); showMyLibrary();} else if(state.route==='mealview') openMealCalendar(); else if(state.route==='likedview') openLikedView(); else if(state.route==='encyclopediaview') openEncyclopediaView(); else showView('home'); requestAnimationFrame(openRecipeFromUrl);}
+function boot(){const brand=$('#brandMark'); if(brand && !brand.querySelector('.brand-app-icon')) brand.innerHTML='<img class="brand-app-icon" src="./assets/icons/icon-192.png" alt="" loading="eager">'; persistBackup(); preloadHomeActionIcons(); initCloudAuth(); setHomeActionIcon('myRecipesIcon','my-recipes','Мои рецепты'); setHomeActionIcon('mealCalendarIcon','menu-week','Меню на неделю'); setHomeActionIcon('likedRecipesIcon','liked','Мне нравится'); setHomeActionIcon('encyclopediaIcon','encyclopedia','Энциклопедия'); ensureMealPlan(); fillMyCategory(); const myCatSelect=$('#myCategory'); if(myCatSelect) myCatSelect.onchange=()=>{state.myCat=myCatSelect.value; saveState();}; renderProductRows([{name:'',weight:'',kcal:'',protein:'',fat:'',carbs:''}]); ['myWeight','myKcal100','myProtein100','myFat100','myCarbs100','myServings'].forEach(id=>{const el=$('#'+id); if(el) el.addEventListener('input',updateKbjuPreview);}); updateKbjuPreview(); setTheme(); updateStats(); renderCountries(); renderMyRecipes(); renderLikedRecipes(false); renderEncyclopedia(); initDialogDrag(); if(state.country==='Италия'||state.country==='Испания') state.country='Средиземноморская'; if(state.route==='country' && state.country) renderCountry(state.country); else if(state.route==='myview'){state.editingId=null; showView('myview'); showMyLibrary();} else if(state.route==='mealview') openMealCalendar(); else if(state.route==='likedview') openLikedView(); else if(state.route==='encyclopediaview') openEncyclopediaView(); else showView('home'); requestAnimationFrame(()=>openRecipeFromUrl().catch(error=>console.warn('Recipe URL opening failed',error)));}
 try{boot();}catch(error){console.warn('Boot failed',error); try{cloudStatus('Ошибка запуска приложения: '+(error?.message||error)+'. Авторизация доступна, попробуйте войти снова.');}catch(e){} try{renderCloudUi();}catch(e){}}

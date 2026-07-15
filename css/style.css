@@ -6033,6 +6033,14 @@ body.meal-picker-open {
   outline-offset: 3px;
 }
 
+.revoke-share-btn[hidden] {
+  display: none !important;
+}
+
+.revoke-share-btn {
+  color: color-mix(in srgb, #a65a62 72%, var(--ink));
+}
+
 #modalTags .like-btn {
   width: 40px;
   height: 40px;

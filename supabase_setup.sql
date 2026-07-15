@@ -146,3 +146,272 @@ on public.user_recipe_overrides
 for delete
 to authenticated
 using ((select auth.uid()) = user_id);
+
+-- Public short links for user-created recipes.
+-- The table is never exposed directly through the Data API. A public reader
+-- can fetch only one non-revoked snapshot when it knows its random code, while
+-- authenticated owners create, inspect and revoke their own links through RPC.
+create table if not exists public.shared_recipe_links (
+  id uuid primary key default extensions.gen_random_uuid(),
+  share_code text not null unique,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  source_recipe_id text not null,
+  recipe_data jsonb not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  revoked_at timestamptz,
+  constraint shared_recipe_links_code_format check (share_code ~ '^[A-Za-z0-9_-]{12}$'),
+  constraint shared_recipe_links_recipe_id_not_blank check (length(btrim(source_recipe_id)) between 1 and 220),
+  constraint shared_recipe_links_recipe_data_object check (jsonb_typeof(recipe_data) = 'object')
+);
+
+create unique index if not exists shared_recipe_links_one_active_per_recipe
+on public.shared_recipe_links (owner_id, source_recipe_id)
+where revoked_at is null;
+
+alter table public.shared_recipe_links enable row level security;
+
+revoke all on table public.shared_recipe_links from public, anon, authenticated;
+
+drop policy if exists "Block direct access to shared recipe links" on public.shared_recipe_links;
+create policy "Block direct access to shared recipe links"
+on public.shared_recipe_links
+as restrictive
+for all
+to public
+using (false)
+with check (false);
+
+create schema if not exists private;
+revoke all on schema private from public;
+grant usage on schema private to anon, authenticated;
+
+create or replace function private.create_shared_recipe_impl(
+  p_recipe_id text,
+  p_recipe_data jsonb
+)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_recipe_id text := pg_catalog.btrim(p_recipe_id);
+  v_share_code text;
+  v_attempt integer := 0;
+begin
+  if v_user_id is null then
+    raise exception using errcode = '42501', message = 'Authentication required';
+  end if;
+  if v_recipe_id is null or pg_catalog.length(v_recipe_id) not between 1 and 220 then
+    raise exception using errcode = '22023', message = 'Invalid recipe id';
+  end if;
+  if p_recipe_data is null
+     or pg_catalog.jsonb_typeof(p_recipe_data) is distinct from 'object'
+     or coalesce(pg_catalog.length(pg_catalog.btrim(p_recipe_data ->> 'title')), 0) = 0
+     or pg_catalog.jsonb_typeof(p_recipe_data -> 'ingredients') is distinct from 'array'
+     or pg_catalog.jsonb_typeof(p_recipe_data -> 'steps') is distinct from 'array' then
+    raise exception using errcode = '22023', message = 'Invalid recipe snapshot';
+  end if;
+  if pg_catalog.pg_column_size(p_recipe_data) > 131072 then
+    raise exception using errcode = '22001', message = 'Recipe snapshot is too large';
+  end if;
+
+  select link.share_code
+    into v_share_code
+    from public.shared_recipe_links as link
+   where link.owner_id = v_user_id
+     and link.source_recipe_id = v_recipe_id
+     and link.revoked_at is null
+   limit 1
+   for update;
+
+  if v_share_code is not null then
+    update public.shared_recipe_links
+       set recipe_data = p_recipe_data,
+           updated_at = pg_catalog.now()
+     where owner_id = v_user_id
+       and source_recipe_id = v_recipe_id
+       and revoked_at is null;
+    return v_share_code;
+  end if;
+
+  loop
+    v_attempt := v_attempt + 1;
+    v_share_code := pg_catalog.translate(
+      pg_catalog.rtrim(pg_catalog.encode(extensions.gen_random_bytes(9), 'base64'), '='),
+      '+/',
+      '-_'
+    );
+    begin
+      insert into public.shared_recipe_links (
+        share_code,
+        owner_id,
+        source_recipe_id,
+        recipe_data
+      ) values (
+        v_share_code,
+        v_user_id,
+        v_recipe_id,
+        p_recipe_data
+      );
+      return v_share_code;
+    exception
+      when unique_violation then
+        select link.share_code
+          into v_share_code
+          from public.shared_recipe_links as link
+         where link.owner_id = v_user_id
+           and link.source_recipe_id = v_recipe_id
+           and link.revoked_at is null
+         limit 1;
+        if v_share_code is not null then
+          update public.shared_recipe_links
+             set recipe_data = p_recipe_data,
+                 updated_at = pg_catalog.now()
+           where owner_id = v_user_id
+             and source_recipe_id = v_recipe_id
+             and revoked_at is null;
+          return v_share_code;
+        end if;
+        if v_attempt >= 8 then
+          raise exception using errcode = '55000', message = 'Could not create a unique share code';
+        end if;
+    end;
+  end loop;
+end;
+$$;
+
+create or replace function private.get_shared_recipe_impl(p_share_code text)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  v_jwt_role text := auth.role();
+  v_recipe_data jsonb;
+begin
+  if v_jwt_role is distinct from 'anon' and v_jwt_role is distinct from 'authenticated' then
+    raise exception using errcode = '42501', message = 'Public recipe access requires an API role';
+  end if;
+  select link.recipe_data
+    into v_recipe_data
+    from public.shared_recipe_links as link
+   where link.share_code = p_share_code
+     and link.revoked_at is null
+     and pg_catalog.length(p_share_code) = 12
+   limit 1;
+  return v_recipe_data;
+end;
+$$;
+
+create or replace function private.get_my_shared_recipe_code_impl(p_recipe_id text)
+returns text
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_share_code text;
+begin
+  if v_user_id is null then
+    raise exception using errcode = '42501', message = 'Authentication required';
+  end if;
+  select link.share_code
+    into v_share_code
+    from public.shared_recipe_links as link
+   where link.owner_id = v_user_id
+     and link.source_recipe_id = pg_catalog.btrim(p_recipe_id)
+     and link.revoked_at is null
+   limit 1;
+  return v_share_code;
+end;
+$$;
+
+create or replace function private.revoke_shared_recipe_impl(p_recipe_id text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user_id uuid := auth.uid();
+begin
+  if v_user_id is null then
+    raise exception using errcode = '42501', message = 'Authentication required';
+  end if;
+  update public.shared_recipe_links
+     set revoked_at = pg_catalog.now(),
+         updated_at = pg_catalog.now()
+   where owner_id = v_user_id
+     and source_recipe_id = pg_catalog.btrim(p_recipe_id)
+     and revoked_at is null;
+  return found;
+end;
+$$;
+
+create or replace function public.create_shared_recipe(
+  p_recipe_id text,
+  p_recipe_data jsonb
+)
+returns text
+language sql
+security invoker
+set search_path = ''
+as $$
+  select private.create_shared_recipe_impl(p_recipe_id, p_recipe_data)
+$$;
+
+create or replace function public.get_shared_recipe(p_share_code text)
+returns jsonb
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select private.get_shared_recipe_impl(p_share_code)
+$$;
+
+create or replace function public.get_my_shared_recipe_code(p_recipe_id text)
+returns text
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select private.get_my_shared_recipe_code_impl(p_recipe_id)
+$$;
+
+create or replace function public.revoke_shared_recipe(p_recipe_id text)
+returns boolean
+language sql
+security invoker
+set search_path = ''
+as $$
+  select private.revoke_shared_recipe_impl(p_recipe_id)
+$$;
+
+revoke execute on function private.create_shared_recipe_impl(text, jsonb) from public, anon, authenticated;
+revoke execute on function private.get_shared_recipe_impl(text) from public, anon, authenticated;
+revoke execute on function private.get_my_shared_recipe_code_impl(text) from public, anon, authenticated;
+revoke execute on function private.revoke_shared_recipe_impl(text) from public, anon, authenticated;
+
+revoke execute on function public.create_shared_recipe(text, jsonb) from public, anon, authenticated;
+revoke execute on function public.get_shared_recipe(text) from public, anon, authenticated;
+revoke execute on function public.get_my_shared_recipe_code(text) from public, anon, authenticated;
+revoke execute on function public.revoke_shared_recipe(text) from public, anon, authenticated;
+
+grant execute on function public.create_shared_recipe(text, jsonb) to authenticated;
+grant execute on function public.get_shared_recipe(text) to anon, authenticated;
+grant execute on function public.get_my_shared_recipe_code(text) to authenticated;
+grant execute on function public.revoke_shared_recipe(text) to authenticated;
+
+grant execute on function private.create_shared_recipe_impl(text, jsonb) to authenticated;
+grant execute on function private.get_shared_recipe_impl(text) to anon, authenticated;
+grant execute on function private.get_my_shared_recipe_code_impl(text) to authenticated;
+grant execute on function private.revoke_shared_recipe_impl(text) to authenticated;
