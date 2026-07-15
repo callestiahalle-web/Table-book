@@ -415,3 +415,109 @@ grant execute on function private.create_shared_recipe_impl(text, jsonb) to auth
 grant execute on function private.get_shared_recipe_impl(text) to anon, authenticated;
 grant execute on function private.get_my_shared_recipe_code_impl(text) to authenticated;
 grant execute on function private.revoke_shared_recipe_impl(text) to authenticated;
+
+-- Public read-only reference for converting household measures to grams in
+-- the custom-recipe nutrition calculator. Values are intentionally marked as
+-- approximate: an exact kitchen scale measurement always takes precedence.
+create table if not exists public.product_portion_weights (
+  id bigint generated always as identity primary key,
+  canonical_name text not null,
+  aliases text[] not null default '{}'::text[],
+  unit_code text not null,
+  unit_label text not null,
+  grams numeric(8,2) not null,
+  note text not null default '',
+  sort_order integer not null default 0,
+  updated_at timestamptz not null default now(),
+  constraint product_portion_weights_name_not_blank check (length(btrim(canonical_name)) > 0),
+  constraint product_portion_weights_unit_allowed check (unit_code in ('piece','tablespoon','teaspoon','slice','clove')),
+  constraint product_portion_weights_grams_positive check (grams > 0),
+  constraint product_portion_weights_name_unit_unique unique (canonical_name, unit_code)
+);
+
+alter table public.product_portion_weights enable row level security;
+
+revoke all on table public.product_portion_weights from public, anon, authenticated;
+grant select on table public.product_portion_weights to anon, authenticated;
+
+drop policy if exists "Anyone can read product portion weights" on public.product_portion_weights;
+create policy "Anyone can read product portion weights"
+on public.product_portion_weights
+for select
+to anon, authenticated
+using (true);
+
+with seed(canonical_name,aliases,unit_code,unit_label,grams,note,sort_order) as (
+  values
+    ('куриное яйцо',array['яйцо','яйца']::text[],'piece','шт.',50,'масса без скорлупы',10),
+    ('перепелиное яйцо',array['перепелиные яйца']::text[],'piece','шт.',10,'масса без скорлупы',20),
+    ('картофель',array['картошка']::text[],'piece','шт.',150,'средний клубень',30),
+    ('морковь',array[]::text[],'piece','шт.',100,'средний корнеплод',40),
+    ('репчатый лук',array['лук','луковица']::text[],'piece','шт.',100,'средняя луковица',50),
+    ('чеснок',array['зубчик чеснока']::text[],'clove','зубчик',5,'очищенный зубчик',60),
+    ('томат',array['помидор']::text[],'piece','шт.',120,'средний плод',70),
+    ('огурец',array[]::text[],'piece','шт.',100,'средний плод',80),
+    ('болгарский перец',array['сладкий перец']::text[],'piece','шт.',160,'очищенный плод',90),
+    ('кабачок',array['цуккини']::text[],'piece','шт.',200,'небольшой плод',100),
+    ('баклажан',array[]::text[],'piece','шт.',300,'средний плод',110),
+    ('авокадо',array[]::text[],'piece','шт.',150,'мякоть среднего плода',120),
+    ('яблоко',array[]::text[],'piece','шт.',180,'средний плод без сердцевины',130),
+    ('банан',array[]::text[],'piece','шт.',120,'мякоть среднего плода',140),
+    ('лимон',array[]::text[],'piece','шт.',120,'средний плод',150),
+    ('лайм',array[]::text[],'piece','шт.',70,'средний плод',160),
+    ('куриная грудка',array['филе куриной грудки','куриное филе']::text[],'piece','шт.',180,'среднее филе',170),
+    ('белый хлеб',array['тостовый хлеб']::text[],'slice','ломтик',30,'стандартный ломтик',180),
+    ('ржаной хлеб',array['чёрный хлеб']::text[],'slice','ломтик',35,'стандартный ломтик',190),
+    ('твёрдый сыр',array['сыр']::text[],'slice','ломтик',20,'тонкий ломтик',200),
+    ('растительное масло',array['подсолнечное масло','масло растительное']::text[],'tablespoon','ст. л.',14,'',210),
+    ('растительное масло',array['подсолнечное масло','масло растительное']::text[],'teaspoon','ч. л.',5,'',220),
+    ('оливковое масло',array['масло оливковое']::text[],'tablespoon','ст. л.',14,'',230),
+    ('оливковое масло',array['масло оливковое']::text[],'teaspoon','ч. л.',5,'',240),
+    ('сливочное масло',array['масло сливочное']::text[],'tablespoon','ст. л.',14,'размягчённое',250),
+    ('сливочное масло',array['масло сливочное']::text[],'teaspoon','ч. л.',5,'размягчённое',260),
+    ('сахар',array['сахарный песок']::text[],'tablespoon','ст. л.',20,'без горки',270),
+    ('сахар',array['сахарный песок']::text[],'teaspoon','ч. л.',5,'без горки',280),
+    ('соль',array['поваренная соль']::text[],'tablespoon','ст. л.',18,'мелкая, без горки',290),
+    ('соль',array['поваренная соль']::text[],'teaspoon','ч. л.',6,'мелкая, без горки',300),
+    ('пшеничная мука',array['мука']::text[],'tablespoon','ст. л.',25,'без горки',310),
+    ('пшеничная мука',array['мука']::text[],'teaspoon','ч. л.',8,'без горки',320),
+    ('овсяные хлопья',array['геркулес']::text[],'tablespoon','ст. л.',12,'сухие хлопья',330),
+    ('рис',array['сухой рис']::text[],'tablespoon','ст. л.',20,'сухая крупа',340),
+    ('гречневая крупа',array['гречка']::text[],'tablespoon','ст. л.',20,'сухая крупа',350),
+    ('манная крупа',array['манка']::text[],'tablespoon','ст. л.',16,'без горки',360),
+    ('сметана',array[]::text[],'tablespoon','ст. л.',25,'',370),
+    ('сметана',array[]::text[],'teaspoon','ч. л.',8,'',380),
+    ('майонез',array[]::text[],'tablespoon','ст. л.',25,'',390),
+    ('майонез',array[]::text[],'teaspoon','ч. л.',8,'',400),
+    ('натуральный йогурт',array['йогурт']::text[],'tablespoon','ст. л.',20,'',410),
+    ('натуральный йогурт',array['йогурт']::text[],'teaspoon','ч. л.',7,'',420),
+    ('мёд',array['мед']::text[],'tablespoon','ст. л.',21,'',430),
+    ('мёд',array['мед']::text[],'teaspoon','ч. л.',7,'',440),
+    ('томатная паста',array[]::text[],'tablespoon','ст. л.',30,'',450),
+    ('томатная паста',array[]::text[],'teaspoon','ч. л.',10,'',460),
+    ('соевый соус',array[]::text[],'tablespoon','ст. л.',15,'',470),
+    ('соевый соус',array[]::text[],'teaspoon','ч. л.',5,'',480),
+    ('кетчуп',array[]::text[],'tablespoon','ст. л.',25,'',490),
+    ('кетчуп',array[]::text[],'teaspoon','ч. л.',8,'',500),
+    ('горчица',array[]::text[],'tablespoon','ст. л.',25,'',510),
+    ('горчица',array[]::text[],'teaspoon','ч. л.',5,'',520),
+    ('молоко',array[]::text[],'tablespoon','ст. л.',15,'',530),
+    ('молоко',array[]::text[],'teaspoon','ч. л.',5,'',540),
+    ('сливки',array[]::text[],'tablespoon','ст. л.',15,'',550),
+    ('творог',array[]::text[],'tablespoon','ст. л.',20,'',560),
+    ('варёный рис',array['рис варёный']::text[],'tablespoon','ст. л.',25,'',570),
+    ('картофельное пюре',array['пюре']::text[],'tablespoon','ст. л.',25,'',580),
+    ('рубленые орехи',array['орехи']::text[],'tablespoon','ст. л.',10,'',590)
+)
+insert into public.product_portion_weights (
+  canonical_name, aliases, unit_code, unit_label, grams, note, sort_order
+)
+select canonical_name, aliases, unit_code, unit_label, grams, note, sort_order
+from seed
+on conflict (canonical_name, unit_code) do update
+set aliases = excluded.aliases,
+    unit_label = excluded.unit_label,
+    grams = excluded.grams,
+    note = excluded.note,
+    sort_order = excluded.sort_order,
+    updated_at = now();
