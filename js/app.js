@@ -11663,7 +11663,10 @@ const encyclopediaItems=[
   {type:'Термины',name:'Умами',text:'Один из основных вкусов, связанный с глутаматами и некоторыми нуклеотидами. Особенно выражен в выдержанном сыре, грибах, томатах, водорослях и ферментированных продуктах.'},
   {type:'Термины',name:'Наппе',text:'Консистенция соуса, при которой он покрывает ложку ровным слоем. Проведённая пальцем дорожка не должна сразу затягиваться.'},
   {type:'Термины',name:'Альбумин',text:'Белок, который может выступать белыми каплями на поверхности рыбы при сильном или длительном нагреве. Умеренная температура уменьшает его выделение.'},
-  {type:'Термины',name:'Автолиз',text:'Отдых смеси муки и воды до активного замеса. За это время мука увлажняется, а тесто становится более растяжимым.'}
+  {type:'Термины',name:'Автолиз',text:'Отдых смеси муки и воды до активного замеса. За это время мука увлажняется, а тесто становится более растяжимым.'},
+  {type:'Питание',name:'FODMAP (ФОДМАП)',text:'Группа короткоцепочечных углеводов, которые у некоторых людей усваиваются не полностью и могут усиливать симптомы синдрома раздражённого кишечника. Реакция индивидуальна: ограничение и возвращение продуктов лучше проводить вместе с врачом или диетологом.'},
+  {type:'Питание',name:'Светофор FODMAP',text:'Зелёный означает обычно низкое содержание FODMAP, жёлтый — содержание зависит от размера порции, красный — обычно высокое. Оценка относится к порции, поэтому один и тот же продукт при другом количестве может перейти в другую группу.'},
+  {type:'Питание',name:'Как пользоваться отметками FODMAP',text:'Цветные отметки рядом с ингредиентами служат ориентиром, а не диагнозом. Проверяйте индивидуальную переносимость и актуальные порции в лабораторно проверенном справочнике Monash University; не исключайте целые группы продуктов надолго без специалиста.'}
 ];
 function setTheme(){
   const isDark=state.theme==='dark';
@@ -11809,14 +11812,17 @@ function setupCountryCarousel(previousCountry=''){
 function refreshCountryCategory(country,anchorTop){renderCountry(country); const pinMenu=()=>{const choice=$('#categoryChoice'); if(!choice) return; const delta=choice.getBoundingClientRect().top-anchorTop; if(Math.abs(delta)>.5) window.scrollTo({top:Math.max(0,window.scrollY+delta),left:0,behavior:'auto'});}; pinMenu(); requestAnimationFrame(pinMenu);}
 function renderCategoryTiles(country){const list=catalogRecipes().filter(r=>r.country===country), cats=orderedCategories(list); const choice=$('#categoryChoice'); choice.innerHTML=''; cats.forEach(cat=>{const count=list.filter(r=>r.category===cat).length; const a=document.createElement('button'); a.className='cat-tile'+(state.filterCat===cat?' active':'')+(state.filterCat && state.filterCat!==cat?' dim':''); a.innerHTML=`<div><strong>${cat}</strong><span>${count} блюд</span></div>`; a.onclick=()=>{vibe(10); const anchorTop=choice.getBoundingClientRect().top; state.filterCat = state.filterCat===cat ? null : cat; saveState(); refreshCountryCategory(country,anchorTop);}; choice.appendChild(a);}); $('#catControl').hidden=!state.filterCat;}
 function recipeCard(r){const badge=r.healthy?'<span class="recipe-badge">Полезный</span>':''; const origin=originLabel(r); const source=r.source==='custom'?'custom':'base'; return `<article class="recipe-card recipe-card-with-like">${badge}<button class="recipe-open-card" data-open="${esc(r.id)}" data-source="${source}" type="button"><h3>${esc(r.title)}</h3>${origin?`<div class="recipe-origin">${esc(origin)}</div>`:''}<div class="recipe-meta"><span>${esc(r.time||'—')}</span><span>${r.servings||1} порц.</span><span>${esc(r.difficulty||'легко')}</span></div></button>${likeButtonHtml(r.id,source,'')}</article>`}
-function normalizePantryTags(tags){return [...new Set((Array.isArray(tags)?tags:[]).flatMap(value=>String(value||'').split(/[,;\n]+/)).map(normalizePortionName).filter(value=>value.length>1))].slice(0,12);}
-function pantryReferenceCandidates(tag){const rows=[...foodNutritionReference,...productPortionWeights].filter(row=>referenceNameMatches(row,tag,{partial:true})); return [...new Set([tag,...rows.flatMap(referenceNames)])];}
-function pantryTagMatchesText(tag,text){const hay=normalizePortionName(text); if(!hay) return false; const words=hay.split(' '); return pantryReferenceCandidates(tag).some(candidate=>{if(hay.includes(candidate)) return true; return candidate.split(' ').some(token=>{const stem=token.length>=6?token.slice(0,-2):token.length>=4?token.slice(0,4):token; return stem.length>=4&&words.some(word=>word.startsWith(stem));});});}
-function recipePantryText(recipe){return [recipe?.title,...(Array.isArray(recipe?.ingredients)?recipe.ingredients:[]),...(Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition.map(item=>item?.name||''):[])].join(' ');}
-function pantryRecipeScore(recipe,tags){const text=recipePantryText(recipe); const matched=tags.filter(tag=>pantryTagMatchesText(tag,text)); return {matched:matched.length,all:tags.length>0&&matched.length===tags.length};}
+const productTagSystem=window.TABLE_BOOK_PRODUCT_TAGS||null;
+function normalizePantryTags(tags){return [...new Set((Array.isArray(tags)?tags:[]).flatMap(value=>String(value||'').split(/[,;\n]+/)).map(value=>productTagSystem?.resolve(value)||normalizePortionName(value)).filter(value=>value.length>1))].slice(0,12);}
+function pantryRecipeScore(recipe,tags){
+  if(productTagSystem){const result=productTagSystem.recipeMatches(recipe,tags); return {matched:result.matched.length,all:result.all,tags:result.tags};}
+  const ingredients=[...(Array.isArray(recipe?.ingredients)?recipe.ingredients:[]),...(Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition.map(item=>item?.name||''):[])].map(normalizePortionName);
+  const matched=tags.filter(tag=>ingredients.some(name=>name===tag));
+  return {matched:matched.length,all:tags.length>0&&matched.length===tags.length};
+}
 function addPantryTags(value){const next=normalizePantryTags([...(state.pantryTags||[]),value]); state.pantryTags=next; const input=$('#pantryInput'); if(input) input.value=''; saveState({sync:false}); renderPantryFinder();}
 function renderPantryFinder(){const tagsBox=$('#pantryTags'),results=$('#pantryResults'),note=$('#pantryNote'); if(!tagsBox||!results) return; const tags=normalizePantryTags(state.pantryTags); state.pantryTags=tags; tagsBox.innerHTML=tags.map(tag=>`<button class="pantry-tag" type="button" data-remove-pantry="${esc(tag)}"><span>${esc(tag)}</span><b aria-hidden="true">×</b></button>`).join(''); tagsBox.querySelectorAll('[data-remove-pantry]').forEach(btn=>btn.onclick=()=>{state.pantryTags=tags.filter(tag=>tag!==btn.dataset.removePantry);saveState({sync:false});renderPantryFinder();}); if(!tags.length){results.innerHTML='';if(note) note.textContent='Добавьте один или несколько продуктов. Сначала будут показаны блюда, где есть все выбранные ингредиенты.';return;} const ranked=allRecipeOptions().map(recipe=>({recipe,...pantryRecipeScore(recipe,tags)})).filter(item=>item.matched>0).sort((a,b)=>Number(b.all)-Number(a.all)||b.matched-a.matched||(a.recipe.title||'').localeCompare(b.recipe.title||'','ru')); const exact=ranked.filter(item=>item.all),shown=(exact.length?exact:ranked).slice(0,12); if(note) note.textContent=exact.length?`Найдено ${exact.length} ${plural(exact.length,['блюдо','блюда','блюд'])} со всеми выбранными продуктами.`:ranked.length?'Точного совпадения нет — показаны ближайшие варианты.':'По выбранным продуктам совпадений пока нет.'; results.innerHTML=shown.map(item=>recipeCard(item.recipe)).join(''); renderRecipeInteractions(results);}
-function bindPantryFinder(){const input=$('#pantryInput'),add=$('#pantryAdd'); if(add) add.onclick=()=>addPantryTags(input?.value||''); if(input) input.onkeydown=e=>{if(e.key==='Enter'||e.key===','){e.preventDefault();addPantryTags(input.value);}}; renderPantryFinder();}
+function bindPantryFinder(){const input=$('#pantryInput'),add=$('#pantryAdd'),list=$('#pantryProductTagOptions'); if(list&&productTagSystem) list.innerHTML=productTagSystem.availableTags.map(tag=>`<option value="${esc(tag)}"></option>`).join(''); if(add) add.onclick=()=>addPantryTags(input?.value||''); if(input) input.onkeydown=e=>{if(e.key==='Enter'||e.key===','){e.preventDefault();addPantryTags(input.value);}}; renderPantryFinder();}
 function ingredientGroupedRecipeCards(items){return recipesByIngredientGroup(items).map(({group,recipes:groupRecipes})=>`<section class="ingredient-group-block"><div class="ingredient-group-head"><h3>${esc(group)}</h3><span>${groupRecipes.length} ${plural(groupRecipes.length,['блюдо','блюда','блюд'])}</span></div><div class="recipe-grid">${groupRecipes.map(recipeCard).join('')}</div></section>`).join('');}
 function renderCountry(country){state.country=country; saveState(); const th=theme(country), list=catalogRecipes().filter(r=>r.country===country), cats=orderedCategories(list); $('#countryHead').style.setProperty('--head-bg', th.bg); $('#countryTitle').textContent=country; $('#countryNote').textContent=th.note; $('#countryMeta').innerHTML=`<span class="pill">${list.length} рецептов</span><span class="pill">${cats.length} категорий</span>`; renderCategoryTiles(country); const wrap=$('#countryRecipes'); wrap.innerHTML=''; const showCats=state.filterCat?[state.filterCat]:cats; showCats.forEach(cat=>{const v=visual(cat), items=list.filter(r=>r.category===cat); if(!items.length) return; const sec=document.createElement('section'); sec.className='cat-section'; sec.id='cat-'+slug(cat); sec.innerHTML=`<div class="cat-line"><h2>${cat}</h2></div>${ingredientGroupedRecipeCards(items)}`; wrap.appendChild(sec);}); renderRecipeInteractions(wrap); const countryView=$('#country'); if(state.route!=='country' || !countryView?.classList.contains('active')) showView('country');}
 function slug(s){return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-|-$/g,'')}
@@ -12071,6 +12077,8 @@ function currentMealMonthDate(){
 }
 function setMealMonthOffset(delta){const d=currentMealMonthDate(); d.setMonth(d.getMonth()+delta); state.mealMonth=monthKeyFromDate(d); saveState({sync:false}); document.body.classList.add('meal-calendar-switching'); if(window.__mealCalendarRaf) cancelAnimationFrame(window.__mealCalendarRaf); window.__mealCalendarRaf=requestAnimationFrame(()=>{renderMealCalendar(); loadMealMonth(state.mealMonth).finally(()=>requestAnimationFrame(()=>document.body.classList.remove('meal-calendar-switching')));});}
 function openMealCalendar(dateKey=null){ensureMealPlan(); if(!state.mealMonth) state.mealMonth=monthKeyFromDate(new Date()); if(dateKey){state.selectedMealDate=dateKey;state.mealMonth=monthKeyFromDayKey(dateKey)||state.mealMonth;state.shoppingWeekStart=localDateKey(startOfMealWeek(dateKey));} showView('mealview'); loadMealMonth(state.mealMonth).then(()=>{if(state.selectedMealDate) openMealDay(state.selectedMealDate,{scroll:!!dateKey}); else renderShoppingList();}); vibe(12);}
+function mealRecipeCalories(item){const recipe=getRecipeByRef(item); return recipe?Math.max(0,Number(nutritionOf(recipe)?.kcal)||0):0;}
+function mealDayCalories(day){return MEAL_SLOTS.reduce((total,[slot])=>total+(Array.isArray(day?.[slot])?day[slot]:[]).reduce((sum,item)=>sum+mealRecipeCalories(item),0),0);}
 function mealDateSummary(dateKey,limit=3,plan=null){
   const sourcePlan=plan||ensureMealPlan();
   const raw=sourcePlan[dateKey];
@@ -12084,8 +12092,9 @@ function mealDateSummary(dateKey,limit=3,plan=null){
       chips.push(`${label[0]}: ${(r?.title||item.title||'Рецепт').trim()}`);
     });
   });
+  const calories=mealDayCalories(day);
   const shown=chips.slice(0,limit).map(x=>`<span class="meal-chip">${esc(x)}</span>`).join('');
-  return shown+(chips.length>limit?`<span class="meal-more">+${chips.length-limit}</span>`:'');
+  return `${calories>0?`<span class="meal-calorie-chip">≈ ${fmt(calories)} ккал</span>`:''}${shown}${chips.length>limit?`<span class="meal-more">+${chips.length-limit}</span>`:''}`;
 }
 function mealCalendarMonthFirstDate(month){
   const start=new Date(month.getFullYear(),month.getMonth(),1);
@@ -12120,7 +12129,7 @@ function mealCalendarRenderSignature(month,{compact=false}={}){
     const ids=[];
     MEAL_SLOTS.forEach(([slot])=>{
       const list=Array.isArray(day?.[slot])?day[slot]:[];
-      list.forEach(item=>ids.push(`${slot}:${item.source||'base'}:${item.id||item.title||''}`));
+      list.forEach(item=>ids.push(`${slot}:${item.source||'base'}:${item.id||item.title||''}:${fmt(mealRecipeCalories(item))}`));
     });
     if(ids.length) parts.push(cell.key+'='+ids.join(','));
   });
@@ -12313,16 +12322,19 @@ function updateMealDayModeUi(){
 function mealDayStatus(text){const el=$('#mealDayStatus'); if(el) el.textContent=text||'';}
 function renderMealDayEditor(){
   const box=$('#mealDayEditor'); if(!box||!mealDraftDate||!mealDraft) return;
-  box.innerHTML=MEAL_SLOTS.map(([slot,label])=>{
+  const dayCalories=mealDayCalories(mealDraft);
+  const slots=MEAL_SLOTS.map(([slot,label])=>{
     const items=mealDraft[slot]||[];
     const list=items.length?items.map((item,index)=>{
       const r=getRecipeByRef(item);
       const title=r?.title||item.title||'Рецепт удалён';
-      const meta=r?[mealCountryLabel(Object.assign({source:item.source},r)), r.category].filter(Boolean).join(' • '):'Рецепт недоступен';
+      const calories=r?mealRecipeCalories(item):0;
+      const meta=r?[mealCountryLabel(Object.assign({source:item.source},r)),r.category,calories>0?`≈ ${fmt(calories)} ккал · 1 порция`:null].filter(Boolean).join(' • '):'Рецепт недоступен';
       return `<div class="meal-dish-row"><button class="meal-dish-open${r?'':' missing'}" type="button" data-open-meal="${esc(item.source+':'+item.id)}" ${r?'':'disabled'}><span>${esc(title)}</span><small>${esc(meta)}</small></button><button class="meal-remove" type="button" data-remove-meal="${slot}:${index}" aria-label="Убрать блюдо">×</button></div>`;
     }).join(''):'<div class="meal-empty">Пока нет блюд</div>';
     return `<div class="meal-slot"><div class="meal-slot-head"><div class="meal-slot-title"><h4>${label}</h4><span>${items.length} ${plural(items.length,['блюдо','блюда','блюд'])}</span></div><button class="meal-add-btn" type="button" data-add-meal="${slot}" aria-label="Добавить блюдо в ${label}">+</button></div><div class="meal-dishes">${list}</div></div>`;
   }).join('');
+  box.innerHTML=`<div class="meal-day-energy"><span>За день</span><strong>${dayCalories>0?`≈ ${fmt(dayCalories)} ккал`:'Блюда не выбраны'}</strong><small>Сумма рассчитана по одной порции каждого блюда.</small></div>${slots}`;
   $$('[data-add-meal]').forEach(btn=>btn.onclick=()=>openMealDishPicker(btn.dataset.addMeal));
   $$('[data-remove-meal]').forEach(btn=>btn.onclick=()=>{const [slot,index]=btn.dataset.removeMeal.split(':'); removeMealDish(slot,Number(index));});
   $$('[data-open-meal]').forEach(btn=>btn.onclick=()=>{const [source,id]=btn.dataset.openMeal.split(':'); closeMealDishPicker(); openRecipe(id,source);});
@@ -12514,6 +12526,36 @@ function userNickname(){
   return (cloudUser?.user_metadata?.nickname||cloudUser?.user_metadata?.name||'').trim();
 }
 function userDisplayName(){return userNickname()||'Вы';}
+const PROFILE_ACTIVITY=[
+  {value:1,label:'Низкая',factor:1.2},
+  {value:2,label:'Лёгкая',factor:1.375},
+  {value:3,label:'Средняя',factor:1.55},
+  {value:4,label:'Высокая',factor:1.725}
+];
+function normalizeHealthProfile(value=cloudProfile){
+  const sex=value?.sex==='male'||value?.sex==='female'?value.sex:'';
+  return {age:Math.max(0,Number(value?.age)||0),height:Math.max(0,Number(value?.height)||0),weight:Math.max(0,Number(value?.weight)||0),sex,activity:Math.min(4,Math.max(1,Number(value?.activity)||1))};
+}
+function estimateProfileEnergy(value=cloudProfile){
+  const profile=normalizeHealthProfile(value);
+  if(!profile.sex||profile.age<19||profile.height<120||profile.weight<30) return null;
+  const resting=10*profile.weight+6.25*profile.height-5*profile.age+(profile.sex==='male'?5:-161);
+  const activity=PROFILE_ACTIVITY.find(item=>item.value===profile.activity)||PROFILE_ACTIVITY[0];
+  return {resting:Math.round(resting),daily:Math.round(resting*activity.factor),activity,profile};
+}
+function healthProfileFromInputs(){
+  const checked=document.querySelector('input[name="settingsSex"]:checked');
+  return normalizeHealthProfile({age:$('#settingsAge')?.value,height:$('#settingsHeight')?.value,weight:$('#settingsWeight')?.value,sex:checked?.value||'',activity:$('#settingsActivity')?.value});
+}
+function renderProfileEnergyEstimate(value=null){
+  const profile=value||healthProfileFromInputs();
+  const activity=PROFILE_ACTIVITY.find(item=>item.value===profile.activity)||PROFILE_ACTIVITY[0];
+  const label=$('#settingsActivityLabel'); if(label) label.textContent=activity.label;
+  const box=$('#settingsEnergyEstimate'); if(!box) return;
+  const estimate=estimateProfileEnergy(profile);
+  if(!estimate){box.innerHTML='<span>Заполните пол, возраст, рост и вес</span><small>После этого появится ориентировочная суточная потребность.</small>';return;}
+  box.innerHTML=`<span>≈ ${estimate.daily.toLocaleString('ru-RU')} ккал в день</span><small>Обмен в покое ≈ ${estimate.resting.toLocaleString('ru-RU')} ккал. Ориентировочный расчёт для взрослого, не медицинская рекомендация.</small>`;
+}
 function updateCabinetInfo(){
   const display=userDisplayName();
   const email=cloudUser?.email||'—';
@@ -12522,6 +12564,10 @@ function updateCabinetInfo(){
   const em=$('#cabinetEmailMini'); if(em) em.textContent=email;
   const se=$('#settingsEmail'); if(se) se.textContent=email;
   const sn=$('#settingsNickname'); if(sn && document.activeElement!==sn) sn.value=userNickname();
+  const profile=normalizeHealthProfile();
+  [['settingsAge',profile.age||''],['settingsHeight',profile.height||''],['settingsWeight',profile.weight||''],['settingsActivity',profile.activity]].forEach(([id,value])=>{const input=$('#'+id);if(input&&document.activeElement!==input) input.value=value;});
+  document.querySelectorAll('input[name="settingsSex"]').forEach(input=>{input.checked=input.value===profile.sex;});
+  renderProfileEnergyEstimate(profile);
   const title=$('#topAuthTitle'); if(title && cloudUser) title.textContent=$('#accountSettings')?.hidden===false?'Настройки':'Личный кабинет';
 }
 function openCabinetHome(){
@@ -12569,8 +12615,9 @@ function openTopAuth(mode='login'){
 async function saveNickname(){
   if(!cloud || !cloudUser){const st=$('#settingsStatus'); if(st) st.textContent='Сначала войдите в аккаунт.'; return;}
   const nickname=($('#settingsNickname')?.value||'').trim().slice(0,32);
-  const st=$('#settingsStatus'); if(st) st.textContent='Сохраняю никнейм...';
-  rememberCloudProfile({nickname});
+  const health=healthProfileFromInputs();
+  const st=$('#settingsStatus'); if(st) st.textContent='Сохраняю профиль...';
+  rememberCloudProfile({nickname,...health});
   renderCloudUi();
   updateCabinetInfo();
   let authOk=false, cloudOk=false;
@@ -12578,7 +12625,7 @@ async function saveNickname(){
     const {data,error}=await cloud.auth.updateUser({data:{nickname}});
     if(error) throw error;
     if(data?.user) setCloudUser(data.user);
-    rememberCloudProfile({nickname});
+    rememberCloudProfile({nickname,...health});
     authOk=true;
   }catch(error){console.warn('Auth nickname update failed',error);}
   try{
@@ -12587,10 +12634,10 @@ async function saveNickname(){
   renderCloudUi();
   updateCabinetInfo();
   if(st){
-    if(authOk || cloudOk) st.textContent=nickname?'Никнейм сохранён и будет синхронизирован.':'Никнейм очищен. Сверху будет отображаться «Вы».';
-    else st.textContent='Никнейм сохранён на устройстве. Облачная синхронизация повторится автоматически.';
+    if(authOk || cloudOk) st.textContent='Профиль сохранён и будет синхронизирован между вашими устройствами.';
+    else st.textContent='Профиль сохранён на устройстве. Облачная синхронизация повторится автоматически.';
   }
-  cloudStatus((authOk||cloudOk)?'Настройки аккаунта обновлены.':'Никнейм сохранён локально, облачная синхронизация не подтвердилась.');
+  cloudStatus((authOk||cloudOk)?'Настройки аккаунта обновлены.':'Профиль сохранён локально, облачная синхронизация не подтвердилась.');
   vibe(12);
 }
 
@@ -12734,7 +12781,7 @@ function cloudSnapshot(){
     selectedMealDate:null,
     mealEditorOpen:false,
     mealStorageVersion:2,
-    profile:{email:cloudUser?.email||cloudProfile.email||'',nickname:userNickname()},
+    profile:{email:cloudUser?.email||cloudProfile.email||'',nickname:userNickname(),...normalizeHealthProfile()},
     likedRecipes:normalizeLikedRecipes(state.likedRecipes),
     encyTab:state.encyTab||'Все'
   };
@@ -13102,6 +13149,7 @@ function normalizeFoodNutritionRows(rows){return (Array.isArray(rows)?rows:[]).m
 function normalizeFoodStorageRows(rows){return (Array.isArray(rows)?rows:[]).map(row=>({canonical_name:String(row.canonical_name||'').trim(),aliases:Array.isArray(row.aliases)?row.aliases.map(String):[],fridge_days_min:Math.max(0,Number(row.fridge_days_min)||0),fridge_days_max:Math.max(0,Number(row.fridge_days_max)||0),note:String(row.note||'').trim(),source_name:String(row.source_name||'USDA FoodKeeper').trim(),source_url:String(row.source_url||'https://www.foodsafety.gov/keep-food-safe/foodkeeper-app').trim()})).filter(row=>row.canonical_name&&row.fridge_days_max>0);}
 function referenceNames(row){return [row?.canonical_name,...(Array.isArray(row?.aliases)?row.aliases:[])].map(normalizePortionName).filter(Boolean);}
 function referenceNameMatches(row,name,{partial=true}={}){const key=normalizePortionName(name); if(!key) return false; return referenceNames(row).some(candidate=>candidate===key || (partial && candidate.length>3 && (key.includes(candidate)||(key.length>=7&&candidate.includes(key)))));}
+function foodNutritionEntryExact(name){const key=normalizePortionName(name); return key?foodNutritionReference.find(row=>referenceNames(row).includes(key))||null:null;}
 function foodNutritionEntry(name){return foodNutritionReference.find(row=>referenceNameMatches(row,name,{partial:false}))||foodNutritionReference.find(row=>referenceNameMatches(row,name,{partial:true}))||null;}
 function foodStorageEntry(name){return foodStorageReference.find(row=>referenceNameMatches(row,name,{partial:false}))||foodStorageReference.find(row=>referenceNameMatches(row,name,{partial:true}))||null;}
 function hydrateProductPortionCache(){try{const cached=normalizeProductPortionRows(safeJson(localStorage.getItem(PRODUCT_PORTION_CACHE_KEY),[])); if(cached.length) productPortionWeights=cached;}catch(e){} updateProductPortionSuggestions();}
@@ -13128,10 +13176,10 @@ function productWeightFor(name,amount,unit){if(!(amount>0)) return {weight:0,gra
 function nutritionForProduct(product,mult=1){const k=(Number(product?.weight)||0)/100*mult; return {kcal:(Number(product?.kcal)||0)*k,protein:(Number(product?.protein)||0)*k,fat:(Number(product?.fat)||0)*k,carbs:(Number(product?.carbs)||0)*k};}
 function addNutrition(target,value){target.kcal+=value.kcal;target.protein+=value.protein;target.fat+=value.fat;target.carbs+=value.carbs;return target;}
 function productMeasureText(product,mult=1){const unit=product?.unit||'g'; const baseAmount=Number(product?.amount??product?.quantity??(unit==='g'?product?.weight:0))||0; const amount=baseAmount*mult; const storedWeight=Number(product?.weight)||0; const resolvedWeight=storedWeight||productWeightFor(product?.name||'',baseAmount,unit).weight; const weight=resolvedWeight*mult; if(unit==='g') return `${fmt(weight||amount)} г`; return `${fmt(amount)} ${productUnitLabel(unit)} ≈ ${fmt(weight)} г`;}
-function productRowHtml(row={}){const unit=row.unit||'g'; const amount=row.amount??row.quantity??(unit==='g'?(row.weight??''):''); return `<div class="product-row" data-product-row data-fdc-id="${esc(row.fdcId||row.fdc_id||'')}"><div class="product-name-cell"><input class="input" data-prod="name" list="productPortionNames" placeholder="Например, куриное яйцо" value="${esc(row.name||'')}"><small data-product-source></small></div><div class="product-quantity"><input class="input" data-prod="amount" type="number" min="0" step="0.1" inputmode="decimal" placeholder="кол-во" value="${esc(amount)}"><select class="select" data-prod="unit" aria-label="Единица измерения">${productUnitOptions(unit)}</select><small data-product-grams></small></div><input class="input" data-prod="kcal" type="number" min="0" step="0.1" placeholder="ккал" value="${esc(row.kcal??'')}"><input class="input" data-prod="protein" type="number" min="0" step="0.01" placeholder="б" value="${esc(row.protein??'')}"><input class="input" data-prod="fat" type="number" min="0" step="0.01" placeholder="ж" value="${esc(row.fat??'')}"><input class="input" data-prod="carbs" type="number" min="0" step="0.01" placeholder="у" value="${esc(row.carbs??'')}"><button class="product-remove" type="button" data-remove-product aria-label="Удалить продукт">×</button></div>`;}
-function updateProductNutritionSource(row,entry=null){const source=row?.querySelector('[data-product-source]'); if(!source) return; const name=row.querySelector('[data-prod="name"]')?.value||''; const match=entry||foodNutritionEntry(name); if(match && (row.dataset.autoNutrition==='1'||Number(row.dataset.fdcId)===Number(match.fdc_id))){source.textContent=`USDA · FDC ${match.fdc_id}`; source.title=`${match.source_name}, ${match.dataset_release}; значения на 100 г`; source.hidden=false;} else {source.textContent='';source.title='';source.hidden=true;}}
-function applyProductNutritionReference(row,{force=false}={}){if(!row) return false; const name=row.querySelector('[data-prod="name"]')?.value||''; const entry=foodNutritionEntry(name); const fields=['kcal','protein','fat','carbs'].map(key=>row.querySelector(`[data-prod="${key}"]`)); const hasManual=fields.some(input=>String(input?.value||'').trim()!=='') && row.dataset.autoNutrition!=='1'; if(!entry||(!force&&hasManual)){updateProductNutritionSource(row,entry); return false;} ['kcal','protein','fat','carbs'].forEach(key=>{const input=row.querySelector(`[data-prod="${key}"]`); if(input) input.value=fmt(entry[key]);}); row.dataset.autoNutrition='1'; row.dataset.fdcId=String(entry.fdc_id||''); row.dataset.referenceName=normalizePortionName(name); updateProductNutritionSource(row,entry); return true;}
-function renderProductRows(rows=[{}]){const box=$('#productRows'); if(!box) return; const list=rows.length?rows:[{}]; box.innerHTML=list.map(productRowHtml).join(''); box.querySelectorAll('[data-product-row]').forEach(row=>{const name=row.querySelector('[data-prod="name"]'); if(row.dataset.fdcId) row.dataset.autoNutrition='1'; updateProductNutritionSource(row); if(name){name.addEventListener('input',()=>{if(normalizePortionName(name.value)!==row.dataset.referenceName){row.dataset.autoNutrition='';row.dataset.fdcId='';updateProductNutritionSource(row);}}); name.addEventListener('change',()=>{applyProductNutritionReference(row);updateProductWeightHints();updateKbjuPreview();}); name.addEventListener('blur',()=>{applyProductNutritionReference(row);updateProductWeightHints();updateKbjuPreview();});}}); box.querySelectorAll('input,select').forEach(control=>{control.addEventListener('input',()=>{if(['kcal','protein','fat','carbs'].includes(control.dataset.prod||'')) control.closest('[data-product-row]').dataset.autoNutrition=''; updateProductWeightHints();updateKbjuPreview();}); control.addEventListener('change',()=>{updateProductWeightHints();updateKbjuPreview();});}); box.querySelectorAll('[data-remove-product]').forEach(btn=>btn.onclick=()=>{const rows=getProductRows({includeEmpty:true}); const idx=[...box.querySelectorAll('[data-remove-product]')].indexOf(btn); rows.splice(idx,1); renderProductRows(rows.length?rows:[{}]); updateKbjuPreview();}); updateProductWeightHints();}
+function productRowHtml(row={}){const unit=row.unit||'g'; const amount=row.amount??row.quantity??(unit==='g'?(row.weight??''):''); return `<div class="product-row" data-product-row data-fdc-id="${esc(row.fdcId||row.fdc_id||'')}"><div class="product-main"><div class="product-name-cell"><label>Продукт</label><input class="input" data-prod="name" list="productPortionNames" placeholder="Например, куриное яйцо" value="${esc(row.name||'')}"><small data-product-source></small></div><div class="product-quantity"><label>Количество</label><div><input class="input" data-prod="amount" type="number" min="0" step="0.1" inputmode="decimal" placeholder="100" value="${esc(amount)}"><select class="select" data-prod="unit" aria-label="Единица измерения">${productUnitOptions(unit)}</select></div><small data-product-grams></small></div></div><div class="product-macros"><span>Пищевая ценность на 100 г</span><label><b>Ккал</b><input class="input" data-prod="kcal" type="number" min="0" step="0.1" placeholder="—" value="${esc(row.kcal??'')}"></label><label><b>Белки</b><input class="input" data-prod="protein" type="number" min="0" step="0.01" placeholder="—" value="${esc(row.protein??'')}"></label><label><b>Жиры</b><input class="input" data-prod="fat" type="number" min="0" step="0.01" placeholder="—" value="${esc(row.fat??'')}"></label><label><b>Углеводы</b><input class="input" data-prod="carbs" type="number" min="0" step="0.01" placeholder="—" value="${esc(row.carbs??'')}"></label></div><button class="product-remove" type="button" data-remove-product aria-label="Удалить продукт">×</button></div>`;}
+function updateProductNutritionSource(row,entry=null){const source=row?.querySelector('[data-product-source]'); if(!source) return; const name=row.querySelector('[data-prod="name"]')?.value||''; const match=entry||foodNutritionEntry(name); const fields=['kcal','protein','fat','carbs'].map(key=>row.querySelector(`[data-prod="${key}"]`)); const hasValues=fields.some(input=>String(input?.value||'').trim()!==''); if(match && (row.dataset.autoNutrition==='1'||Number(row.dataset.fdcId)===Number(match.fdc_id))){source.textContent='Справочник · можно изменить по этикетке'; source.title=`${match.source_name}, ${match.dataset_release}; значения на 100 г`; source.hidden=false;} else if(name&&hasValues){source.textContent='Данные на 100 г изменены вручную';source.title='Используются введённые вами значения с этикетки';source.hidden=false;} else {source.textContent='';source.title='';source.hidden=true;}}
+function applyProductNutritionReference(row,{force=false,entry=null}={}){if(!row) return false; const name=row.querySelector('[data-prod="name"]')?.value||''; const match=entry||foodNutritionEntry(name); const fields=['kcal','protein','fat','carbs'].map(key=>row.querySelector(`[data-prod="${key}"]`)); const hasManual=fields.some(input=>String(input?.value||'').trim()!=='') && row.dataset.autoNutrition!=='1'; if(!match||(!force&&hasManual)){updateProductNutritionSource(row,match); return false;} ['kcal','protein','fat','carbs'].forEach(key=>{const input=row.querySelector(`[data-prod="${key}"]`); if(input) input.value=fmt(match[key]);}); const amount=row.querySelector('[data-prod="amount"]'),unit=row.querySelector('[data-prod="unit"]'); if(amount&&!String(amount.value||'').trim()){amount.value='100';if(unit) unit.value='g';} row.dataset.autoNutrition='1'; row.dataset.fdcId=String(match.fdc_id||''); row.dataset.referenceName=normalizePortionName(name); updateProductNutritionSource(row,match); return true;}
+function renderProductRows(rows=[{}]){const box=$('#productRows'); if(!box) return; const list=rows.length?rows:[{}]; box.innerHTML=list.map(productRowHtml).join(''); box.querySelectorAll('[data-product-row]').forEach(row=>{const name=row.querySelector('[data-prod="name"]'); if(row.dataset.fdcId) row.dataset.autoNutrition='1'; updateProductNutritionSource(row); if(name){name.addEventListener('input',()=>{const current=normalizePortionName(name.value);if(current!==row.dataset.referenceName){const wasAuto=row.dataset.autoNutrition==='1';row.dataset.autoNutrition='';row.dataset.fdcId='';const exact=foodNutritionEntryExact(name.value);if(exact) applyProductNutritionReference(row,{force:true,entry:exact});else{if(wasAuto) ['kcal','protein','fat','carbs'].forEach(key=>{const input=row.querySelector(`[data-prod="${key}"]`);if(input) input.value='';});updateProductNutritionSource(row);}}updateProductWeightHints();updateKbjuPreview();}); name.addEventListener('change',()=>{applyProductNutritionReference(row);updateProductWeightHints();updateKbjuPreview();}); name.addEventListener('blur',()=>{applyProductNutritionReference(row);updateProductWeightHints();updateKbjuPreview();});}}); box.querySelectorAll('input,select').forEach(control=>{control.addEventListener('input',()=>{if(['kcal','protein','fat','carbs'].includes(control.dataset.prod||'')){const row=control.closest('[data-product-row]');row.dataset.autoNutrition='';row.dataset.fdcId='';updateProductNutritionSource(row);} updateProductWeightHints();updateKbjuPreview();}); control.addEventListener('change',()=>{updateProductWeightHints();updateKbjuPreview();});}); box.querySelectorAll('[data-remove-product]').forEach(btn=>btn.onclick=()=>{const rows=getProductRows({includeEmpty:true}); const idx=[...box.querySelectorAll('[data-remove-product]')].indexOf(btn); rows.splice(idx,1); renderProductRows(rows.length?rows:[{}]); updateKbjuPreview();}); updateProductWeightHints();}
 function addProductRow(row={}){const rows=getProductRows({includeEmpty:true}); rows.push(row); renderProductRows(rows); updateKbjuPreview(); setTimeout(()=>$('#productRows [data-product-row]:last-child input')?.focus(),20);}
 function getProductRows({includeEmpty=false}={}){return $$('#productRows [data-product-row]').map(row=>{const get=n=>row.querySelector(`[data-prod="${n}"]`)?.value?.trim()||''; const name=get('name'),amount=Number(get('amount'))||0,unit=get('unit')||'g'; const resolved=productWeightFor(name,amount,unit); const ref=foodNutritionEntry(name); const item={name,amount,unit,weight:resolved.weight,gramsPerUnit:resolved.gramsPerUnit,kcal:Number(get('kcal'))||0,protein:Number(get('protein'))||0,fat:Number(get('fat'))||0,carbs:Number(get('carbs'))||0,fdcId:Number(row.dataset.fdcId)||null,nutritionSource:row.dataset.fdcId?ref?.source_name||'USDA FoodData Central':''}; return item;}).filter(item=>includeEmpty || item.name || item.amount || item.kcal || item.protein || item.fat || item.carbs);}
 function updateProductWeightHints(){const rows=$$('#productRows [data-product-row]'); rows.forEach(row=>{const value=n=>row.querySelector(`[data-prod="${n}"]`)?.value||''; const name=value('name'),amount=Number(value('amount'))||0,unit=value('unit')||'g',hint=row.querySelector('[data-product-grams]'); if(!hint) return; const resolved=productWeightFor(name,amount,unit); const hasNutrition=['kcal','protein','fat','carbs'].some(key=>String(value(key)).trim()!==''); if(!amount){hint.textContent='';hint.title='';hint.classList.remove('missing');return;} if(!(resolved.weight>0)){hint.textContent='Нет такой меры для этого продукта — выберите граммы';hint.title='';hint.classList.add('missing');return;} const product={weight:resolved.weight,kcal:Number(value('kcal'))||0,protein:Number(value('protein'))||0,fat:Number(value('fat'))||0,carbs:Number(value('carbs'))||0}; const contribution=nutritionForProduct(product); const weightText=unit==='g'?`${fmt(resolved.weight)} г`:`≈ ${fmt(resolved.weight)} г`; const nutritionText=hasNutrition?` · ${fmt(contribution.kcal)} ккал · Б ${fmt(contribution.protein)} · Ж ${fmt(contribution.fat)} · У ${fmt(contribution.carbs)}`:''; const note=resolved.entry?.note||''; hint.textContent=`${weightText}${nutritionText}${!hasNutrition&&note?` · ${note}`:''}`; hint.title=note; hint.classList.remove('missing');});}
@@ -13540,6 +13588,12 @@ async function resetBaseRecipeToOriginal(id){
   openRecipe(canonicalId,'base');
   return true;
 }
+function fodmapIngredientMark(value){
+  const result=window.TABLE_BOOK_FODMAP_REFERENCE?.classify(value);
+  if(!result) return '';
+  return `<i class="fodmap-dot ${result.level}" title="${esc(result.label)}" aria-label="FODMAP: ${esc(result.short)}"></i>`;
+}
+function fodmapLegendHtml(){return '<div class="fodmap-legend" aria-label="Подсказка FODMAP"><span><i class="fodmap-dot green"></i>низкий</span><span><i class="fodmap-dot yellow"></i>зависит от порции</span><span><i class="fodmap-dot red"></i>высокий</span><small>Ориентир: переносимость и размер порции индивидуальны.</small></div>';}
 function openRecipe(id,source='base',recipeOverride=null){
   clearRecipeStepTimers();
   const normalizedSource=source==='custom'?'custom':source==='shared'?'shared':'base';
@@ -13552,10 +13606,10 @@ function openRecipe(id,source='base',recipeOverride=null){
   const nut=r.nutrition||nutritionOf(r);
   const baseServings=r.servings||1;
   const nutritionProducts=Array.isArray(r.ingredientNutrition)?r.ingredientNutrition:[];
-  const ingredients=(list,m)=>(Array.isArray(list)?list:[]).map(x=>`<li><span>${esc(scaledIngredientText(x,m))}</span></li>`).join('');
+  const ingredients=(list,m)=>(Array.isArray(list)?list:[]).map(x=>`<li>${fodmapIngredientMark(x)}<span>${esc(scaledIngredientText(x,m))}</span></li>`).join('');
   const nutritionHtml=(n,s)=>`<div class="nutrition-total-label">На всё блюдо · ${s} ${plural(s,['порция','порции','порций'])}</div><div class="nutrition"><div class="ncard"><strong>${fmt(n.kcal*s)}</strong><span>ккал</span></div><div class="ncard"><strong>${fmt(n.protein*s)} г</strong><span>белки</span></div><div class="ncard"><strong>${fmt(n.fat*s)} г</strong><span>жиры</span></div><div class="ncard"><strong>${fmt(n.carbs*s)} г</strong><span>углеводы</span></div></div><div class="nnote">На 1 порцию: ${fmt(n.kcal)} ккал • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</div>`;
   const stepsHtml=(r.steps||[]).map(step=>{const sec=extractStepTimerSeconds(step); return `<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${esc(step)}</span></label>${sec?timerHtml(sec):''}</div>`;}).join('');
-  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul><div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${nutritionProducts.length?`<div id="productNutritionBreakdown">${productNutritionDetailsHtml(nutritionProducts,{servings:baseServings})}</div>`:''}${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса готового блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>${normalizedSource==='base'?recipeVersionActionsHtml(canonicalId):''}`;
+  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div><h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul>${fodmapLegendHtml()}<div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${nutritionProducts.length?`<div id="productNutritionBreakdown">${productNutritionDetailsHtml(nutritionProducts,{servings:baseServings})}</div>`:''}${r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и веса готового блюда ${r.weight||0} г.</div>`:''}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>${normalizedSource==='base'?recipeVersionActionsHtml(canonicalId):''}`;
   function rerender(){
     const raw=Number($('#portionInput').value); const s=Number.isFinite(raw)&&raw>0?raw:baseServings;
     $('#portionInput').value=s;
@@ -13770,6 +13824,8 @@ bindClick('cabinetSettingsBtn',openAccountSettings);
 bindClick('cabinetUserEmail',openAccountSettings);
 bindClick('accountBackBtn',openCabinetHome);
 bindClick('accountSaveNickname',saveNickname);
+['settingsAge','settingsHeight','settingsWeight','settingsActivity'].forEach(id=>{const input=$('#'+id);if(input) input.addEventListener('input',()=>renderProfileEnergyEstimate());});
+document.querySelectorAll('input[name="settingsSex"]').forEach(input=>input.addEventListener('change',()=>renderProfileEnergyEstimate()));
 bindClick('cloudSignIn',cloudSignIn);
 bindClick('cloudSignUp',cloudSignUp);
 bindClick('cloudSignOut',cloudSignOut);
