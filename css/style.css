@@ -6435,7 +6435,8 @@ body.dark .brand-mark::after {
 /* Pantry search, verified nutrition references and weekly shopping planner. */
 .product-name-cell{display:grid;gap:3px;min-width:0}
 .product-name-cell [data-product-source]{min-height:13px;padding-left:8px;color:var(--muted);font-size:9.5px;line-height:1.2;text-align:left}
-.pantry-finder{display:grid;gap:10px;width:min(100%,760px);margin:4px auto 24px;padding:8px;border:1px solid color-mix(in srgb,var(--line) 66%,transparent);border-radius:999px;background:color-mix(in srgb,var(--paper) 86%,transparent);box-shadow:0 8px 22px color-mix(in srgb,var(--ink) 7%,transparent)}
+.pantry-finder{display:grid;align-items:center;gap:10px;width:min(100%,760px);margin:4px auto 24px;padding:8px;border:1px solid color-mix(in srgb,var(--line) 66%,transparent);border-radius:999px;background:color-mix(in srgb,var(--paper) 86%,transparent);box-shadow:0 8px 22px color-mix(in srgb,var(--ink) 7%,transparent)}
+.pantry-finder>[hidden]{display:none!important}
 .pantry-finder:has(.pantry-tags:not([hidden])){border-radius:24px;padding-bottom:16px}
 .pantry-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
 .pantry-entry .input{height:44px;border-radius:999px;text-align:center}
