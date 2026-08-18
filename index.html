@@ -12,8 +12,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png" />
 <link rel="manifest" href="./site.webmanifest" />
-<link rel="preload" href="./css/style.css?v=20260818-nutrition" as="style" />
-<link rel="stylesheet" href="./css/style.css?v=20260818-nutrition" />
+<link rel="preload" href="./css/style.css?v=20260818-compact-search" as="style" />
+<link rel="stylesheet" href="./css/style.css?v=20260818-compact-search" />
 </head>
 <body>
 <div class="shell">
@@ -23,7 +23,7 @@
 <div class="home-planner-row"><button class="tab-card home-my-card" id="myRecipesCard" type="button"><div class="tab-icon" id="myRecipesIcon"></div><div class="home-card-copy"><b>Мои рецепты</b><span>Тут ты можешь хранить свои блюда</span><small id="myRecipesCount">0 записей</small></div></button><button class="tab-card home-menu-card" id="homeMealCalendarCard" type="button"><div class="tab-icon" id="mealCalendarIcon"></div><div class="home-card-copy"><b>Меню на неделю</b><span>Тут ты можешь записать меню на неделю или месяц</span><small id="mealCalendarCount">0 дней</small></div></button></div>
 <div class="home-tools-row" id="homeToolsRow"><button class="tab-card home-liked-card" id="likedRecipesCard" type="button"><div class="tab-icon liked-tab-icon" id="likedRecipesIcon" aria-hidden="true">♡</div><div class="home-card-copy"><b>Мне нравится</b><span>Блюда, отмеченные сердечком</span><small id="likedRecipesCount">0 блюд</small></div></button><button class="tab-card home-encyclopedia-card" id="encyclopediaCard" type="button"><div class="tab-icon encyclopedia-tab-icon" id="encyclopediaIcon" aria-hidden="true">⌁</div><div class="home-card-copy"><b>Энциклопедия</b><span>Посуда, техники, термины и питание</span><small>Открыть справочник</small></div></button></div>
 <div class="section-title cuisine-title"><div><h2>Кухни</h2><p>Рецепты со всего мира.</p></div></div>
-<details class="pantry-finder" id="pantryFinder"><summary><span>Что приготовить из продуктов</span><small>Найти блюда по содержимому холодильника</small></summary><div class="pantry-finder-body"><div class="pantry-entry"><input class="input" id="pantryInput" type="text" list="pantryProductTagOptions" autocomplete="off" placeholder="Например: курица, кабачок, морковь"><datalist id="pantryProductTagOptions"></datalist><button class="btn ghost compact-btn" id="pantryAdd" type="button">Добавить</button></div><div class="pantry-tags" id="pantryTags"></div><p class="pantry-note" id="pantryNote">Добавьте один или несколько продуктов. Поиск учитывает точные продуктовые теги и варианты написания.</p><div class="recipe-grid pantry-results" id="pantryResults"></div></div></details>
+<section class="pantry-finder" id="pantryFinder" aria-label="Что приготовить из продуктов"><div class="pantry-entry"><input class="input" id="pantryInput" type="search" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Что приготовить из продуктов"><button class="btn ghost compact-btn" id="pantryAdd" type="button">Найти</button></div><div class="pantry-tags" id="pantryTags"></div><p class="pantry-note" id="pantryNote" hidden></p><div class="recipe-grid pantry-results" id="pantryResults"></div></section>
 <div class="cuisine-carousel-shell" id="cuisineCarouselShell" aria-label="Карусель кухонь"><div class="country-grid cuisine-carousel" id="countryGrid"></div></div></section>
 <section id="country" class="view"><section class="country-head" id="countryHead"><div><button class="back-btn" id="backBtn">← Назад</button><h1 id="countryTitle"></h1><p id="countryNote"></p></div><div class="country-meta" id="countryMeta"></div></section><div class="section-title"><div><h2>Меню</h2><p>Выберите тип блюда.</p></div></div><div class="category-choice" id="categoryChoice"></div><div class="cat-control" id="catControl" hidden><button class="clear-filter" id="clearCat">Показать всё</button></div><div id="countryRecipes"></div></section>
 <section id="likedview" class="view"><section class="custom-head"><div><button class="back-btn" id="likedBackBtn" type="button">← Назад</button><h1>Мне нравится</h1><p>Здесь собраны рецепты, которые вы отметили сердечком.</p></div><div class="country-meta"><span class="pill" id="likedMetaCount">0 блюд</span></div></section><div id="likedRecipesList" class="recipe-grid liked-recipes-grid"></div><div id="likedEmpty" class="empty-box" hidden>Пока нет сохранённых блюд. Нажмите сердечко на карточке или на странице рецепта.</div></section>
@@ -50,10 +50,10 @@
 <script src="./js/korean-recipes.js" defer></script>
 <script src="./js/russian-recipes.js" defer></script>
 <script src="./js/sous-vide-recipes.js?v=20260715-stylus-swipe" defer></script>
-<script src="./js/food-reference.js?v=20260818-nutrition" defer></script>
+<script src="./js/food-reference.js?v=20260818-compact-search" defer></script>
 <script src="./js/product-portions.js?v=20260818-planner" defer></script>
 <script src="./js/product-tags.js?v=20260818-profile" defer></script>
 <script src="./js/fodmap-reference.js?v=20260818-profile" defer></script>
-<script src="./js/app.js?v=20260818-nutrition3" defer></script>
+<script src="./js/app.js?v=20260818-compact-search" defer></script>
 </body>
 </html>

@@ -6435,27 +6435,27 @@ body.dark .brand-mark::after {
 /* Pantry search, verified nutrition references and weekly shopping planner. */
 .product-name-cell{display:grid;gap:3px;min-width:0}
 .product-name-cell [data-product-source]{min-height:13px;padding-left:8px;color:var(--muted);font-size:9.5px;line-height:1.2;text-align:left}
-.pantry-finder{width:min(100%,920px);margin:4px auto 24px;border:1px solid color-mix(in srgb,var(--line) 66%,transparent);border-radius:22px;background:color-mix(in srgb,var(--paper) 82%,transparent);box-shadow:0 8px 22px color-mix(in srgb,var(--ink) 7%,transparent);overflow:hidden}
-.pantry-finder>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:14px 18px;cursor:pointer;list-style:none;color:var(--ink)}
-.pantry-finder>summary::-webkit-details-marker{display:none}
-.pantry-finder>summary:after{content:'⌄';font-size:18px;color:var(--muted);transition:transform .2s ease}
-.pantry-finder[open]>summary:after{transform:rotate(180deg)}
-.pantry-finder>summary span{font-size:15px;font-weight:560}
-.pantry-finder>summary small{margin-left:auto;color:var(--muted);font-size:11.5px;font-weight:400}
-.pantry-finder-body{display:grid;gap:12px;padding:0 18px 18px;border-top:1px solid color-mix(in srgb,var(--line) 42%,transparent)}
-.pantry-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding-top:14px}
+.pantry-finder{display:grid;gap:10px;width:min(100%,760px);margin:4px auto 24px;padding:8px;border:1px solid color-mix(in srgb,var(--line) 66%,transparent);border-radius:999px;background:color-mix(in srgb,var(--paper) 86%,transparent);box-shadow:0 8px 22px color-mix(in srgb,var(--ink) 7%,transparent)}
+.pantry-finder:has(.pantry-tags:not([hidden])){border-radius:24px;padding-bottom:16px}
+.pantry-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.pantry-entry .input{height:44px;border-radius:999px;text-align:center}
+.pantry-entry .btn{min-width:88px;height:44px;border-radius:999px;padding-inline:18px}
 .pantry-tags{display:flex;flex-wrap:wrap;gap:7px;min-height:0}
 .pantry-tag{display:inline-flex;align-items:center;gap:7px;min-height:31px;padding:6px 10px 6px 12px;border:1px solid color-mix(in srgb,var(--line) 74%,transparent);border-radius:999px;background:var(--paper);color:var(--ink);font-size:12px;box-shadow:none!important}
 .pantry-tag b{font-size:15px;font-weight:400;color:var(--muted)}
 .pantry-note{margin:0;color:var(--muted);font-size:11.5px;line-height:1.4;text-align:center}
 .pantry-results{margin-top:2px}
-.shopping-panel{width:min(100%,944px);margin:22px auto 0!important;padding:20px!important;display:grid;gap:14px;border-radius:28px!important}
+.shopping-panel{width:min(100%,560px);margin:22px auto 0!important;padding:20px!important;display:grid;gap:12px;border-radius:28px!important;transition:width .22s ease}
+.shopping-panel.shopping-panel-wide{width:min(100%,760px)}
 .shopping-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .shopping-head h3{margin:0 0 4px;font-size:clamp(21px,2.4vw,27px);font-weight:520}
 .shopping-head p,.shopping-summary{margin:0;color:var(--muted);font-size:12px;line-height:1.4}
 .shopping-nav{display:flex;gap:6px;align-items:center}
-.shopping-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.shopping-list{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+.shopping-list.shopping-list-split{grid-template-columns:repeat(2,minmax(0,1fr))}
 .shopping-group{display:grid;gap:7px;min-width:0}
+.shopping-group-items{display:grid;grid-template-columns:1fr;gap:0;min-width:0}
+.shopping-group-wide .shopping-group-items{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}
 .shopping-group h4{margin:0 0 2px;font-size:13px;font-weight:550;color:var(--ink)}
 .shopping-item{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:center;gap:9px;padding:10px 11px;border:1px solid color-mix(in srgb,var(--line) 55%,transparent);border-radius:16px;background:color-mix(in srgb,var(--paper2) 65%,transparent);cursor:pointer}
 .shopping-item input{width:17px;height:17px;accent-color:var(--gold)}
@@ -6470,21 +6470,20 @@ body.dark .pantry-finder,body.dark .shopping-panel{background:color-mix(in srgb,
 
 @media(max-width:760px){
   .product-row .product-name-cell{grid-column:1 / -1}
-  .pantry-finder>summary small{display:none}
-  .pantry-entry{grid-template-columns:1fr}
-  .pantry-entry .btn{width:100%}
   .shopping-panel{padding:15px!important;border-radius:23px!important}
   .shopping-head{display:grid;justify-items:center;text-align:center}
   .shopping-nav{justify-content:center;flex-wrap:wrap}
-  .shopping-list{grid-template-columns:1fr}
+  .shopping-list.shopping-list-split,.shopping-group-wide .shopping-group-items{grid-template-columns:1fr}
 }
 
 @media(max-width:520px){
   .product-row .product-name-cell{grid-column:1 / -1}
   .product-name-cell [data-prod="name"]{grid-column:auto}
-  .pantry-finder{border-radius:18px;margin-bottom:18px}
-  .pantry-finder>summary{padding:12px 14px;min-height:48px}
-  .pantry-finder-body{padding:0 12px 14px}
+  .pantry-finder{margin-bottom:18px;padding:6px}
+  .pantry-finder:has(.pantry-tags:not([hidden])){border-radius:20px;padding-bottom:12px}
+  .pantry-entry{gap:6px}
+  .pantry-entry .input{height:42px;font-size:12px}
+  .pantry-entry .btn{min-width:70px;height:42px;padding-inline:12px}
   .shopping-item{grid-template-columns:20px minmax(0,1fr)}
   .shopping-item em{grid-column:2;justify-self:start}
 }
