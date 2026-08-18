@@ -6377,8 +6377,6 @@ body.dark .brand-mark::after {
 #settingsActivity{width:100%;height:5px;margin:3px 0;appearance:none;border:0;border-radius:999px;background:linear-gradient(90deg,var(--gold),rgba(201,164,95,.24));box-shadow:none!important;padding:0}
 #settingsActivity::-webkit-slider-thumb{appearance:none;width:21px;height:21px;border-radius:50%;background:var(--paper2);border:1px solid var(--gold);box-shadow:0 3px 10px rgba(70,46,33,.18)}
 #settingsActivity::-moz-range-thumb{width:21px;height:21px;border-radius:50%;background:var(--paper2);border:1px solid var(--gold);box-shadow:0 3px 10px rgba(70,46,33,.18)}
-.activity-icons{display:flex;justify-content:space-between;align-items:flex-end;color:var(--muted);line-height:1}
-.activity-icons svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .profile-energy{padding:12px 13px;border-radius:18px;background:rgba(201,164,95,.10);border:1px solid rgba(201,164,95,.25);display:grid;gap:4px;text-align:left}
 .profile-energy span{font-size:15px;color:var(--ink)}
 .profile-energy small{font-size:10.5px;line-height:1.4;color:var(--muted)}
@@ -6610,4 +6608,136 @@ button::-moz-focus-inner {
   .my-ingredient-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* 1.0.15 — personal nutrition dashboard and notebook shopping list */
+.account-settings,
+.account-settings .account-hint,
+.account-settings .account-label,
+.profile-measures label,
+.profile-sex legend,
+.profile-activity-head,
+.profile-energy{
+  text-align:center !important;
+}
+.profile-sex-options span{
+  min-height:44px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:500;
+}
+.profile-activity-head{
+  display:grid;
+  justify-items:center;
+  gap:3px;
+}
+.activity-labels{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:4px;
+  color:var(--muted);
+  font-size:8.5px;
+  line-height:1.15;
+  text-align:center;
+}
+.activity-labels span{overflow-wrap:anywhere}
+.profile-energy{justify-items:center}
+
+.ingredient-entry{
+  display:grid;
+  gap:7px;
+  margin-top:18px;
+  text-align:center;
+}
+.ingredient-entry small{
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+}
+.ingredient-entry .recipe-textarea{min-height:118px;text-align:left}
+.product-calc-head{text-align:center !important}
+.product-calc-head>div{margin-inline:auto}
+.product-calc-head h4,.product-calc-head p{text-align:center}
+.product-name-cell>label,.product-name-cell small,.product-quantity>label,.product-quantity small,.product-macros>span{text-align:center !important}
+.product-name-cell [data-prod="name"]{text-align:center !important}
+
+.meal-day-energy{
+  display:block !important;
+  padding:16px !important;
+  text-align:center !important;
+}
+.meal-energy-title{
+  display:grid;
+  gap:4px;
+  justify-items:center;
+  margin-bottom:13px;
+}
+.meal-energy-title span{font-size:11px;color:var(--muted)}
+.meal-energy-title strong{font-size:18px;font-weight:500!important;color:var(--ink)}
+.meal-nutrition-progress{display:grid;gap:10px}
+.meal-macro-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.meal-nutrient{display:grid;grid-template-columns:1fr auto;gap:5px 8px;align-items:center;min-width:0;text-align:left}
+.meal-nutrient>div:first-child{display:flex;justify-content:space-between;gap:8px;align-items:baseline;min-width:0}
+.meal-nutrient span,.meal-nutrient b,.meal-nutrient small{font-size:10px;font-weight:500;color:var(--muted)}
+.meal-nutrient b{color:var(--ink);overflow-wrap:anywhere;text-align:right}
+.meal-nutrient-track{grid-column:1;height:7px;border-radius:999px;background:color-mix(in srgb,var(--line) 38%,transparent);overflow:hidden;box-shadow:inset 0 1px 2px rgba(67,50,38,.08)}
+.meal-nutrient-track i{display:block;height:100%;border-radius:inherit;background:var(--gold);transition:width .28s ease}
+.meal-nutrient.protein .meal-nutrient-track i{background:#8da388}
+.meal-nutrient.fat .meal-nutrient-track i{background:#c6a765}
+.meal-nutrient.carbs .meal-nutrient-track i{background:#a68b79}
+.meal-nutrient.calories{padding-bottom:2px}
+.meal-day-energy>small{display:block;margin-top:12px;color:var(--muted);font-size:9.8px;line-height:1.4;text-align:center}
+
+.shopping-panel{
+  position:relative;
+  overflow:hidden;
+  padding:22px 24px 22px 38px !important;
+  background:var(--paper) !important;
+}
+.shopping-panel::before{
+  content:"";
+  position:absolute;
+  top:18px;
+  bottom:18px;
+  left:22px;
+  width:1px;
+  background:color-mix(in srgb,#bd7770 44%,transparent);
+  pointer-events:none;
+}
+.shopping-head{align-items:center;text-align:center}
+.shopping-head>div{flex:1;text-align:center}
+.shopping-head h3,.shopping-head p,.shopping-summary{text-align:center}
+.shopping-summary{padding:0 8px}
+.shopping-group{gap:0}
+.shopping-group h4{
+  padding:0 10px 8px;
+  text-align:left;
+  font-size:13px;
+  letter-spacing:.015em;
+}
+.shopping-item{
+  position:relative;
+  min-height:48px;
+  padding:9px 10px;
+  border:0;
+  border-bottom:1px solid color-mix(in srgb,var(--line) 58%,transparent);
+  border-radius:0;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+.shopping-item input{accent-color:var(--gold)}
+.shopping-item b{font-size:13px;font-weight:500}
+.shopping-item small{font-size:10.5px}
+.shopping-item em{background:transparent;border:1px solid color-mix(in srgb,var(--line) 62%,transparent)}
+body.dark .shopping-panel{background:var(--paper) !important}
+
+@media(max-width:620px){
+  .activity-labels{font-size:7.6px;gap:2px}
+  .meal-macro-progress{grid-template-columns:1fr}
+  .meal-nutrient>div:first-child{justify-content:space-between}
+  .shopping-panel{padding:18px 14px 18px 29px !important}
+  .shopping-panel::before{left:17px}
+  .shopping-head{justify-items:center}
+  .shopping-nav{justify-content:center}
+  .shopping-group h4{text-align:center}
 }
