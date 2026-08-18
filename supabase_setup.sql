@@ -544,3 +544,103 @@ set aliases = excluded.aliases,
     note = excluded.note,
     sort_order = excluded.sort_order,
     updated_at = now();
+
+-- Verified public food references used by both the web app and the packaged
+-- Android app. They are read-only for clients; only migrations can change them.
+create table if not exists public.food_nutrition_reference (
+  canonical_name text primary key,
+  aliases text[] not null default '{}'::text[],
+  kcal numeric(10,3) not null,
+  protein numeric(10,3) not null,
+  fat numeric(10,3) not null,
+  carbs numeric(10,3) not null,
+  fdc_id bigint not null unique,
+  data_type text not null,
+  dataset_release date not null,
+  source_name text not null default 'USDA FoodData Central',
+  source_url text not null default 'https://fdc.nal.usda.gov/',
+  updated_at timestamptz not null default now(),
+  constraint food_nutrition_name_not_blank check (length(btrim(canonical_name)) > 0),
+  constraint food_nutrition_values_nonnegative check (kcal >= 0 and protein >= 0 and fat >= 0 and carbs >= 0)
+);
+
+alter table public.food_nutrition_reference enable row level security;
+revoke all on table public.food_nutrition_reference from public, anon, authenticated;
+grant select on table public.food_nutrition_reference to anon, authenticated;
+drop policy if exists "Anyone can read food nutrition reference" on public.food_nutrition_reference;
+create policy "Anyone can read food nutrition reference"
+on public.food_nutrition_reference for select to anon, authenticated using (true);
+
+insert into public.food_nutrition_reference
+  (canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release)
+values
+  ('яблоко',array['яблоки','яблоко гала']::text[],54.9,0.133,0.15,14.8,1750341,'Foundation','2026-04-30'),
+  ('банан',array['бананы']::text[],97,0.74,0.29,23,1105314,'Foundation','2026-04-30'),
+  ('говяжий фарш 90/10',array['говяжий фарш','фарш из говядины']::text[],190,18.2,12.8,0,2514743,'Foundation','2026-04-30'),
+  ('морковь',array['морковка']::text[],45,0.941,0.351,10.3,2258586,'Foundation','2026-04-30'),
+  ('фета',array['сыр фета']::text[],273,19.7,19.1,5.58,2259796,'Foundation','2026-04-30'),
+  ('куриная грудка',array['курица','куриное филе','филе куриной грудки','грудка куриная']::text[],112,22.5,1.93,0,2646170,'Foundation','2026-04-30'),
+  ('огурец',array['огурцы']::text[],13.9,0.625,0.178,2.95,2346406,'Foundation','2026-04-30'),
+  ('куриное яйцо',array['яйцо','яйца','яйцо куриное']::text[],148,12.4,9.96,0.96,748967,'Foundation','2026-04-30'),
+  ('пшеничная мука',array['мука','мука пшеничная','мука общего назначения']::text[],358,13.1,1.48,73.2,789951,'Foundation','2026-04-30'),
+  ('чеснок',array['зубчик чеснока','зубчики чеснока']::text[],143,6.62,0.38,28.2,1104647,'Foundation','2026-04-30'),
+  ('молоко цельное',array['молоко','цельное молоко']::text[],60,3.27,3.2,4.63,746782,'Foundation','2026-04-30'),
+  ('овсяные хлопья',array['овсянка','геркулес','хлопья овсяные']::text[],379,13.5,5.89,68.7,2346396,'Foundation','2026-04-30'),
+  ('репчатый лук',array['лук','луковица','лук репчатый']::text[],38,0.83,0.05,8.61,790646,'Foundation','2026-04-30'),
+  ('арахисовая паста',array['паста арахисовая','арахисовое масло']::text[],589,24,49.4,22.7,2262072,'Foundation','2026-04-30'),
+  ('свиная вырезка',array['свинина','вырезка свиная']::text[],125,21.6,3.9,0,2646169,'Foundation','2026-04-30'),
+  ('картофель',array['картошка','картофель очищенный']::text[],71.6,1.81,0.264,16,2346403,'Foundation','2026-04-30'),
+  ('рис белый сухой',array['рис','белый рис','рис длиннозёрный','рис длиннозерный']::text[],370,7.04,1.03,80.3,2512381,'Foundation','2026-04-30'),
+  ('томат',array['помидор','помидоры','томаты','томат рома']::text[],19,0.696,0.425,3.84,1999634,'Foundation','2026-04-30'),
+  ('натуральный йогурт',array['йогурт','йогурт натуральный','йогурт без добавок']::text[],77.3,3.82,4.48,5.57,2259793,'Foundation','2026-04-30'),
+  ('кабачок',array['кабачки','цуккини']::text[],17,1.21,0.32,3.11,169291,'SR Legacy','2018-04-01'),
+  ('оливковое масло',array['масло оливковое','оливковое масло extra virgin']::text[],884,0,100,0,171413,'SR Legacy','2018-04-01'),
+  ('лосось атлантический',array['лосось','сёмга','семга','филе лосося']::text[],142,19.8,6.34,0,173686,'SR Legacy','2018-04-01'),
+  ('мёд',array['мед']::text[],304,0.3,0,82.4,169640,'SR Legacy','2018-04-01'),
+  ('сахар',array['сахарный песок','сахар белый']::text[],387,0,0,100,169655,'SR Legacy','2018-04-01')
+on conflict (canonical_name) do update set
+  aliases=excluded.aliases,kcal=excluded.kcal,protein=excluded.protein,fat=excluded.fat,
+  carbs=excluded.carbs,fdc_id=excluded.fdc_id,data_type=excluded.data_type,
+  dataset_release=excluded.dataset_release,source_name=excluded.source_name,
+  source_url=excluded.source_url,updated_at=now();
+
+create table if not exists public.food_storage_reference (
+  canonical_name text primary key,
+  aliases text[] not null default '{}'::text[],
+  fridge_days_min smallint not null,
+  fridge_days_max smallint not null,
+  note text not null default '',
+  source_name text not null default 'USDA FoodKeeper',
+  source_url text not null default 'https://www.foodsafety.gov/keep-food-safe/foodkeeper-app',
+  updated_at timestamptz not null default now(),
+  constraint food_storage_name_not_blank check (length(btrim(canonical_name)) > 0),
+  constraint food_storage_days_valid check (fridge_days_min >= 0 and fridge_days_max >= fridge_days_min)
+);
+
+alter table public.food_storage_reference enable row level security;
+revoke all on table public.food_storage_reference from public, anon, authenticated;
+grant select on table public.food_storage_reference to anon, authenticated;
+drop policy if exists "Anyone can read food storage reference" on public.food_storage_reference;
+create policy "Anyone can read food storage reference"
+on public.food_storage_reference for select to anon, authenticated using (true);
+
+insert into public.food_storage_reference
+  (canonical_name,aliases,fridge_days_min,fridge_days_max,note)
+values
+  ('сырая птица',array['курица','куриная грудка','куриное филе','индейка','утка']::text[],1,2,'Храните при 4 °C или ниже; для более позднего дня недели заморозьте.'),
+  ('сырая рыба и морепродукты',array['лосось','сёмга','семга','рыба','креветки','мидии','кальмар','тунец','треска']::text[],1,2,'Покупайте максимально близко ко дню приготовления.'),
+  ('мясной фарш',array['говяжий фарш','свиной фарш','фарш','рубленое мясо']::text[],1,2,'Храните при 4 °C или ниже.'),
+  ('сырое мясо куском',array['говядина','свинина','свиная вырезка','телятина','баранина','стейк']::text[],3,5,'Соблюдайте срок на упаковке и холодовую цепь.'),
+  ('яйца',array['куриное яйцо','яйцо','яйца']::text[],21,35,'Храните в холодильнике в заводской упаковке.'),
+  ('молочные продукты',array['молоко','сливки','йогурт','кефир','творог','сметана']::text[],3,7,'После вскрытия ориентируйтесь на маркировку производителя.'),
+  ('мягкий сыр',array['моцарелла','фета','брынза','рикотта']::text[],3,7,'После вскрытия держите в холодильнике и учитывайте рассол.'),
+  ('зелень и листовые овощи',array['зелень','базилик','петрушка','укроп','кинза','салат','шпинат']::text[],2,5,'Не мойте заранее, если это ускоряет увядание.'),
+  ('грибы',array['грибы','шампиньоны','вешенки']::text[],3,5,'Храните сухими в воздухопроницаемой упаковке.'),
+  ('ягоды',array['клубника','малина','черника','смородина','ягоды']::text[],2,4,'Переберите и мойте непосредственно перед использованием.'),
+  ('нежные овощи',array['кабачок','цуккини','огурец','томат','помидор','баклажан','болгарский перец']::text[],4,7,'Проверьте зрелость: очень спелые плоды используйте раньше.'),
+  ('корнеплоды',array['морковь','свёкла','свекла','редис']::text[],7,21,'Удалите ботву и храните в овощном отсеке.'),
+  ('готовые блюда',array['готовое блюдо','суп','бульон','рагу']::text[],3,4,'Охладите в течение двух часов и храните закрытым.')
+on conflict (canonical_name) do update set
+  aliases=excluded.aliases,fridge_days_min=excluded.fridge_days_min,
+  fridge_days_max=excluded.fridge_days_max,note=excluded.note,
+  source_name=excluded.source_name,source_url=excluded.source_url,updated_at=now();
