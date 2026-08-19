@@ -6731,6 +6731,24 @@ button::-moz-focus-inner {
 .shopping-item em{background:transparent;border:1px solid color-mix(in srgb,var(--line) 62%,transparent)}
 body.dark .shopping-panel{background:var(--paper) !important}
 
+.recipe-timing{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin:4px 0 16px;
+}
+.recipe-timing span{
+  display:grid;
+  gap:3px;
+  padding:9px 6px;
+  border-radius:15px;
+  background:var(--paper);
+  box-shadow:var(--pressed);
+  text-align:center;
+}
+.recipe-timing small{font-size:9px;line-height:1.2;color:var(--muted)}
+.recipe-timing b{font-size:11px;line-height:1.25;font-weight:600;color:var(--ink)}
+
 @media(max-width:620px){
   .activity-labels{font-size:7.6px;gap:2px}
   .meal-macro-progress{grid-template-columns:1fr}

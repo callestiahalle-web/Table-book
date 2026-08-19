@@ -1,13 +1,14 @@
 {
   "name": "table-book",
-  "version": "1.0.16",
+  "version": "1.0.19",
   "private": true,
   "description": "Table book web and Android application",
   "scripts": {
     "web:prepare": "node scripts/prepare-mobile.mjs",
     "android:sync": "node scripts/prepare-mobile.mjs && cap sync android",
     "android:apk": "node scripts/prepare-mobile.mjs && cap sync android && cd android && gradlew.bat assembleDebug",
-    "audit:tags": "node scripts/audit-recipe-tags.mjs"
+    "audit:tags": "node scripts/audit-recipe-tags.mjs",
+    "audit:weekly-menu": "node scripts/audit-weekly-menu.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.4.1",
