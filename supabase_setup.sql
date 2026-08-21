@@ -661,6 +661,27 @@ on conflict (canonical_name) do update set
   dataset_release=excluded.dataset_release,source_name=excluded.source_name,
   source_url=excluded.source_url,updated_at=now();
 
+-- Дополнительные продукты из пользовательских рецептов и маркировок.
+-- Отрицательные fdc_id отделяют локальные/брендовые записи от идентификаторов USDA.
+insert into public.food_nutrition_reference
+  (canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name,source_url)
+values
+  ('вода',array['питьевая вода']::text[],0,0,0,0,-1001,'Справочное значение','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('грейпфрут',array['грейпфрут, мякоть','мякоть грейпфрута']::text[],42,0.77,0.14,10.66,-1002,'Foundation','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('рисовая лапша сухая',array['рисовая лапша','лапша рисовая']::text[],364,5.95,0.56,80.18,169742,'SR Legacy','2018-04-01','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('разрыхлитель теста',array['разрыхлитель','пекарский порошок']::text[],51,0.1,0,24.1,172804,'SR Legacy','2018-04-01','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('фарш минтая',array['минтай фарш','рыбный фарш из минтая','ингредиенты на всю партию: фарш минтая','ингредиенты на всю рыбную партию: фарш минтая']::text[],70,15.9,0.9,0,-1003,'Маркировка продукта','2026-08-21','Данные с упаковки',''),
+  ('угорь унаги в соусе',array['угорь унаги','угорь в соусе','оставшийся угорь унаги']::text[],281.4,16.4,29.4,1.8,-1004,'Маркировка продукта','2026-08-21','Данные с упаковки',''),
+  ('San Carlo Classica',array['чипсы San Carlo Classica']::text[],502,6.3,27,56.3,-1005,'Маркировка производителя','2026-08-21','San Carlo','https://www.sancarlo.it/it/prodotti_scheda.asp?NutrizionId=502&ProductId=171'),
+  ('San Carlo Lime & Pink Pepper',array['San Carlo лайм с перцем','чипсы San Carlo Lime & Pink Pepper']::text[],493,6.7,26,56,-1006,'Маркировка производителя','2026-08-21','San Carlo','https://www.sancarlo.it/it/prodotti_scheda.asp?NutrizionId=570&ProductId=564'),
+  ('San Carlo томат',array['San Carlo томатные','чипсы San Carlo томат','San Carlo помидор и базилик']::text[],480,6.9,23,59,-1007,'Маркировка производителя','2026-08-21','San Carlo','https://www.sancarlo.it/it/prodotti_scheda.asp?NutrizionId=746&ProductId=745'),
+  ('консервированная кукуруза',array['кукуруза консервированная','половина банки консервированной кукурузы','оставшаяся половина банки кукурузы']::text[],72,2.3,1.4,12,-1008,'Данные из рецепта','2026-08-21','Данные пользователя','')
+on conflict (canonical_name) do update set
+  aliases=excluded.aliases,kcal=excluded.kcal,protein=excluded.protein,fat=excluded.fat,
+  carbs=excluded.carbs,fdc_id=excluded.fdc_id,data_type=excluded.data_type,
+  dataset_release=excluded.dataset_release,source_name=excluded.source_name,
+  source_url=excluded.source_url,updated_at=now();
+
 create table if not exists public.food_storage_reference (
   canonical_name text primary key,
   aliases text[] not null default '{}'::text[],

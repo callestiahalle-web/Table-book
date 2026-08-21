@@ -6,6 +6,9 @@
   const food=(canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type='Foundation',dataset_release=foundationRelease)=>({
     canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name:source,source_url:sourceUrl
   });
+  const sourcedFood=(canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name,source_url)=>({
+    canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name,source_url
+  });
 
   // Values are stated per 100 g. Foundation Foods is preferred; SR Legacy is
   // used where the current Foundation release has no suitable raw food.
@@ -28,7 +31,7 @@
     food('моцарелла',['сыр моцарелла'],299,22.17,22.14,2.4,170845,'SR Legacy',legacyRelease),
     food('сливочное масло',['масло сливочное'],717,0.85,81.11,0.06,173410,'SR Legacy',legacyRelease),
     food('овсяные хлопья',['овсянка','геркулес','хлопья овсяные'],379,13.5,5.89,68.7,2346396),
-    food('репчатый лук',['лук','луковица','лук репчатый'],38,0.83,0.05,8.61,790646),
+    food('репчатый лук',['лук','луковица','лук репчатый','красный лук','лук красный репчатый'],38,0.83,0.05,8.61,790646),
     food('арахисовая паста',['паста арахисовая','арахисовое масло'],589,24,49.4,22.7,2262072),
     food('свиная вырезка',['свинина','вырезка свиная'],125,21.6,3.9,0,2646169),
     food('картофель',['картошка','картофель очищенный'],71.6,1.81,0.264,16,2346403),
@@ -54,6 +57,7 @@
     food('свёкла',['свекла','свекла сырая'],43,1.61,0.17,9.56,169145,'SR Legacy',legacyRelease),
     food('сельдерей',['стебель сельдерея','стебли сельдерея'],14,0.69,0.17,2.97,169988,'SR Legacy',legacyRelease),
     food('зелёный горошек',['зеленый горошек','свежий горошек'],81,5.42,0.4,14.45,170419,'SR Legacy',legacyRelease),
+    sourcedFood('консервированная кукуруза',['кукуруза консервированная','половина банки консервированной кукурузы','оставшаяся половина банки кукурузы'],72,2.3,1.4,12,-1008,'Данные из рецепта','2026-08-21','Данные пользователя',''),
     food('баклажан',['баклажаны'],25,0.98,0.18,5.88,169228,'SR Legacy',legacyRelease),
     food('болгарский перец',['сладкий перец','красный сладкий перец'],26,0.99,0.3,6.03,170108,'SR Legacy',legacyRelease),
     food('гречневая крупа',['гречка','гречка сухая'],346,11.73,2.71,74.95,170685,'SR Legacy',legacyRelease),
@@ -85,12 +89,21 @@
     food('тёмный шоколад',['темный шоколад','горький шоколад','шоколад 70%'],598,7.79,42.63,45.9,170273,'SR Legacy',legacyRelease),
     food('имбирь',['корень имбиря','свежий имбирь'],80,1.82,0.75,17.77,169231,'SR Legacy',legacyRelease),
     food('уксус пищевой',['рисовый уксус','яблочный уксус','столовый уксус'],18,0,0,0.04,172237,'SR Legacy',legacyRelease),
-    food('подсолнечное масло',['растительное масло','масло растительное','масло для жарки'],884,0,100,0,171017,'SR Legacy',legacyRelease),
+    food('подсолнечное масло',['растительное масло','масло растительное','масло подсолнечное','масло для жарки','масло для смазывания поверхности'],884,0,100,0,171017,'SR Legacy',legacyRelease),
     food('оливковое масло',['масло оливковое','оливковое масло extra virgin'],884,0,100,0,171413,'SR Legacy',legacyRelease),
     food('лосось атлантический',['лосось','сёмга','семга','филе лосося'],142,19.8,6.34,0,173686,'SR Legacy',legacyRelease),
     food('мёд',['мед'],304,0.3,0,82.4,169640,'SR Legacy',legacyRelease),
     food('сахар',['сахарный песок','сахар белый'],387,0,0,100,169655,'SR Legacy',legacyRelease),
-    food('соль',['поваренная соль','столовая соль'],0,0,0,0,173468,'SR Legacy',legacyRelease)
+    food('соль',['поваренная соль','столовая соль'],0,0,0,0,173468,'SR Legacy',legacyRelease),
+    food('вода',['питьевая вода'],0,0,0,0,-1001,'Справочное значение',foundationRelease),
+    food('грейпфрут',['грейпфрут, мякоть','мякоть грейпфрута'],42,0.77,0.14,10.66,-1002,'Foundation',foundationRelease),
+    food('рисовая лапша сухая',['рисовая лапша','лапша рисовая'],364,5.95,0.56,80.18,169742,'SR Legacy',legacyRelease),
+    food('разрыхлитель теста',['разрыхлитель','пекарский порошок'],51,0.1,0,24.1,172804,'SR Legacy',legacyRelease),
+    sourcedFood('фарш минтая',['минтай фарш','рыбный фарш из минтая','ингредиенты на всю партию: фарш минтая','ингредиенты на всю рыбную партию: фарш минтая'],70,15.9,0.9,0,-1003,'Маркировка продукта','2026-08-21','Данные с упаковки',''),
+    sourcedFood('угорь унаги в соусе',['угорь унаги','угорь в соусе','оставшийся угорь унаги'],281.4,16.4,29.4,1.8,-1004,'Маркировка продукта','2026-08-21','Данные с упаковки',''),
+    sourcedFood('San Carlo Classica',['чипсы San Carlo Classica'],502,6.3,27,56.3,-1005,'Маркировка производителя','2026-08-21','San Carlo','https://www.sancarlo.it/it/prodotti_scheda.asp?NutrizionId=502&ProductId=171'),
+    sourcedFood('San Carlo Lime & Pink Pepper',['San Carlo лайм с перцем','чипсы San Carlo Lime & Pink Pepper'],493,6.7,26,56,-1006,'Маркировка производителя','2026-08-21','San Carlo','https://www.sancarlo.it/it/prodotti_scheda.asp?NutrizionId=570&ProductId=564'),
+    sourcedFood('San Carlo томат',['San Carlo томатные','чипсы San Carlo томат','San Carlo помидор и базилик'],480,6.9,23,59,-1007,'Маркировка производителя','2026-08-21','San Carlo','https://www.sancarlo.it/it/prodotti_scheda.asp?NutrizionId=746&ProductId=745')
   ];
 
   const keeper='USDA FoodKeeper';
