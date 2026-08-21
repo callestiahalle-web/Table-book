@@ -1711,6 +1711,14 @@ body.dark #mealview .meal-chip{background:rgba(226,232,240,.42)}
 .meal-picker-dialog{max-height:min(80vh,760px)}
 @media(max-width:560px){.meal-day-panel .meal-day-actions-active{grid-template-columns:1fr !important}.meal-picker-body{padding-bottom:24px !important}.meal-pick-grid-modal{padding-bottom:18px !important}}
 
+/* editable meal portions */
+#mealview .meal-dish-row{grid-template-columns:minmax(0,1fr) auto 32px;align-items:stretch}
+.meal-serving-control{min-width:68px;display:grid;grid-template-rows:auto 1fr;gap:2px;align-items:center;justify-items:center;padding:4px 6px;border:1px solid var(--theme-border);border-radius:14px;background:var(--paper2);box-shadow:0 5px 12px rgba(80,63,42,.06)}
+.meal-serving-control span{font-size:9px;line-height:1;color:var(--muted);font-weight:650}
+.meal-serving-control select{width:100%;min-width:54px;height:24px;padding:0 18px 0 7px;border:0!important;outline:0!important;border-radius:9px!important;background-color:transparent!important;box-shadow:none!important;color:var(--ink);font:inherit;font-size:12px;text-align:center;text-align-last:center}
+body.dark .meal-serving-control{background:var(--paper2);border-color:var(--theme-border);box-shadow:0 5px 12px rgba(0,0,0,.14)}
+@media(max-width:560px){#mealview .meal-dish-row{grid-template-columns:minmax(0,1fr) 64px 32px}.meal-serving-control{min-width:64px;padding-inline:4px}.meal-serving-control select{min-width:48px}}
+
 
 
 /* meal planner clean user wording + centered plus controls */

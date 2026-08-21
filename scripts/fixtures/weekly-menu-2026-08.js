@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  const REVISION='2026-08-19-25-v3';
+  const REVISION='2026-08-19-25-v4';
   const food=(kcal,protein,fat,carbs)=>({kcal,protein,fat,carbs});
   const F={
     nordic:food(400,12.2,15.9,51.9),
@@ -37,7 +37,17 @@
     peas:food(81,5.42,.4,14.45),
     chicken:food(112,22.5,1.93,0),
     chipsClassica:food(502,6.3,27,56.3),
-    chipsLime:food(493,6.7,26,56)
+    chipsLime:food(493,6.7,26,56),
+    apple:food(54.9,.133,.15,14.8),
+    banana:food(97,.74,.29,23),
+    pear:food(63,.39,.16,15.01),
+    peach:food(39,.91,.25,9.54),
+    kiwi:food(61,1.14,.52,14.66),
+    grapes:food(69,.72,.16,18.1),
+    raspberry:food(52,1.2,.65,11.94),
+    blueberry:food(57,.74,.33,14.49),
+    blackberry:food(43,1.39,.49,9.61),
+    cherry:food(63,1.06,.2,16.01)
   };
   const n=(name,weight,values,amount=weight,unit='g')=>({name,amount,unit,weight,kcal:values.kcal,protein:values.protein,fat:values.fat,carbs:values.carbs});
   const sum=(rows,servings)=>{
@@ -81,7 +91,7 @@
       ingredients:['угорь унаги в соусе — 100 г','рис — 35 г сухого','салатный лист — 30 г','томат — 150 г','морковь — 50 г','кунжут — 3 г','нори — небольшое количество','рисовый уксус — немного','соевый соус — при необходимости совсем немного'],
       ingredientNutrition:[n('угорь унаги в соусе',100,F.unagi),n('рис белый сухой',35,F.rice),n('салатный лист',30,F.lettuce),n('томат',150,F.tomato),n('морковь',50,F.carrot),n('кунжут',3,F.sesame)],
       steps:['Промойте 35 г сухого риса прохладной водой до почти прозрачной воды.','Переложите рис в небольшой сотейник, добавьте воду по инструкции на упаковке, доведите до кипения и варите под крышкой на слабом огне до готовности; затем оставьте под крышкой на 5 минут.','При желании добавьте в горячий рис немного рисового уксуса и аккуратно перемешайте, не разминая зёрна.','Прогрейте 100 г угря унаги способом, указанным на упаковке, до равномерно горячей середины; не пересушивайте соус.','Очистите 50 г моркови и нарежьте тонкой соломкой длиной 4–5 см.','Нарежьте 150 г томата небольшими дольками, 30 г салатных листьев промойте в холодной воде и полностью обсушите.','Выложите рис на дно боула, рядом разложите салат, томат и морковь.','Положите сверху 100 г прогретого угря, добавьте небольшое количество нарезанного нори и посыпьте 3 г кунжута.','Попробуйте блюдо и только при необходимости добавьте совсем немного соевого соуса.'],
-      tips:'В этот день используется первая половина упаковки угря 200 г. Оставшиеся 100 г держите закрытыми в холодильнике только до приготовления ужина 19 августа.'
+      tips:'В этот день используется первая половина упаковки угря. Оставшуюся половину держите закрытой в холодильнике только до приготовления ужина 19 августа.'
     }),
     makeRecipe({
       id:'week-20260819-dinner-unagi-kimbap',title:'Мини-кимпаб с угрём унаги',category:'Горячие блюда',
@@ -89,7 +99,7 @@
       ingredients:['оставшийся угорь унаги — 100 г','рис — 30 г сухого','яйцо — 1 шт.','морковь — 40 г','салатный лист — 20 г','томат — 100 г, подать отдельно','нори — необходимое количество'],
       ingredientNutrition:[n('угорь унаги в соусе',100,F.unagi),n('рис белый сухой',30,F.rice),n('куриное яйцо',50,F.egg,1,'piece'),n('морковь',40,F.carrot),n('салатный лист',20,F.lettuce),n('томат',100,F.tomato)],
       steps:['Промойте 30 г сухого риса, сварите по инструкции на упаковке и оставьте под крышкой на 5 минут.','Разложите рис тонким слоем на тарелке и остудите до тёплого состояния, чтобы нори не размокли.','Взбейте 1 яйцо вилкой, вылейте тонким слоем на антипригарную сковороду без большого количества масла и готовьте под крышкой на слабом огне до схватывания; либо сварите яйцо вкрутую.','Остудите готовое яйцо и нарежьте длинными полосками.','Очистите 40 г моркови и нарежьте тонкой длинной соломкой.','Прогрейте оставшиеся 100 г угря согласно инструкции на упаковке и нарежьте длинными полосками.','Положите лист нори шероховатой стороной вверх, тонко распределите по нему рис, оставив свободными 1–2 см дальнего края.','Выложите вдоль ближнего края угря, яйцо и морковь, плотно сверните рулет и оставьте швом вниз на 2 минуты.','Смочите нож водой и нарежьте рулет порционными кусочками.','Промойте и обсушите 20 г салатных листьев, нарежьте 100 г томата и подайте рядом с кимпабом.'],
-      tips:'Упаковка угря 200 г полностью использована 19 августа. После вскрытия угорь не переносится на следующие дни.'
+      tips:'Упаковка угря полностью используется 19 августа. После вскрытия угорь не переносится на следующие дни.'
     }),
     makeRecipe({
       id:'week-snack-savushkin-grapefruit',title:'Творожная паста «Савушкин» с грейпфрутом',category:'Закуски',prepTime:'5 мин',cookTime:'0 мин',totalTime:'5 мин',time:'5 мин',servings:1,
@@ -106,8 +116,8 @@
       tips:'Для ориентировочного КБЖУ одна съедаемая порция апельсина принята равной 130 г мякоти.'
     }),
     makeRecipe({
-      id:'week-chip-san-carlo-tomato-25',title:'San Carlo томат — 25 г',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,
-      ingredients:['San Carlo томат — 25 г'],ingredientNutrition:[n('чипсы San Carlo томат',25,F.chipsClassica)],steps:['Отмерьте 25 г чипсов и переложите в небольшую пиалу.','Уберите открытую упаковку, чтобы порция оставалась равной 25 г.'],tips:'Дополнительный снек входит в меню 19 августа.'
+      id:'week-chip-san-carlo-tomato',title:'San Carlo томат',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,
+      ingredients:['San Carlo томат — 25 г'],ingredientNutrition:[n('чипсы San Carlo томат',25,F.chipsClassica)],steps:['Переложите стандартную порцию чипсов из списка ингредиентов в небольшую пиалу.','Закройте и уберите упаковку сразу после отделения порции.']
     }),
     makeRecipe({
       id:'week-20260820-breakfast-nordic-egg',title:'Nordic с кокосовым молоком, клубникой и яйцом',category:'Завтраки',prepTime:'4 мин',cookTime:'10 мин',totalTime:'14 мин',time:'14 мин',servings:1,
@@ -127,7 +137,7 @@
       ingredientNutrition:[n('филе окорока молодого бычка',150,F.beef),n('цельнозерновые спагетти сухие',55,F.wholePasta),n('кабачок',150,F.zucchini),n('морковь',50,F.carrot)],
       steps:['Нарежьте 150 г филе окорока поперёк волокон полосками толщиной около 1 см.','Переложите мясо в сотейник, добавьте 2–3 столовые ложки воды, накройте крышкой и тушите на слабом огне 18–25 минут до мягкости и полной готовности; при необходимости понемногу добавляйте воду.','Вскипятите воду, опустите 55 г сухих цельнозерновых спагетти и варите до состояния, указанного на упаковке, затем слейте воду.','Нарежьте 150 г кабачка брусочками, а 50 г очищенной моркови — тонкими полукружьями.','Переложите овощи в отдельный сотейник, добавьте 2 столовые ложки воды и тушите под крышкой 8–10 минут до мягкости без разваривания.','Проверьте готовность мяса: внутри не должно оставаться сырого участка; подайте мясо, пасту и овощи вместе.']
     }),
-    makeRecipe({id:'week-chip-san-carlo-classica-15',title:'San Carlo Classica — 15 г',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,ingredients:['San Carlo Classica — 15 г'],ingredientNutrition:[n('чипсы San Carlo Classica',15,F.chipsClassica)],steps:['Отмерьте 15 г чипсов и переложите в небольшую пиалу.','Закройте и уберите упаковку после отделения порции.'],tips:'Дополнительный снек входит в меню 20 августа.'}),
+    makeRecipe({id:'week-chip-san-carlo-classic',title:'San Carlo Classica',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,ingredients:['San Carlo Classica — 25 г'],ingredientNutrition:[n('чипсы San Carlo Classica',25,F.chipsClassica)],steps:['Переложите стандартную порцию чипсов из списка ингредиентов в небольшую пиалу.','Закройте и уберите упаковку сразу после отделения порции.']}),
     makeRecipe({
       id:'week-breakfast-nordic-water-egg',title:'Nordic с кокосовым молоком и клубникой',category:'Завтраки',prepTime:'4 мин',cookTime:'10 мин',totalTime:'14 мин',time:'14 мин',servings:1,
       ingredients:['Nordic — 35 г','кокосовое молоко — 30 мл','вода','клубника — 80 г','яйцо — 1 шт.'],
@@ -150,7 +160,7 @@
       steps:['Разогрейте духовку до 190 °C и застелите противень пергаментом.','Вымойте 100 г кабачка для фарша, мелко натрите и слегка отожмите руками, если выделилось много жидкости.','Соедините в миске все 400 г фарша минтая, тёртый кабачок и 1 яйцо; перемешайте до равномерной массы.','Смоченными водой руками сформируйте одинаковые котлетки или фрикадельки и разложите на противне.','Запекайте 20–25 минут до полной готовности; середина должна быть непрозрачной и горячей, безопасная температура рыбы — 63 °C.','Сварите 60 г сухих гречневых спагетти по инструкции на упаковке и слейте воду.','Нарежьте дополнительные 100 г кабачка полукружьями, добавьте 2 столовые ложки воды и тушите под крышкой 7–9 минут до мягкости.','Разделите только готовые рыбные котлетки на две равные части.','Одну половину котлет подайте на ужин 21 августа с 60 г спагетти в пересчёте на сухой продукт и 100 г тушёного кабачка.','Полностью остудите вторую половину котлет не дольше 2 часов, переложите в закрытый контейнер и уберите в холодильник для обеда 22 августа.'],
       tips:'Готовим всю упаковку фарша. Одна съедаемая порция показана в КБЖУ; вторая порция — заготовка на следующий день.',batchLabel:'Готовим 2 порции: ужин + обед следующего дня',preparedForNextDay:true,shoppingFromNutritionOnly:true
     }),
-    makeRecipe({id:'week-chip-san-carlo-lime-25',title:'San Carlo Lime & Pink Pepper — 25 г',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,ingredients:['San Carlo Lime & Pink Pepper — 25 г'],ingredientNutrition:[n('чипсы San Carlo Lime & Pink Pepper',25,F.chipsLime)],steps:['Отмерьте 25 г чипсов и переложите в небольшую пиалу.','Уберите открытую упаковку после отделения порции.'],tips:'Дополнительный снек входит в меню 21 августа.'}),
+    makeRecipe({id:'week-chip-san-carlo-lime-pepper',title:'San Carlo Lime & Pink Pepper',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,ingredients:['San Carlo Lime & Pink Pepper — 25 г'],ingredientNutrition:[n('чипсы San Carlo Lime & Pink Pepper',25,F.chipsLime)],steps:['Переложите стандартную порцию чипсов из списка ингредиентов в небольшую пиалу.','Закройте и уберите упаковку сразу после отделения порции.']}),
     makeRecipe({
       id:'week-20260822-lunch-rice-noodles-pollock',title:'Азиатская рисовая лапша с рыбными котлетками',category:'Горячие блюда',prepTime:'12 мин',cookTime:'15 мин',totalTime:'27 мин',time:'27 мин',servings:1,
       ingredients:['оставшаяся половина приготовленного 21 августа минтая','рисовая лапша — 60 г сухой','кабачок — 100 г','морковь — 60 г','оставшаяся половина банки кукурузы','томат — 50 г','свежий имбирь','соевый соус','кунжутное масло — 3 г'],
@@ -165,7 +175,6 @@
       ingredientNutrition:[n('филе окорока молодого бычка',140,F.beef),n('красная чечевица сухая',25,F.lentils),n('картофель',150,F.potato),n('кабачок',100,F.zucchini),n('морковь',50,F.carrot)],
       steps:['Переберите и тщательно промойте 25 г красной чечевицы до прозрачной воды.','Залейте чечевицу водой с запасом, доведите до кипения и варите на слабом огне 10–15 минут до мягкости; остаток воды полностью слейте.','Нарежьте 140 г филе окорока поперёк волокон полосками толщиной около 1 см.','Переложите мясо в сотейник, добавьте немного воды и тушите под крышкой 20–25 минут до мягкости и полной готовности.','Очистите 150 г картофеля, нарежьте кусочками одинакового размера и отварите 15–20 минут до мягкости либо запеките при 200 °C около 25 минут.','Нарежьте 100 г кабачка полукружьями, 50 г моркови — тонкими ломтиками и тушите с 2 столовыми ложками воды под крышкой 8–10 минут.','Проверьте, что мясо полностью готово, и соберите на одной тарелке мясо, чечевицу, картофель и овощи.']
     }),
-    makeRecipe({id:'week-chip-san-carlo-tomato-20',title:'San Carlo томат — 20 г',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,ingredients:['San Carlo томат — 20 г'],ingredientNutrition:[n('чипсы San Carlo томат',20,F.chipsClassica)],steps:['Отмерьте 20 г чипсов в небольшую пиалу.','Уберите упаковку после отделения порции.'],tips:'Дополнительный снек входит в меню 22 августа.'}),
     makeRecipe({
       id:'week-20260823-breakfast-last-nordic',title:'Nordic с кокосовым молоком и клубникой — последний пакет',category:'Завтраки',prepTime:'4 мин',cookTime:'10 мин',totalTime:'14 мин',time:'14 мин',servings:1,
       ingredients:['Nordic — 35 г, последний пакет','кокосовое молоко — 30 мл','вода','клубника — 80 г','яйцо — 1 шт.'],
@@ -185,7 +194,6 @@
       steps:['Разогрейте духовку до 190 °C и застелите противень пергаментом.','Разделите 300 г фарша индейки на равные части, сформируйте небольшие тефтели влажными руками и разложите на противне.','Запекайте тефтели 20–25 минут до полной готовности; температура в центре должна достигнуть 74 °C.','Отварите 120 г сухих гречневых спагетти по инструкции на упаковке и слейте воду.','Нарежьте 240 г кабачка полукружьями, 100 г очищенной моркови — тонкими ломтиками.','Тушите кабачок и морковь с 3–4 столовыми ложками воды под крышкой 8–10 минут до мягкости.','Откройте банку горошка, полностью слейте жидкость.','Разделите тефтели, спагетти, овощи и горошек на две одинаковые порции: в каждой должно быть по 150 г сырого фарша, 60 г сухих спагетти, 120 г кабачка, 50 г моркови и половине банки горошка.','Порцию №1 подайте на ужин 23 августа.','Порцию №2 охладите не дольше 2 часов, переложите в герметичный контейнер и сразу уберите в холодильник для обеда на работе 24 августа.'],
       tips:'Готовим сразу 2 порции: ужин + обед на работу. КБЖУ указано для одной съедаемой порции.',batchLabel:'Готовим сразу 2 порции: ужин + обед на работу',preparedForNextDay:true
     }),
-    makeRecipe({id:'week-chip-san-carlo-classica-25',title:'San Carlo Classica — 25 г',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,ingredients:['San Carlo Classica — 25 г'],ingredientNutrition:[n('чипсы San Carlo Classica',25,F.chipsClassica)],steps:['Отмерьте 25 г чипсов и переложите в небольшую пиалу.','Уберите упаковку после отделения порции.'],tips:'Дополнительный снек входит в меню 23 августа.'}),
     makeRecipe({
       id:'week-20260824-breakfast-oatmeal',title:'Овсяная каша с кокосом',category:'Завтраки',prepTime:'5 мин',cookTime:'10 мин',totalTime:'15 мин',time:'15 мин',servings:1,
       ingredients:['обычная овсянка — 45 г','кокосовое молоко — 30 мл','вода','кокосовая стружка — 5 г','яйцо — 1 шт.','грейпфрут — небольшая порция'],
@@ -214,7 +222,6 @@
       steps:['Разогрейте духовку до 190 °C и застелите противень пергаментом.','Мелко натрите 100 г кабачка для фарша и слегка отожмите лишнюю влагу.','Соедините все 400 г второй упаковки фарша минтая, тёртый кабачок и 1 яйцо, перемешайте до однородности.','Сформируйте одинаковые котлетки или фрикадельки, разложите на противне и запекайте 20–25 минут до непрозрачной середины и температуры 63 °C.','Очистите 250 г картофеля, нарежьте одинаковыми кусочками, залейте холодной водой и варите после закипания 15–20 минут до мягкости.','Полностью слейте воду с картофеля и перемешайте его с 5 г безлактозного сливочного масла.','Нарежьте дополнительные 100 г кабачка полукружьями, 50 г моркови — тонкими ломтиками и тушите с 2 столовыми ложками воды 8–10 минут.','Разделите только готовые рыбные котлетки пополам.','На ужин 25 августа подайте одну половину котлет, 250 г картофеля, 100 г кабачка, 50 г моркови и 5 г масла в составе картофеля.','Вторую половину котлет полностью остудите не дольше 2 часов и либо используйте 26 августа, либо заморозьте после приготовления в подходящем контейнере.'],
       tips:'Остаток заготовки: использовать 26 августа или заморозить после приготовления. КБЖУ указано для одной половины партии.',batchLabel:'Вся упаковка: ужин + остаток заготовки',preparedForNextDay:true,shoppingFromNutritionOnly:true
     }),
-    makeRecipe({id:'week-chip-san-carlo-any-25',title:'San Carlo — любой из трёх имеющихся вкусов, 25 г',category:'Закуски',prepTime:'1 мин',cookTime:'0 мин',totalTime:'1 мин',time:'1 мин',servings:1,ingredients:['San Carlo любого из трёх имеющихся вкусов — 25 г'],ingredientNutrition:[n('чипсы San Carlo',25,F.chipsClassica)],steps:['Выберите любой из трёх имеющихся вкусов San Carlo.','Отмерьте ровно 25 г чипсов и переложите в небольшую пиалу.','Уберите упаковку после отделения порции.'],tips:'Дополнительный снек входит в меню 25 августа; КБЖУ ориентировочно рассчитано по San Carlo Classica.'})
   ];
 
   const reviewedSteps={
@@ -259,10 +266,6 @@
       'Апельсин вымойте, очистите, разделите на дольки и удалите косточки.',
       'Подайте порцию апельсина вместе с творожной пастой.'
     ],
-    'week-chip-san-carlo-tomato-25':[
-      'Отмерьте порцию чипсов, указанную в списке ингредиентов, и переложите в небольшую пиалу.',
-      'Сразу закройте и уберите открытую упаковку, чтобы случайно не увеличить запланированную порцию.'
-    ],
     'week-20260820-breakfast-nordic-egg':[
       'Яйцо положите в сотейник, залейте холодной водой и доведите до кипения.',
       'Варите яйцо 8–9 минут после закипания, затем переложите в холодную воду, остудите и очистите.',
@@ -290,10 +293,6 @@
       'Кабачок нарежьте брусочками, очищенную морковь — тонкими полукружьями.',
       'Тушите овощи отдельно под крышкой с небольшим количеством воды 8–10 минут: они должны стать мягкими, но сохранить форму.',
       'Проверьте готовность мяса в самом толстом кусочке и подайте его вместе с пастой и овощами.'
-    ],
-    'week-chip-san-carlo-classica-15':[
-      'Отмерьте порцию чипсов, указанную в списке ингредиентов, и переложите в небольшую пиалу.',
-      'Закройте и уберите упаковку сразу после отделения порции.'
     ],
     'week-breakfast-nordic-water-egg':[
       'Яйцо положите в сотейник, залейте холодной водой и доведите до кипения.',
@@ -327,10 +326,6 @@
       'Одну часть подайте со спагетти и тушёным кабачком.',
       'Вторую часть котлет остудите в неглубоком контейнере не дольше 2 часов, закройте и уберите в холодильник для обеда следующего дня.'
     ],
-    'week-chip-san-carlo-lime-25':[
-      'Отмерьте порцию чипсов, указанную в списке ингредиентов, и переложите в небольшую пиалу.',
-      'Закройте и уберите упаковку сразу после отделения порции.'
-    ],
     'week-20260822-lunch-rice-noodles-pollock':[
       'Рисовую лапшу приготовьте строго по инструкции на упаковке, затем откиньте на сито и дайте воде стечь.',
       'Кабачок нарежьте брусочками, очищенную морковь — тонкой соломкой, свежий имбирь мелко натрите.',
@@ -350,10 +345,6 @@
       'Картофель очистите, нарежьте одинаковыми кусочками и сварите в отдельной кастрюле 15–20 минут после закипания.',
       'Кабачок нарежьте полукружьями, морковь — тонкими ломтиками и тушите под крышкой 8–10 минут до мягкости.',
       'Дайте готовому мясу постоять под крышкой 3 минуты и подайте с чечевицей, картофелем и овощами.'
-    ],
-    'week-chip-san-carlo-tomato-20':[
-      'Отмерьте порцию чипсов, указанную в списке ингредиентов, и переложите в небольшую пиалу.',
-      'Закройте и уберите упаковку сразу после отделения порции.'
     ],
     'week-20260823-breakfast-last-nordic':[
       'Яйцо положите в сотейник, залейте холодной водой и доведите до кипения.',
@@ -384,10 +375,6 @@
       'Разделите тефтели, спагетти, овощи и горошек на две одинаковые порции.',
       'Первую порцию подайте на ужин.',
       'Вторую порцию разложите в неглубоком контейнере, охладите не дольше 2 часов, герметично закройте и уберите в холодильник для обеда на работе следующего дня.'
-    ],
-    'week-chip-san-carlo-classica-25':[
-      'Отмерьте порцию чипсов, указанную в списке ингредиентов, и переложите в небольшую пиалу.',
-      'Закройте и уберите упаковку сразу после отделения порции.'
     ],
     'week-20260824-breakfast-oatmeal':[
       'Яйцо положите в сотейник, залейте холодной водой и доведите до кипения.',
@@ -432,11 +419,6 @@
       'Дополнительный кабачок нарежьте полукружьями, морковь — тонкими ломтиками и тушите с небольшим количеством воды 8–10 минут.',
       'Разделите только готовые рыбные котлетки на две равные части и подайте одну часть с картофелем и овощами.',
       'Вторую часть котлет остудите в неглубоком контейнере не дольше 2 часов и используйте на следующий день либо заморозьте после приготовления.'
-    ],
-    'week-chip-san-carlo-any-25':[
-      'Выберите любой из трёх имеющихся вкусов San Carlo.',
-      'Отмерьте порцию, указанную в списке ингредиентов, и переложите в небольшую пиалу.',
-      'Закройте и уберите упаковку сразу после отделения порции.'
     ]
   };
 
@@ -448,8 +430,19 @@
     'week-breakfast-nordic-water-egg',
     'week-20260823-breakfast-last-nordic',
     'week-20260824-breakfast-oatmeal',
-    'week-20260825-breakfast-oatmeal'
+    'week-20260825-breakfast-oatmeal',
+    'week-chip-san-carlo-tomato-25',
+    'week-chip-san-carlo-tomato-20',
+    'week-chip-san-carlo-classica-15',
+    'week-chip-san-carlo-classica-25',
+    'week-chip-san-carlo-lime-25',
+    'week-chip-san-carlo-any-25',
+    'week-fruit-grapefruit-small'
   ]);
+  const fruitRecipe=({id,title,ingredient,nutritionName,weight,values,amount=weight,unit='g',steps,tips=''})=>makeRecipe({
+    id,title,category:'Фрукты',prepTime:'5 мин',cookTime:'0 мин',totalTime:'5 мин',time:'5 мин',servings:1,
+    ingredients:[ingredient],ingredientNutrition:[n(nutritionName,weight,values,amount,unit)],steps,tips
+  });
   const componentDrafts=[
     makeRecipe({
       id:'week-breakfast-nordic-milk',title:'Каша Nordic кокос-чиа на молоке',category:'Завтраки',prepTime:'3 мин',cookTime:'7 мин',totalTime:'10 мин',time:'10 мин',servings:1,
@@ -484,42 +477,47 @@
       tips:'Фрукт для перекуса выбран отдельной карточкой; конкретный вкус пасты может немного изменить КБЖУ, поэтому приоритет имеет этикетка.'
     }),
     makeRecipe({
-      id:'week-fruit-strawberry-80',title:'Клубника — порция 80 г',category:'Фрукты',prepTime:'5 мин',cookTime:'0 мин',totalTime:'5 мин',time:'5 мин',servings:1,
+      id:'week-fruit-strawberry-80',title:'Клубника',category:'Фрукты',prepTime:'5 мин',cookTime:'0 мин',totalTime:'5 мин',time:'5 мин',servings:1,
       ingredients:['замороженная клубника — 80 г'],ingredientNutrition:[n('замороженная клубника',80,F.strawberry)],
       steps:['Переложите клубнику из морозильной камеры в закрытую ёмкость.','Разморозьте в холодильнике либо осторожно прогрейте на слабом огне до мягкости.','Слейте только лишнюю отделившуюся воду и подайте ягоды отдельно или добавьте к готовой каше.']
     }),
     makeRecipe({
-      id:'week-fruit-grapefruit-100',title:'Грейпфрут — 100 г мякоти',category:'Фрукты',prepTime:'5 мин',cookTime:'0 мин',totalTime:'5 мин',time:'5 мин',servings:1,
+      id:'week-fruit-grapefruit-100',title:'Грейпфрут',category:'Фрукты',prepTime:'5 мин',cookTime:'0 мин',totalTime:'5 мин',time:'5 мин',servings:1,
       ingredients:['грейпфрут — около 100 г мякоти'],ingredientNutrition:[n('грейпфрут, мякоть',100,F.grapefruit)],
       steps:['Вымойте грейпфрут под проточной водой и обсушите.','Срежьте кожуру, удалите белую часть и разделите плод на сегменты.','Снимите плотные плёнки, удалите косточки и отмерьте съедобную мякоть.']
     }),
     makeRecipe({
-      id:'week-fruit-grapefruit-small',title:'Грейпфрут — небольшая порция',category:'Фрукты',prepTime:'5 мин',cookTime:'0 мин',totalTime:'5 мин',time:'5 мин',servings:1,
-      ingredients:['грейпфрут — около 60 г мякоти'],ingredientNutrition:[n('грейпфрут, мякоть',60,F.grapefruit)],
-      steps:['Вымойте грейпфрут под проточной водой и обсушите.','Срежьте кожуру и полностью удалите белую часть.','Отделите небольшую порцию мякоти от плёнок, удалите косточки и подайте.'],
-      tips:'Эта небольшая порция используется в завтраке 24 августа.'
-    }),
-    makeRecipe({
-      id:'week-fruit-orange-portion',title:'Апельсин — 1 порция',category:'Фрукты',prepTime:'4 мин',cookTime:'0 мин',totalTime:'4 мин',time:'4 мин',servings:1,
+      id:'week-fruit-orange-portion',title:'Апельсин',category:'Фрукты',prepTime:'4 мин',cookTime:'0 мин',totalTime:'4 мин',time:'4 мин',servings:1,
       ingredients:['апельсин — 1 порция'],ingredientNutrition:[n('апельсин, мякоть',130,F.orange,1,'piece')],
       steps:['Вымойте апельсин под проточной водой и обсушите.','Снимите кожуру и большую часть белой прослойки.','Разделите апельсин на дольки, удалите косточки и подайте.'],
-      tips:'Для ориентировочного КБЖУ одна съедаемая порция принята равной 130 г мякоти.'
-    })
+      tips:'Ориентировочное КБЖУ рассчитано по съедобной части, указанной в ингредиентах.'
+    }),
+    fruitRecipe({id:'week-fruit-apple',title:'Яблоко',ingredient:'яблоко — 1 шт., около 180 г съедобной части',nutritionName:'яблоко',weight:180,values:F.apple,amount:1,unit:'piece',steps:['Вымойте яблоко под проточной водой и обсушите.','Разрежьте плод, удалите сердцевину и повреждённые участки.','Нарежьте яблоко дольками и подайте.']}),
+    fruitRecipe({id:'week-fruit-banana',title:'Банан',ingredient:'банан — 1 шт., около 120 г мякоти',nutritionName:'банан',weight:120,values:F.banana,amount:1,unit:'piece',steps:['Вымойте кожуру банана и обсушите.','Очистите банан непосредственно перед подачей.','Удалите повреждённые участки мякоти и нарежьте банан кружочками либо подайте целиком.']}),
+    fruitRecipe({id:'week-fruit-pear',title:'Груша',ingredient:'груша — 1 шт., около 178 г съедобной части',nutritionName:'груша',weight:178,values:F.pear,amount:1,unit:'piece',steps:['Вымойте грушу под проточной водой и обсушите.','Разрежьте плод и удалите сердцевину с семенами.','Нарежьте грушу дольками и подайте сразу.']}),
+    fruitRecipe({id:'week-fruit-peach',title:'Персик',ingredient:'персик — 1 шт., около 150 г мякоти',nutritionName:'персик',weight:150,values:F.peach,amount:1,unit:'piece',steps:['Вымойте персик под проточной водой, аккуратно протирая поверхность, и обсушите.','Разрежьте плод по бороздке и удалите косточку.','Нарежьте мякоть дольками и подайте.']}),
+    fruitRecipe({id:'week-fruit-kiwi',title:'Киви',ingredient:'киви — 2 шт., около 140 г мякоти',nutritionName:'киви',weight:140,values:F.kiwi,amount:2,unit:'piece',steps:['Вымойте киви под проточной водой и обсушите.','Срежьте концы, снимите кожуру тонким слоем.','Нарежьте мякоть кружочками или дольками и подайте.']}),
+    fruitRecipe({id:'week-fruit-grapes',title:'Виноград',ingredient:'виноград — 100 г',nutritionName:'виноград',weight:100,values:F.grapes,steps:['Снимите ягоды с повреждённых веточек и удалите испорченные.','Тщательно промойте виноград прохладной проточной водой.','Дайте воде стечь, обсушите ягоды и подайте.']}),
+    fruitRecipe({id:'week-fruit-raspberry',title:'Малина',ingredient:'малина — 100 г',nutritionName:'малина',weight:100,values:F.raspberry,steps:['Переберите малину и удалите повреждённые ягоды.','Осторожно промойте ягоды прохладной водой в сите, не раздавливая их.','Дайте воде полностью стечь и подайте ягоды свежими.']}),
+    fruitRecipe({id:'week-fruit-blueberry',title:'Черника',ingredient:'черника — 100 г',nutritionName:'черника',weight:100,values:F.blueberry,steps:['Переберите чернику, удалите листья и повреждённые ягоды.','Промойте ягоды прохладной проточной водой в сите.','Дайте воде стечь, аккуратно обсушите и подайте.']}),
+    fruitRecipe({id:'week-fruit-blackberry',title:'Ежевика',ingredient:'ежевика — 100 г',nutritionName:'ежевика',weight:100,values:F.blackberry,steps:['Переберите ежевику и удалите повреждённые ягоды.','Осторожно промойте ягоды прохладной водой в сите.','Дайте воде полностью стечь и подайте ежевику свежей.']}),
+    fruitRecipe({id:'week-fruit-cherry',title:'Черешня',ingredient:'черешня — 100 г',nutritionName:'черешня',weight:100,values:F.cherry,steps:['Переберите черешню и удалите повреждённые ягоды.','Тщательно промойте ягоды прохладной проточной водой и обсушите.','Удалите плодоножки; косточки удаляйте непосредственно перед употреблением или предупредите о них при подаче.']})
   ];
-  const recipes=[...recipeDrafts.filter(recipe=>!replacedCompositeIds.has(recipe.id)),...componentDrafts]
+  const recipes=[...recipeDrafts,...componentDrafts]
+    .filter(recipe=>!replacedCompositeIds.has(recipe.id))
     .map(recipe=>Object.assign(recipe,{steps:reviewedSteps[recipe.id]||recipe.steps}));
 
   // Этот файл используется только для проверки и адресной синхронизации.
   // В клиентский каталог он не подключается: рецепты принадлежат одной учётной записи Supabase.
   const ref=(id,meta={})=>Object.assign({id,source:'custom',title:recipes.find(recipe=>recipe.id===id)?.title||id},meta);
   const mealPlan={
-    '2026-08-19':{breakfast:[ref('week-breakfast-nordic-milk'),ref('week-fruit-strawberry-80')],lunch:[ref('week-20260819-lunch-unagi-bowl')],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260819-dinner-unagi-kimbap')],extraSnack:[ref('week-chip-san-carlo-tomato-25')]},
-    '2026-08-20':{breakfast:[ref('week-breakfast-nordic-milk'),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260820-lunch-trout')],snack:[ref('week-snack-savushkin'),ref('week-fruit-orange-portion')],dinner:[ref('week-20260820-dinner-beef-pasta')],extraSnack:[ref('week-chip-san-carlo-classica-15')]},
-    '2026-08-21':{breakfast:[ref('week-breakfast-nordic-water'),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260821-lunch-tuna-kimbap')],snack:[ref('week-snack-savushkin'),ref('week-fruit-orange-portion')],dinner:[ref('week-20260821-dinner-pollock-batch')],extraSnack:[ref('week-chip-san-carlo-lime-25')]},
-    '2026-08-22':{breakfast:[ref('week-breakfast-nordic-water'),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260822-lunch-rice-noodles-pollock')],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260822-dinner-beef-lentils')],extraSnack:[ref('week-chip-san-carlo-tomato-20')]},
-    '2026-08-23':{breakfast:[ref('week-breakfast-nordic-water',{mealBadge:'Последний пакет Nordic'}),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260823-lunch-tuna-pasta')],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260823-dinner-turkey-batch')],extraSnack:[ref('week-chip-san-carlo-classica-25')]},
-    '2026-08-24':{breakfast:[ref('week-breakfast-oatmeal-coconut'),ref('week-breakfast-boiled-egg'),ref('week-fruit-grapefruit-small')],lunch:[ref('week-20260823-dinner-turkey-batch',{mealBadge:'Приготовлено с вечера · обед на работу',workday:true,skipShopping:true})],snack:[ref('week-snack-savushkin'),ref('week-fruit-orange-portion')],dinner:[ref('week-20260824-dinner-chicken-bowl-batch')],extraSnack:[]},
-    '2026-08-25':{breakfast:[ref('week-breakfast-oatmeal-coconut'),ref('week-breakfast-boiled-egg'),ref('week-fruit-orange-portion')],lunch:[ref('week-20260824-dinner-chicken-bowl-batch',{mealBadge:'Приготовлено с вечера · обед на работу',workday:true,skipShopping:true})],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260825-dinner-pollock-batch')],extraSnack:[ref('week-chip-san-carlo-any-25')]}
+    '2026-08-19':{breakfast:[ref('week-breakfast-nordic-milk'),ref('week-fruit-strawberry-80')],lunch:[ref('week-20260819-lunch-unagi-bowl')],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260819-dinner-unagi-kimbap')],extraSnack:[ref('week-chip-san-carlo-tomato')]},
+    '2026-08-20':{breakfast:[ref('week-breakfast-nordic-milk'),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260820-lunch-trout')],snack:[ref('week-snack-savushkin'),ref('week-fruit-orange-portion')],dinner:[ref('week-20260820-dinner-beef-pasta')],extraSnack:[ref('week-chip-san-carlo-classic')]},
+    '2026-08-21':{breakfast:[ref('week-breakfast-nordic-water'),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260821-lunch-tuna-kimbap')],snack:[ref('week-snack-savushkin'),ref('week-fruit-orange-portion')],dinner:[ref('week-20260821-dinner-pollock-batch')],extraSnack:[ref('week-chip-san-carlo-lime-pepper')]},
+    '2026-08-22':{breakfast:[ref('week-breakfast-nordic-water'),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260822-lunch-rice-noodles-pollock')],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260822-dinner-beef-lentils')],extraSnack:[ref('week-chip-san-carlo-tomato')]},
+    '2026-08-23':{breakfast:[ref('week-breakfast-nordic-water',{mealBadge:'Последний пакет Nordic'}),ref('week-fruit-strawberry-80'),ref('week-breakfast-boiled-egg')],lunch:[ref('week-20260823-lunch-tuna-pasta')],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260823-dinner-turkey-batch')],extraSnack:[ref('week-chip-san-carlo-classic')]},
+    '2026-08-24':{breakfast:[ref('week-breakfast-oatmeal-coconut'),ref('week-breakfast-boiled-egg'),ref('week-fruit-grapefruit-100')],lunch:[ref('week-20260823-dinner-turkey-batch',{mealBadge:'Приготовлено с вечера · обед на работу',workday:true,skipShopping:true})],snack:[ref('week-snack-savushkin'),ref('week-fruit-orange-portion')],dinner:[ref('week-20260824-dinner-chicken-bowl-batch')],extraSnack:[]},
+    '2026-08-25':{breakfast:[ref('week-breakfast-oatmeal-coconut'),ref('week-breakfast-boiled-egg'),ref('week-fruit-orange-portion')],lunch:[ref('week-20260824-dinner-chicken-bowl-batch',{mealBadge:'Приготовлено с вечера · обед на работу',workday:true,skipShopping:true})],snack:[ref('week-snack-savushkin'),ref('week-fruit-grapefruit-100')],dinner:[ref('week-20260825-dinner-pollock-batch')],extraSnack:[ref('week-chip-san-carlo-classic')]}
   };
 
   window.TABLE_BOOK_WEEKLY_MENU_20260819={

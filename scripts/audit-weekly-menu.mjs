@@ -15,21 +15,47 @@ if(JSON.stringify(actualDates)!==JSON.stringify(expectedDates)) throw new Error(
 
 const recipes=new Map(data.recipes.map(recipe=>[recipe.id,recipe]));
 if(recipes.size!==data.recipes.length) throw new Error('Duplicate weekly recipe IDs found');
-if(recipes.size!==27) throw new Error(`Expected 27 normalized recipe cards, received ${recipes.size}`);
+if(recipes.size!==33) throw new Error(`Expected 33 normalized recipe cards, received ${recipes.size}`);
 for(const duplicateId of ['week-20260824-lunch-turkey-container','week-20260825-lunch-chicken-container']){
   if(recipes.has(duplicateId)) throw new Error(`Duplicate container recipe is still exported: ${duplicateId}`);
 }
 for(const replacedId of ['week-20260819-breakfast-nordic','week-snack-savushkin-grapefruit','week-snack-savushkin-orange','week-20260820-breakfast-nordic-egg','week-breakfast-nordic-water-egg','week-20260823-breakfast-last-nordic','week-20260824-breakfast-oatmeal','week-20260825-breakfast-oatmeal']){
   if(recipes.has(replacedId)) throw new Error(`Composite duplicate is still exported: ${replacedId}`);
 }
+for(const obsoleteId of [
+  'week-chip-san-carlo-tomato-25',
+  'week-chip-san-carlo-tomato-20',
+  'week-chip-san-carlo-classica-15',
+  'week-chip-san-carlo-classica-25',
+  'week-chip-san-carlo-lime-25',
+  'week-chip-san-carlo-any-25',
+  'week-fruit-grapefruit-small'
+]){
+  if(recipes.has(obsoleteId)) throw new Error(`Obsolete duplicate is still exported: ${obsoleteId}`);
+}
 const titleKeys=new Set();
 for(const recipe of recipes.values()){
   if(/контейнер|container/iu.test(`${recipe.id} ${recipe.title}`)) throw new Error(`Container copy still exists as a recipe: ${recipe.id}`);
-  const titleKey=`${String(recipe.category||'').trim().toLowerCase()}::${String(recipe.title||'').trim().toLowerCase()}`;
-  if(titleKeys.has(titleKey)) throw new Error(`Duplicate recipe title/category remains: ${recipe.title}`);
+  const titleKey=String(recipe.title||'').normalize('NFKC').trim().toLocaleLowerCase('ru-RU').replace(/\s+/g,' ');
+  if(titleKeys.has(titleKey)) throw new Error(`Duplicate recipe title remains: ${recipe.title}`);
   titleKeys.add(titleKey);
 }
-if([...recipes.values()].filter(recipe=>recipe.category==='Фрукты').length!==4) throw new Error('Expected four separate fruit portions in the Fruits category');
+if([...recipes.values()].filter(recipe=>recipe.category==='Фрукты').length!==13) throw new Error('Expected thirteen unique fruit and berry cards in the Fruits category');
+
+const expectedChipIds=[
+  'week-chip-san-carlo-classic',
+  'week-chip-san-carlo-lime-pepper',
+  'week-chip-san-carlo-tomato'
+];
+const chips=[...recipes.values()]
+  .filter(recipe=>recipe.id.startsWith('week-chip-san-carlo-'))
+  .sort((a,b)=>a.id.localeCompare(b.id));
+if(JSON.stringify(chips.map(recipe=>recipe.id))!==JSON.stringify(expectedChipIds)) throw new Error('Expected exactly the three canonical San Carlo chip cards');
+for(const chip of chips){
+  if(/\b\d+(?:[.,]\d+)?\s*г(?=\s|[,.!;:]|$)/iu.test(chip.title)) throw new Error(`${chip.id}: portion must not be present in the title`);
+  if(chip.ingredientNutrition?.length!==1||Number(chip.ingredientNutrition[0]?.weight)!==25) throw new Error(`${chip.id}: standard portion must be 25 g`);
+  if(!chip.ingredients.some(value=>/—\s*25\s*г(?=\s|[,.!;:]|$)/iu.test(value))) throw new Error(`${chip.id}: ingredient list must contain the 25 g portion`);
+}
 
 const requiredSlots=['breakfast','lunch','snack','dinner','extraSnack'];
 const chipDates=new Set(['2026-08-19','2026-08-20','2026-08-21','2026-08-22','2026-08-23','2026-08-25']);
@@ -51,8 +77,9 @@ for(const date of expectedDates){
       for(const field of ['title','prepTime','cookTime','totalTime','servings','nutrition']) if(!recipe[field]) throw new Error(`${recipe.id}: ${field} is missing`);
       if(!Array.isArray(recipe.ingredients)||!recipe.ingredients.length) throw new Error(`${recipe.id}: ingredients are missing`);
       if(!Array.isArray(recipe.steps)||!recipe.steps.length) throw new Error(`${recipe.id}: steps are missing`);
-      const fixedAmount=recipe.steps.find(step=>/(?:^|\s)\d+(?:[.,]\d+)?\s*(?:г|кг|мл|л|шт\.?)(?=\s|[,.!;:]|$)/iu.test(step));
-      if(fixedAmount) throw new Error(`${recipe.id}: fixed ingredient quantity remains in a preparation step: ${fixedAmount}`);
+      const instructionalText=[...(recipe.steps||[]),recipe.tips||'',recipe.batchLabel||''];
+      const fixedAmount=instructionalText.find(value=>/(?:^|\s)\d+(?:[.,]\d+)?\s*(?:г|кг|мл|л|шт\.?)(?=\s|[,.!;:]|$)/iu.test(value));
+      if(fixedAmount) throw new Error(`${recipe.id}: fixed ingredient quantity remains outside the ingredient list: ${fixedAmount}`);
       kcal+=Number(recipe.nutrition.kcal)||0;
       protein+=Number(recipe.nutrition.protein)||0;
       fat+=Number(recipe.nutrition.fat)||0;

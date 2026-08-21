@@ -8,7 +8,8 @@
     "android:sync": "node scripts/prepare-mobile.mjs && cap sync android",
     "android:apk": "node scripts/prepare-mobile.mjs && cap sync android && cd android && gradlew.bat assembleDebug",
     "audit:tags": "node scripts/audit-recipe-tags.mjs",
-    "audit:weekly-menu": "node scripts/audit-weekly-menu.mjs"
+    "audit:weekly-menu": "node scripts/audit-weekly-menu.mjs",
+    "audit:food-reference": "node scripts/audit-food-reference.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.4.1",
