@@ -1,14 +1,17 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const source=fs.readFileSync(new URL('../js/food-reference.js',import.meta.url),'utf8');
 const context={window:{}};
 vm.createContext(context);
-vm.runInContext(source,context,{filename:'food-reference.js'});
+for(const file of ['food-reference.js']) vm.runInContext(fs.readFileSync(new URL(`../js/${file}`,import.meta.url),'utf8'),context,{filename:file});
+const baseRows=[...context.window.TABLE_BOOK_FOOD_NUTRITION_FALLBACK];
+for(const file of ['product-portions.js','chef-food-reference.js']) vm.runInContext(fs.readFileSync(new URL(`../js/${file}`,import.meta.url),'utf8'),context,{filename:file});
 
 const rows=context.window.TABLE_BOOK_FOOD_NUTRITION_FALLBACK;
+const portionRows=context.window.TABLE_BOOK_PRODUCT_PORTION_FALLBACK;
 if(!Array.isArray(rows)) throw new Error('Food nutrition fallback was not exported');
-if(rows.length<91) throw new Error(`Expected at least 91 nutrition reference products, received ${rows.length}`);
+if(!Array.isArray(portionRows)) throw new Error('Product portion fallback was not exported');
+if(rows.length<200) throw new Error(`Expected at least 200 nutrition reference products, received ${rows.length}`);
 
 const names=new Set(rows.map(row=>row.canonical_name));
 const fdcIds=new Set(rows.map(row=>row.fdc_id));
@@ -26,12 +29,20 @@ for(const row of rows){
   }
 }
 
+const portionKeys=new Map();
+for(const row of portionRows){
+  const key=`${normalize(row.canonical_name)}::${row.unit_code}`;
+  const owner=portionKeys.get(key);
+  if(owner) throw new Error(`Duplicate portion key "${row.canonical_name}/${row.unit_code}": ${owner} / ${row.note||'без примечания'}`);
+  portionKeys.set(key,row.note||row.canonical_name);
+}
+
 const setupSql=fs.readFileSync(new URL('../supabase_setup.sql',import.meta.url),'utf8');
 const seedBlocks=[...setupSql.matchAll(/insert into public\.food_nutrition_reference[\s\S]*?values([\s\S]*?)on conflict \(canonical_name\)/gimu)];
 if(!seedBlocks.length) throw new Error('Supabase nutrition seed section was not found');
 const seededNames=seedBlocks.flatMap(block=>[...block[1].matchAll(/^\s*\('((?:''|[^'])+)'/gmu)].map(match=>match[1].replaceAll("''","'")));
-if(seededNames.length!==rows.length||new Set(seededNames).size!==rows.length) throw new Error('Supabase nutrition seed must contain the same number of unique products as the web fallback');
-for(const name of names) if(!seededNames.includes(name)) throw new Error(`Supabase nutrition seed is missing: ${name}`);
+if(seededNames.length!==baseRows.length||new Set(seededNames).size!==baseRows.length) throw new Error('Supabase setup seed must contain the same number of unique products as the core web fallback');
+for(const row of baseRows) if(!seededNames.includes(row.canonical_name)) throw new Error(`Supabase nutrition seed is missing: ${row.canonical_name}`);
 
 const required={
   'подсолнечное масло':{kcal:884,protein:0,fat:100,carbs:0,fdc_id:171017},
@@ -55,4 +66,4 @@ for(const [name,expected] of Object.entries(required)){
   }
 }
 
-console.log(`OK: ${rows.length} unique nutrition products and aliases; web fallback and Supabase seed match.`);
+console.log(`OK: ${rows.length} unique nutrition products and aliases; ${portionRows.length} unique household weights; ${baseRows.length} core products match the Supabase setup seed.`);

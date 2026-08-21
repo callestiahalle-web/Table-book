@@ -967,7 +967,8 @@ body.dark .meal-chip{background:rgba(215,182,109,.16)}
 .meal-picker-dialog{width:min(680px,calc(100vw - 28px));max-height:min(78vh,760px);border-radius:32px;background:var(--paper);box-shadow:var(--shadow),var(--inner);display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden;color:var(--ink)}
 .meal-picker-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.32)}
 .meal-picker-head span{display:block;font-size:12px;color:var(--muted);font-weight:900;text-align:left}.meal-picker-head h3{margin:2px 0 0;font:400 28px/1.05 Georgia,"Times New Roman",serif;letter-spacing:-.03em;text-align:left}
-.meal-picker-body{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;padding:14px 16px 16px}.meal-pick-grid-modal{max-height:none;min-height:0;padding:4px;grid-template-columns:repeat(2,minmax(0,1fr))}.meal-pick-grid-modal .meal-pick-card{min-height:82px}
+.meal-picker-body{min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px;padding:14px 16px 16px}.meal-pick-grid-modal{max-height:none;min-height:0;padding:4px;grid-template-columns:repeat(2,minmax(0,1fr))}.meal-pick-grid-modal .meal-pick-card{min-height:82px}
+.meal-picker-search{position:relative;display:block;width:min(100%,520px);justify-self:center}.meal-picker-search-icon{position:absolute;left:17px;top:50%;z-index:1;transform:translateY(-52%) rotate(-20deg);color:var(--muted);font-size:20px;line-height:1;pointer-events:none}.meal-picker-search .meal-search{min-height:44px;border-radius:999px;padding:10px 40px 10px 45px;text-align:center;font-weight:600;background:var(--paper);box-shadow:var(--softShadow),var(--inner);-webkit-appearance:none;appearance:none}.meal-picker-search .meal-search::placeholder{color:var(--muted);opacity:.78}.meal-picker-search .meal-search:focus{box-shadow:0 0 0 1px rgba(201,164,95,.55),var(--pressed)}.meal-picker-search .meal-search::-webkit-search-cancel-button{cursor:pointer}.meal-search-results{align-content:start}
 body.dark .meal-picker-modal{background:rgba(3,10,28,.42)}body.dark .meal-picker-dialog,body.dark .meal-type-card{background:linear-gradient(180deg, rgba(18,38,90,.98), rgba(16,32,77,.98))!important}
 @keyframes mealPickerFade{from{opacity:0}to{opacity:1}}
 @media(max-width:900px){.home-planner-row{grid-template-columns:1fr!important;max-width:620px}.home-my-card,.home-calendar-card{min-height:180px!important}.home-calendar-card{min-height:360px!important}}
@@ -6760,6 +6761,13 @@ body.dark .shopping-panel{background:var(--paper) !important}
 }
 .recipe-timing small{font-size:9px;line-height:1.2;color:var(--muted)}
 .recipe-timing b{font-size:11px;line-height:1.25;font-weight:600;color:var(--ink)}
+.recipe-history{margin:0 0 12px;font-size:13px;color:var(--muted)}
+.recipe-history strong{color:var(--ink);font-weight:600}
+.recipe-sources{display:grid;gap:8px;margin-top:14px;padding:13px 14px;border:1px solid var(--line);border-radius:18px;background:var(--paper2);box-shadow:var(--pressed)}
+.recipe-sources>strong{font-size:12px;font-weight:600;color:var(--ink)}
+.recipe-sources>div{display:flex;flex-wrap:wrap;gap:7px}
+.recipe-sources a{display:inline-flex;align-items:center;min-height:30px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:10px;line-height:1.25;text-decoration:none;transition:color .18s ease,border-color .18s ease,background .18s ease}
+.recipe-sources a:hover{color:var(--ink);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 7%,transparent)}
 
 @media(max-width:620px){
   .activity-labels{font-size:7.6px;gap:2px}

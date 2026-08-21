@@ -10826,6 +10826,7 @@ if(window.TABLE_BOOK_JAPANESE_RECIPES) window.TABLE_BOOK_JAPANESE_RECIPES.apply(
 if(window.TABLE_BOOK_KOREAN_RECIPES) window.TABLE_BOOK_KOREAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_RUSSIAN_RECIPES) window.TABLE_BOOK_RUSSIAN_RECIPES.apply(recipes);
 if(window.TABLE_BOOK_SOUS_VIDE_RECIPES) window.TABLE_BOOK_SOUS_VIDE_RECIPES.apply(recipes);
+if(window.TABLE_BOOK_CHEF_REVIEW) window.TABLE_BOOK_CHEF_REVIEW.apply(recipes);
 const categoryOrder=["Завтраки","Закуски","Салаты","Супы","Горячие блюда","Су-вид","Гарниры","Выпечка","Десерты","Фрукты","Морепродукты","Соусы"];
 const ingredientGroupOrder=["Мясо","Птица","Рыба и морепродукты","Овощи и грибы","Крупы, бобовые и макароны","Яйца и молочные продукты","Тесто и выпечка","Фрукты и ягоды","Орехи и семена","Бульоны","Каши","Йогурт","Десерты","Другие продукты"];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -11778,7 +11779,38 @@ function setTheme(){
   updateHomeActionIcons();
 }
 function dishEmoji(r){return dishIconKey(r);}
-function nutritionOf(r){if(r.nutrition) return r.nutrition; const d={"Завтраки":{kcal:290,protein:13,fat:12,carbs:31},"Закуски":{kcal:220,protein:8,fat:10,carbs:24},"Салаты":{kcal:180,protein:6,fat:10,carbs:16},"Супы":{kcal:210,protein:11,fat:7,carbs:24},"Горячие блюда":{kcal:430,protein:24,fat:17,carbs:39},"Выпечка":{kcal:340,protein:8,fat:12,carbs:48},"Десерты":{kcal:360,protein:6,fat:15,carbs:49},"Фрукты":{kcal:70,protein:1,fat:.3,carbs:17},"Морепродукты":{kcal:280,protein:25,fat:11,carbs:13},"Гарниры":{kcal:250,protein:5,fat:6,carbs:42},"Соусы":{kcal:95,protein:2,fat:7,carbs:6}}; return d[r.category]||{kcal:300,protein:10,fat:10,carbs:30};}
+function catalogNutritionFromIngredients(recipe){
+  const lines=Array.isArray(recipe?.ingredients)?recipe.ingredients:[];
+  if(!lines.length) return null;
+  const products=[];
+  let measurable=0,matched=0;
+  for(const line of lines){
+    const parsed=parseIngredientAmount(line);
+    if(!(parsed.amount>0)||parsed.unit==='text') continue;
+    if(/деревянн(?:ые|ая)\s+шпажк|кулинарн(?:ая|ые)\s+нит|кости\s+и\s+каркас/iu.test(parsed.name)) continue;
+    measurable+=1;
+    const reference=foodNutritionEntry(parsed.name);
+    if(!reference) continue;
+    const resolved=productWeightFor(parsed.name,parsed.amount,parsed.unit);
+    if(!(resolved.weight>0)) continue;
+    matched+=1;
+    products.push({
+      name:parsed.name,amount:parsed.amount,unit:parsed.unit,weight:resolved.weight,gramsPerUnit:resolved.gramsPerUnit,
+      kcal:reference.kcal,protein:reference.protein,fat:reference.fat,carbs:reference.carbs,
+      fdcId:reference.fdc_id||null,nutritionSource:reference.source_name||'USDA FoodData Central',nutritionAuto:true,ingredientLinked:true
+    });
+  }
+  if(!matched||matched<Math.min(2,measurable)||matched/Math.max(1,measurable)<.65) return null;
+  const total=products.reduce((sum,product)=>{const value=nutritionForProduct(product);sum.kcal+=value.kcal;sum.protein+=value.protein;sum.fat+=value.fat;sum.carbs+=value.carbs;return sum;},{kcal:0,protein:0,fat:0,carbs:0});
+  const servings=Math.max(1,Number(recipe.servings)||1);
+  const rounded=value=>Number(value.toFixed(1));
+  recipe.ingredientNutrition=products;
+  recipe.ingredientWeight=rounded(products.reduce((sum,product)=>sum+Number(product.weight||0),0));
+  recipe.nutritionTotal=Object.fromEntries(Object.entries(total).map(([key,value])=>[key,rounded(value)]));
+  recipe.nutritionCalculated=true;
+  return Object.fromEntries(Object.entries(total).map(([key,value])=>[key,rounded(value/servings)]));
+}
+function nutritionOf(r){if(r.nutrition) return r.nutrition; const calculated=catalogNutritionFromIngredients(r); if(calculated) return calculated; const d={"Завтраки":{kcal:290,protein:13,fat:12,carbs:31},"Закуски":{kcal:220,protein:8,fat:10,carbs:24},"Салаты":{kcal:180,protein:6,fat:10,carbs:16},"Супы":{kcal:210,protein:11,fat:7,carbs:24},"Горячие блюда":{kcal:430,protein:24,fat:17,carbs:39},"Выпечка":{kcal:340,protein:8,fat:12,carbs:48},"Десерты":{kcal:360,protein:6,fat:15,carbs:49},"Фрукты":{kcal:70,protein:1,fat:.3,carbs:17},"Морепродукты":{kcal:280,protein:25,fat:11,carbs:13},"Гарниры":{kcal:250,protein:5,fat:6,carbs:42},"Соусы":{kcal:95,protein:2,fat:7,carbs:6}}; r.nutritionEstimated=true; return d[r.category]||{kcal:300,protein:10,fat:10,carbs:30};}
 recipes.forEach(r=>{r.dishEmoji=r.dishEmoji||dishEmoji(r); r.nutrition=nutritionOf(r);});
 function fmt(v){const x=Math.round(v*10)/10; return Number.isInteger(x)?String(x):x.toFixed(1).replace('.0','')}
 function plural(n,a){n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20)return a[2]; if(n1>1&&n1<5)return a[1]; if(n1===1)return a[0]; return a[2];}
@@ -11913,7 +11945,7 @@ function goHomeWithFlip(){flushMealDraftBeforeNavigation(); routeHistory=[]; con
 const MEAL_SLOTS=[['breakfast','Завтрак'],['lunch','Обед'],['snack','Перекус'],['dinner','Ужин'],['extraSnack','Дополнительный снек']];
 let mealDraftDate=null, mealDraft=null, mealDayEditMode=true, mealDraftDirty=false;
 const MEAL_MY_RECIPES_CATEGORY='__my_recipes__';
-let mealPickerDialog={slot:null,category:null,country:null,step:'category'};
+let mealPickerDialog={slot:null,category:null,country:null,step:'category',query:''};
 let mealPlanCleanedOnce=false;
 const mealMonthCache=new Map();
 const mealMonthLoads=new Map();
@@ -12339,10 +12371,12 @@ function renderMealCalendar(){
   }
   updateHomeMeta();
 }
+function normalizeMealSearch(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('ru-RU').replace(/ё/g,'е').replace(/[^a-zа-я0-9]+/gi,' ').trim();}
 function mealRecipeMatches(recipe,q){
-  if(!q) return true;
-  const hay=[recipe.title,recipe.category,recipe.country,recipe.origin,mealCountryLabel(recipe),recipe.source==='custom'?'мои рецепты':'каталог'].join(' ').toLowerCase();
-  return hay.includes(String(q||'').toLowerCase());
+  const words=normalizeMealSearch(q).split(/\s+/).filter(Boolean);
+  if(!words.length) return true;
+  const hay=normalizeMealSearch([recipe.title,...(Array.isArray(recipe.ingredients)?recipe.ingredients:[])].join(' '));
+  return words.every(word=>hay.includes(word));
 }
 function mealTypeList(slot){
   const selected=new Set((mealDraft?.[slot]||[]).map(item=>item.source+':'+item.id));
@@ -12357,18 +12391,24 @@ function mealPickerHtml(slot){
 }
 function openMealDishPicker(slot,category=null){
   if(!MEAL_SLOTS.some(([s])=>s===slot)) return;
-  mealPickerDialog={slot,category:category||null,country:null,step:category?'country':'category'};
+  mealPickerDialog={slot,category:category||null,country:null,step:category?'country':'category',query:''};
   const modal=$('#mealPickerModal');
   if(modal) modal.hidden=false;
   document.body.classList.add('meal-picker-open');
+  const search=$('#mealPickerSearch');
+  if(search){
+    search.value='';
+    search.oninput=()=>{mealPickerDialog.query=search.value;renderMealDishPicker();};
+  }
   renderMealDishPicker();
+  requestAnimationFrame(()=>search?.focus({preventScroll:true}));
   vibe(10);
 }
 function closeMealDishPicker(){
   const modal=$('#mealPickerModal');
   if(modal) modal.hidden=true;
   document.body.classList.remove('meal-picker-open');
-  mealPickerDialog={slot:null,category:null,country:null,step:'category'};
+  mealPickerDialog={slot:null,category:null,country:null,step:'category',query:''};
 }
 function mealPickerBackToCountries(){
   if(mealPickerDialog.step==='dish'){
@@ -12386,11 +12426,29 @@ function mealPickerBackToCountries(){
   renderMealDishPicker();
 }
 function renderMealDishPicker(){
-  const {slot,category,country,step}=mealPickerDialog;
-  const modal=$('#mealPickerModal'), grid=$('#mealPickerGrid'), title=$('#mealPickerTitle'), slotLabel=$('#mealPickerSlotLabel'), note=$('#mealPickerNote'), back=$('#mealPickerBack');
+  const {slot,category,country,step,query=''}=mealPickerDialog;
+  const modal=$('#mealPickerModal'), grid=$('#mealPickerGrid'), title=$('#mealPickerTitle'), slotLabel=$('#mealPickerSlotLabel'), note=$('#mealPickerNote'), back=$('#mealPickerBack'), search=$('#mealPickerSearch');
   if(!modal||modal.hidden||!grid||!slot) return;
   const slotName=(MEAL_SLOTS.find(([s])=>s===slot)||[])[1]||'Приём пищи';
   const selected=new Set((mealDraft?.[slot]||[]).map(item=>item.source+':'+item.id));
+  if(search&&search.value!==query) search.value=query;
+  if(normalizeMealSearch(query)){
+    const all=allRecipeOptions()
+      .filter(r=>!selected.has((r.source==='custom'?'custom':'base')+':'+r.id))
+      .filter(r=>mealRecipeMatches(r,query))
+      .sort((a,b)=>Number(b.source==='custom')-Number(a.source==='custom')||String(a.title||'').localeCompare(String(b.title||''),'ru'));
+    if(title) title.textContent='Поиск блюд';
+    if(slotLabel) slotLabel.textContent=slotName;
+    if(back) back.hidden=true;
+    grid.className='meal-pick-grid meal-pick-grid-modal meal-search-results';
+    grid.innerHTML=all.length?all.slice(0,80).map(r=>{
+      const source=r.source==='custom'?'custom':'base';
+      return `<button class="meal-pick-card" type="button" data-pick-slot="${slot}" data-pick-source="${source}" data-pick-id="${esc(r.id)}"><b>${esc(r.title)}</b><span>${esc((source==='custom'?'Мои рецепты':'Каталог')+' • '+mealCountryLabel(r))}</span></button>`;
+    }).join(''):'<div class="meal-empty">По этому запросу блюда не найдены.</div>';
+    if(note) note.textContent=all.length?`Найдено ${all.length} ${plural(all.length,['блюдо','блюда','блюд'])}`:'Попробуйте другое слово из названия или ингредиентов.';
+    grid.querySelectorAll('[data-pick-slot]').forEach(btn=>btn.onclick=()=>addMealDish(btn.dataset.pickSlot,btn.dataset.pickSource,btn.dataset.pickId));
+    return;
+  }
   if(step==='category' || !category){
     const cats=mealTypeList(slot);
     const myCount=myRecipes.filter(r=>!selected.has('custom:'+r.id)).length;
@@ -12581,7 +12639,13 @@ function parseIngredientAmount(line){
   const normalized=source.replace(/½/g,'1/2').replace(/¼/g,'1/4').replace(/¾/g,'3/4');
   const divided=normalized.match(/^(.*?)(?:\s*[—–]\s*|\s+-\s+)(.+)$/);
   const amountText=divided?.[2]||normalized;
-  const match=amountText.match(/(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?)(?:\s*[–—-]\s*(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?))?\s*(кг|мг|г(?:р|рамм(?:а|ов)?)?\.?|мл\.?|луковиц(?:а|ы|у|е)?|л\.?|шт\.?|штук(?:а|и)?|ст\.?\s*л\.?|столов(?:ая|ой|ую|ые)?\s+ложк(?:а|и|у|ой)?|ч\.?\s*л\.?|чайн(?:ая|ой|ую|ые)?\s+ложк(?:а|и|у|ой)?|зубчик(?:а|ов)?|ломтик(?:а|ов)?|дольк(?:а|и|ек)|пуч(?:ок|ка|ков))/i);
+  const embeddedWeight=amountText.match(/(?:около|весом|массой)\s*(\d+(?:[.,]\d+)?)(?:\s*[–—-]\s*(\d+(?:[.,]\d+)?))?\s*г(?:р|рамм(?:а|ов)?)?(?![а-яё])/i);
+  if(embeddedWeight){
+    const low=ingredientNumber(embeddedWeight[1]),high=ingredientNumber(embeddedWeight[2]||embeddedWeight[1]);
+    const name=cleanShoppingProductName(divided?.[1]||normalized.slice(0,Math.max(0,embeddedWeight.index||0))||source);
+    return {name,amount:(low+high)/2,unit:'g',explicit:true};
+  }
+  const match=amountText.match(/(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?)(?:\s*[–—-]\s*(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?))?\s*(кг|мг|г(?:р|рамм(?:а|ов)?)?\.?|мл\.?|луковиц(?:а|ы|у|е)?|шт\.?|штук(?:а|и)?|ст\.?\s*л\.?|столов(?:ая|ой|ую|ые)?\s+ложк(?:а|и|у|ой)?|ч\.?\s*л\.?|чайн(?:ая|ой|ую|ые)?\s+ложк(?:а|и|у|ой)?|зубчик(?:а|ов)?|ломтик(?:а|ов)?|дольк(?:а|и|ек)|пуч(?:ок|ка|ков)|лист(?:а|ов)?|стеб(?:ель|ля|лей)|пер(?:о|а|ьев)|палочк(?:а|и|ек)|полоск(?:а|и|ок)|банк(?:а|и)|упаковк(?:а|и)|л\.?)(?![а-яё])/i);
   const rawName=divided?.[1]||(match?normalized.slice(0,Math.max(0,match.index||0)):normalized);
   const name=cleanShoppingProductName(rawName||source);
   if(!match) return {name,amount:0,unit:'text',text:divided?.[2]||'по потребности',explicit:false};
@@ -12598,7 +12662,7 @@ function parseIngredientAmount(line){
   else if(rawUnit.startsWith('зубчик')) unit='clove';
   else if(rawUnit.startsWith('ломтик')) unit='slice';
   else if(rawUnit.startsWith('дольк')) unit='wedge';
-  else if(rawUnit.startsWith('пуч')) unit='bunch';
+  else if(rawUnit.startsWith('пуч')) unit='piece';
   return {name,amount,unit,explicit:true};
 }
 function shoppingIngredientRows(recipe,selectedServings=1){if(recipe?.skipShopping) return []; const recipeServings=Math.max(1,Number(recipe?.servings)||1),requested=Math.max(1,Math.min(12,Math.round(Number(selectedServings)||1))),scale=recipe?.preparedForNextDay?Math.max(1,requested/recipeServings):requested/recipeServings; const rows=[],calculatedNames=new Set(),skippedLines=new Set((Array.isArray(recipe?.skipShoppingLines)?recipe.skipShoppingLines:[]).map(line=>String(line).trim())); (Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition:[]).forEach(product=>{const amount=Number(product?.amount??product?.quantity)||0,unit=product?.unit||'g',name=String(product?.name||'').trim(); const resolved=Number(product?.weight)||productWeightFor(name,amount,unit).weight; const key=normalizePortionName(canonicalShoppingName(name)); if(key) calculatedNames.add(key); if(resolved>0) rows.push({name,amount:resolved*scale,unit:'g'}); else if(amount>0) rows.push({name,amount:amount*scale,unit});}); if(recipe?.shoppingFromNutritionOnly) return rows; (Array.isArray(recipe?.ingredients)?recipe.ingredients:[]).forEach(line=>{if(skippedLines.has(String(line).trim())) return; const parsed=parseIngredientAmount(line); const key=normalizePortionName(canonicalShoppingName(parsed.name)); if(!key||!calculatedNames.has(key)) rows.push(parsed.amount>0?Object.assign({},parsed,{amount:parsed.amount*scale}):parsed);}); return rows;}
@@ -14075,8 +14139,11 @@ function openRecipe(id,source='base',recipeOverride=null){
   const nutritionHtml=(n,s)=>`<div class="nutrition-total-label">На всё блюдо · ${s} ${plural(s,['порция','порции','порций'])}</div><div class="nutrition"><div class="ncard"><strong>${fmt(n.kcal*s)}</strong><span>ккал</span></div><div class="ncard"><strong>${fmt(n.protein*s)} г</strong><span>белки</span></div><div class="ncard"><strong>${fmt(n.fat*s)} г</strong><span>жиры</span></div><div class="ncard"><strong>${fmt(n.carbs*s)} г</strong><span>углеводы</span></div></div><div class="nnote">На 1 порцию: ${fmt(n.kcal)} ккал • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</div>`;
   const stepsHtml=(r.steps||[]).map(step=>{const sec=extractStepTimerSeconds(step); return `<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${esc(step)}</span></label>${sec?timerHtml(sec):''}</div>`;}).join('');
   const timingHtml=(r.prepTime||r.cookTime||r.totalTime)?`<div class="recipe-timing"><span><small>Подготовка</small><b>${esc(r.prepTime||'—')}</b></span><span><small>Приготовление</small><b>${esc(r.cookTime||'—')}</b></span><span><small>Общее время</small><b>${esc(r.totalTime||r.time||'—')}</b></span></div>`:'';
+  const historyHtml=r.historyNote?`<div class="tip recipe-history"><strong>История и традиция:</strong> ${esc(r.historyNote)}</div>`:'';
+  const recipeSources=Array.isArray(r.recipeSources)?r.recipeSources.filter(source=>source&&source.url&&source.label):[];
+  const sourcesHtml=recipeSources.length?`<div class="recipe-sources"><strong>Источники проверки</strong><div>${recipeSources.map(source=>`<a href="${esc(source.url)}" target="_blank" rel="noopener noreferrer">${esc(source.label)}</a>`).join('')}</div></div>`:'';
   const cookedWeightNote=r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и ${r.weightEstimated?'оценочного':'взвешенного'} веса готового блюда ${r.weightEstimated?'≈ ':''}${r.weight||0} г.${!r.weightEstimated&&r.estimatedWeight&&Math.abs(Number(r.estimatedWeight)-Number(r.weight||0))>Math.max(10,Number(r.weight||0)*.05)?` Расчётный ориентир по продуктам ≈ ${fmt(r.estimatedWeight)} г.`:''}</div>`:'';
-  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div>${timingHtml}<h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul>${fodmapLegendHtml()}<div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${nutritionProducts.length?`<div id="productNutritionBreakdown">${productNutritionDetailsHtml(nutritionProducts,{servings:baseServings})}</div>`:''}${cookedWeightNote}</aside><section class="panel"><h3>Приготовление</h3><div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>${normalizedSource==='base'?recipeVersionActionsHtml(canonicalId):''}`;
+  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div>${timingHtml}<h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul>${fodmapLegendHtml()}<div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${nutritionProducts.length?`<div id="productNutritionBreakdown">${productNutritionDetailsHtml(nutritionProducts,{servings:baseServings})}</div>`:''}${cookedWeightNote}</aside><section class="panel"><h3>Приготовление</h3>${historyHtml}<div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}${sourcesHtml}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>${normalizedSource==='base'?recipeVersionActionsHtml(canonicalId):''}`;
   function rerender(){
     const raw=Number($('#portionInput').value); const s=Number.isFinite(raw)&&raw>0?raw:baseServings;
     $('#portionInput').value=s;

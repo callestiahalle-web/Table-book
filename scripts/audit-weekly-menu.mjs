@@ -15,7 +15,7 @@ if(JSON.stringify(actualDates)!==JSON.stringify(expectedDates)) throw new Error(
 
 const recipes=new Map(data.recipes.map(recipe=>[recipe.id,recipe]));
 if(recipes.size!==data.recipes.length) throw new Error('Duplicate weekly recipe IDs found');
-if(recipes.size!==33) throw new Error(`Expected 33 normalized recipe cards, received ${recipes.size}`);
+if(recipes.size!==44) throw new Error(`Expected 44 normalized recipe cards, received ${recipes.size}`);
 for(const duplicateId of ['week-20260824-lunch-turkey-container','week-20260825-lunch-chicken-container']){
   if(recipes.has(duplicateId)) throw new Error(`Duplicate container recipe is still exported: ${duplicateId}`);
 }
@@ -40,7 +40,7 @@ for(const recipe of recipes.values()){
   if(titleKeys.has(titleKey)) throw new Error(`Duplicate recipe title remains: ${recipe.title}`);
   titleKeys.add(titleKey);
 }
-if([...recipes.values()].filter(recipe=>recipe.category==='Фрукты').length!==13) throw new Error('Expected thirteen unique fruit and berry cards in the Fruits category');
+if([...recipes.values()].filter(recipe=>recipe.category==='Фрукты').length!==24) throw new Error('Expected twenty-four unique fruit and berry cards in the Fruits category');
 
 const expectedChipIds=[
   'week-chip-san-carlo-classic',
@@ -96,11 +96,11 @@ const assertText=(id,pattern,message)=>{
 };
 assertText('week-20260819-lunch-unagi-bowl',/угорь унаги в соусе — 100 г/,'19 August lunch must use 100 g unagi');
 assertText('week-20260819-dinner-unagi-kimbap',/оставшийся угорь унаги — 100 г/,'19 August dinner must use remaining 100 g unagi');
-assertText('week-20260821-dinner-pollock-batch',/фарш минтая — 400 г/,'21 August must cook the full 400 g pollock pack');
-assertText('week-20260822-lunch-rice-noodles-pollock',/оставшаяся половина/,'22 August must use the remaining pollock half');
+assertText('week-20260821-dinner-pollock-batch',/фарш минтая \(на всю партию\) — 400 г/,'21 August must cook the full 400 g pollock pack');
+assertText('week-20260822-lunch-rice-noodles-pollock',/1\/2 партии, приготовленной 21 августа/,'22 August must use the remaining pollock half');
 assertText('week-20260823-dinner-turkey-batch',/Готовим сразу 2 порции: ужин \+ обед на работу/,'23 August must prepare Monday work lunch');
 assertText('week-20260824-dinner-chicken-bowl-batch',/Готовим сразу 2 порции: ужин \+ обед на работу/,'24 August must prepare Tuesday work lunch');
-assertText('week-20260825-dinner-pollock-batch',/фарш минтая — 400 г/,'25 August must open the second 400 g pollock pack');
+assertText('week-20260825-dinner-pollock-batch',/фарш минтая \(на всю партию\) — 400 г/,'25 August must open the second 400 g pollock pack');
 assertText('week-20260825-dinner-pollock-batch',/использовать 26 августа или заморозить/,'25 August must preserve the leftover note');
 
 const mondayLunch=data.mealPlan['2026-08-24'].lunch[0];
