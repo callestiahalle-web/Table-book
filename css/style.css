@@ -4047,14 +4047,6 @@ main.page {
   min-height: 128px;
 }
 
-.liked-tab-icon,
-.encyclopedia-tab-icon {
-  display: grid !important;
-  place-items: center;
-  font-size: 32px;
-  line-height: 1;
-}
-
 .cuisine-title {
   margin-top: 26px !important;
 }
