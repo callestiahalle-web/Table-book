@@ -2811,8 +2811,8 @@ function loadLocalDataScript(src){
 async function ensureLocalFoodReferences(){
   if(localFoodReferenceReady) return true;
   try{
-    await loadLocalDataScript('./js/food-reference.js?v=20260827-targeted-load');
-    await loadLocalDataScript('./js/product-portions.js?v=20260827-targeted-load');
+    await loadLocalDataScript('./js/food-reference.js?v=20260828-nutrition-repair');
+    await loadLocalDataScript('./js/product-portions.js?v=20260828-nutrition-repair');
     await loadLocalDataScript('./js/chef-food-reference.js?v=20260827-targeted-load');
     foodNutritionReference=mergeFoodNutritionRows(foodNutritionReference,window.TABLE_BOOK_FOOD_NUTRITION_FALLBACK||[]);
     foodStorageReference=mergeReferenceSubset(foodStorageReference,normalizeFoodStorageRows(window.TABLE_BOOK_FOOD_STORAGE_FALLBACK||[]),row=>normalizePortionName(row.canonical_name));
@@ -2954,7 +2954,12 @@ const productReferenceTimers=new WeakMap();
 const visibleProductReferenceRows=new Set();
 let visibleProductReferenceBatchTimer=null;
 let visibleProductReferenceBatchRunning=false;
-function productRowNeedsNutrition(row){return ['kcal','protein','fat','carbs'].some(key=>String(row?.querySelector(`[data-prod="${key}"]`)?.value||'').trim()==='');}
+function productRowNeedsNutrition(row){
+  const values=['kcal','protein','fat','carbs'].map(key=>String(row?.querySelector(`[data-prod="${key}"]`)?.value||'').trim());
+  if(values.some(value=>value==='')) return true;
+  const hasReference=Boolean(row?.dataset?.fdcId)||row?.dataset?.autoNutrition==='1';
+  return !hasReference&&!values.some(value=>(Number(value)||0)>0);
+}
 async function flushVisibleProductReferences(){
   if(visibleProductReferenceBatchRunning) return;
   const rows=[...visibleProductReferenceRows].filter(row=>row?.isConnected&&row.dataset.referenceVisible==='1');
@@ -3235,6 +3240,37 @@ function reconcileCustomRecipeNutrition(recipe){
     nutrition100,
     nutrition
   });
+}
+function recipeNutritionRowsMissingReference(recipe){
+  return (Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition:[]).filter(row=>{
+    const name=String(row?.name||'').trim();
+    const hasReference=Boolean(Number(row?.fdcId||row?.fdc_id))||Boolean(row?.nutritionAuto&&row?.nutritionSource);
+    return name&&!hasReference&&productNutritionScore(row)===0;
+  });
+}
+async function hydrateRecipeNutritionReferences(recipe){
+  const missing=recipeNutritionRowsMissingReference(recipe);
+  if(!missing.length) return {recipe,changed:false};
+  const names=[...new Set(missing.map(row=>String(row.name||'').trim()).filter(Boolean))];
+  await loadReferenceDataForNames(names,{nutrition:true,portions:false});
+  if(referenceQueryFailed.nutrition) await ensureLocalFoodReferences();
+  let changed=false;
+  const products=(Array.isArray(recipe.ingredientNutrition)?recipe.ingredientNutrition:[]).map(product=>{
+    if(!missing.includes(product)) return product;
+    const reference=foodNutritionEntryExact(product.name)||foodNutritionEntry(product.name);
+    if(!reference) return product;
+    changed=true;
+    return Object.assign({},product,{
+      kcal:reference.kcal,
+      protein:reference.protein,
+      fat:reference.fat,
+      carbs:reference.carbs,
+      fdcId:reference.fdc_id||null,
+      nutritionSource:reference.source_name||'USDA FoodData Central',
+      nutritionAuto:true
+    });
+  });
+  return changed?{recipe:reconcileCustomRecipeNutrition(Object.assign({},recipe,{ingredientNutrition:products})),changed:true}:{recipe,changed:false};
 }
 function calcFromProducts(){const products=getProductRows(); const used=products.filter(p=>p.name && p.weight>0).map(product=>({...product,total:nutritionForProduct(product)})); if(!used.length) return null; const inputWeight=used.reduce((sum,product)=>sum+product.weight,0); if(inputWeight<=0) return null; const total=used.reduce((sum,product)=>addNutrition(sum,product.total),{kcal:0,protein:0,fat:0,carbs:0}); return {inputWeight,total,products:used};}
 function scrollToMyRecipeListStart(){
@@ -3675,6 +3711,17 @@ async function openRecipe(id,source='base',recipeOverride=null,{skipCloud=false}
     if(activeRecipeModalKey!==requestedModalKey||!$('#modal')?.classList.contains('open')) return false;
     r=recipeOverride||effectiveBaseRecipe(canonicalId);
     if(!r) return false;
+  }
+  const hydrated=await hydrateRecipeNutritionReferences(r);
+  if(hydrated.changed){
+    r=hydrated.recipe;
+    if(normalizedSource==='custom'){
+      const index=myRecipes.findIndex(recipe=>recipe.id===canonicalId);
+      if(index>-1){
+        myRecipes[index]=r;
+        saveMyRecipes();
+      }
+    }
   }
   activeSharedRecipe=normalizedSource==='shared'?r:null;
   const likeAction=normalizedSource==='shared'?'':likeButtonHtml(r.id,normalizedSource,'');

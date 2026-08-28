@@ -49,6 +49,8 @@ for(const marker of ['food_nutrition_alias_lookup','food_nutrition_lookup','secu
 }
 
 const required={
+  'болгарский перец':{kcal:26,protein:.99,fat:.3,carbs:6.03,fdc_id:170108},
+  'кокосовое молоко Aroy-D':{kcal:185,protein:1.6,fat:19,carbs:2,fdc_id:-1062},
   'подсолнечное масло':{kcal:884,protein:0,fat:100,carbs:0,fdc_id:171017},
   'сливочное масло':{kcal:717,protein:.85,fat:81.11,carbs:.06,fdc_id:173410},
   'сахар':{kcal:387,protein:0,fat:0,carbs:100,fdc_id:169655},
@@ -68,6 +70,18 @@ for(const [name,expected] of Object.entries(required)){
   for(const [field,value] of Object.entries(expected)){
     if(Number(actual[field])!==value) throw new Error(`${name}: expected ${field}=${value}, received ${actual[field]}`);
   }
+}
+
+const requiredAliases={
+  'перец красный болгарский':'болгарский перец',
+  'перец болгарский красный':'болгарский перец',
+  'красный болгарский перец':'болгарский перец',
+  'мокровь':'морковь',
+  'кокосовое молоко aroy-d':'кокосовое молоко Aroy-D'
+};
+for(const [alias,canonical] of Object.entries(requiredAliases)){
+  const actual=aliases.get(normalize(alias));
+  if(actual!==canonical) throw new Error(`Alias "${alias}" must resolve to "${canonical}", received "${actual||'nothing'}"`);
 }
 
 console.log(`OK: ${rows.length} offline nutrition products and aliases; ${portionRows.length} household weights; ${seededNames.length} Supabase seed products include all ${baseRows.length} core fallback products.`);
