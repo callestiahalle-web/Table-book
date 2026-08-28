@@ -127,6 +127,7 @@ const CLOUD_MEAL_TABLE="user_meal_days";
 const CLOUD_RECIPE_OVERRIDE_TABLE="user_recipe_overrides";
 const CLOUD_PRODUCT_PORTION_TABLE="product_portion_weights";
 const CLOUD_FOOD_NUTRITION_TABLE="food_nutrition_reference";
+const CLOUD_FOOD_NUTRITION_LOOKUP="food_nutrition_lookup";
 const CLOUD_FOOD_STORAGE_TABLE="food_storage_reference";
 const PRODUCT_PORTION_CACHE_KEY="tableBookProductPortions:v2";
 const FOOD_NUTRITION_CACHE_KEY="tableBookFoodNutrition:v1";
@@ -2791,6 +2792,7 @@ function productIdentityKey(name){
 }
 const referenceQueryLoaded={nutrition:new Set(),portions:new Set(),storage:new Set()};
 const referenceQueryPending=new Map();
+const referenceQueryFailed={nutrition:false,portions:false,storage:false};
 const localDataScriptLoads=new Map();
 let localFoodReferenceReady=false;
 function loadLocalDataScript(src){
@@ -2844,29 +2846,43 @@ function mergeReferenceSubset(current,incoming,keyOf){
   return [...map.values()];
 }
 async function fetchReferenceSubset(kind,names){
-  if(!cloud?.from) return false;
+  if(!cloud?.from){if(referenceQueryFailed[kind]!==undefined) referenceQueryFailed[kind]=true;return false;}
   const config={
-    nutrition:{table:CLOUD_FOOD_NUTRITION_TABLE,rows:foodNutritionReference,columns:'canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name,source_url',normalize:normalizeFoodNutritionRows},
+    nutrition:{table:CLOUD_FOOD_NUTRITION_LOOKUP,rows:foodNutritionReference,queryField:'alias_key',columns:'alias_key,canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name,source_url',normalize:normalizeFoodNutritionRows},
     portions:{table:CLOUD_PRODUCT_PORTION_TABLE,rows:productPortionWeights,columns:'canonical_name,aliases,unit_code,unit_label,grams,note,sort_order',normalize:normalizeProductPortionRows},
     storage:{table:CLOUD_FOOD_STORAGE_TABLE,rows:foodStorageReference,columns:'canonical_name,aliases,fridge_days_min,fridge_days_max,note,source_name,source_url',normalize:normalizeFoodStorageRows}
   }[kind];
   if(!config) return false;
-  const canonical=referenceCanonicalNames(names,config.rows).filter(name=>!referenceQueryLoaded[kind].has(normalizePortionName(name)));
-  if(!canonical.length) return false;
-  const pendingKey=`${kind}:${canonical.map(normalizePortionName).sort().join('|')}`;
+  const lookupValues=(kind==='nutrition'
+    ? [...new Set((Array.isArray(names)?names:[]).map(normalizePortionName).filter(Boolean))].slice(0,40)
+    : referenceCanonicalNames(names,config.rows.length?config.rows:foodNutritionReference)
+  ).filter(name=>!referenceQueryLoaded[kind].has(normalizePortionName(name)));
+  if(!lookupValues.length) return false;
+  const pendingKey=`${kind}:${lookupValues.map(normalizePortionName).sort().join('|')}`;
   if(referenceQueryPending.has(pendingKey)) return referenceQueryPending.get(pendingKey);
   const task=(async()=>{
     try{
-      const {data,error}=await cloud.from(config.table).select(config.columns).in('canonical_name',canonical);
+      const queryField=config.queryField||'canonical_name';
+      let {data,error}=await cloud.from(config.table).select(config.columns).in(queryField,lookupValues);
+      if(error&&kind==='nutrition'){
+        const canonicalFallback=referenceCanonicalNames(names,foodNutritionReference);
+        if(canonicalFallback.length){
+          ({data,error}=await cloud.from(CLOUD_FOOD_NUTRITION_TABLE)
+            .select('canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name,source_url')
+            .in('canonical_name',canonicalFallback));
+        }
+      }
       if(error) throw error;
+      referenceQueryFailed[kind]=false;
       const next=config.normalize(data);
-      canonical.forEach(name=>referenceQueryLoaded[kind].add(normalizePortionName(name)));
+      lookupValues.forEach(name=>referenceQueryLoaded[kind].add(normalizePortionName(name)));
       if(!next.length) return false;
       if(kind==='nutrition') foodNutritionReference=mergeReferenceSubset(foodNutritionReference,next,row=>normalizePortionName(row.canonical_name));
       else if(kind==='portions') productPortionWeights=mergeReferenceSubset(productPortionWeights,next,row=>`${normalizePortionName(row.canonical_name)}:${row.unit_code}`);
       else foodStorageReference=mergeReferenceSubset(foodStorageReference,next,row=>normalizePortionName(row.canonical_name));
       return true;
     }catch(error){
+      referenceQueryFailed[kind]=true;
       console.warn(`Visible ${kind} reference load failed; using local fallback`,error);
       return false;
     }finally{referenceQueryPending.delete(pendingKey);}
@@ -2935,18 +2951,43 @@ function updateProductNutritionSource(row,entry=null){const source=row?.querySel
 function applyProductNutritionReference(row,{force=false,entry=null}={}){if(!row) return false; const name=row.querySelector('[data-prod="name"]')?.value||''; const match=entry||foodNutritionEntry(name); const fields=['kcal','protein','fat','carbs'].map(key=>row.querySelector(`[data-prod="${key}"]`)); const hasManual=fields.some(input=>String(input?.value||'').trim()!=='') && row.dataset.autoNutrition!=='1'; if(!match||(!force&&hasManual)){updateProductNutritionSource(row,match); return false;} ['kcal','protein','fat','carbs'].forEach(key=>{const input=row.querySelector(`[data-prod="${key}"]`); if(input) input.value=fmt(match[key]);}); const amount=row.querySelector('[data-prod="amount"]'),unit=row.querySelector('[data-prod="unit"]'); if(amount&&!String(amount.value||'').trim()){amount.value='100';if(unit) unit.value='g';} row.dataset.autoNutrition='1'; row.dataset.fdcId=String(match.fdc_id||''); row.dataset.referenceName=normalizePortionName(name); updateProductNutritionSource(row,match); return true;}
 let productReferenceObserver=null;
 const productReferenceTimers=new WeakMap();
-async function refreshVisibleProductReference(row){
+const visibleProductReferenceRows=new Set();
+let visibleProductReferenceBatchTimer=null;
+let visibleProductReferenceBatchRunning=false;
+function productRowNeedsNutrition(row){return ['kcal','protein','fat','carbs'].some(key=>String(row?.querySelector(`[data-prod="${key}"]`)?.value||'').trim()==='');}
+async function flushVisibleProductReferences(){
+  if(visibleProductReferenceBatchRunning) return;
+  const rows=[...visibleProductReferenceRows].filter(row=>row?.isConnected&&row.dataset.referenceVisible==='1');
+  visibleProductReferenceRows.clear();
+  if(!rows.length) return;
+  visibleProductReferenceBatchRunning=true;
+  try{
+    const snapshots=rows.map(row=>({row,name:String(row.querySelector('[data-prod="name"]')?.value||'').trim(),unit:row.querySelector('[data-prod="unit"]')?.value||'g'})).filter(item=>item.name);
+    const nutritionNames=[...new Set(snapshots.filter(item=>productRowNeedsNutrition(item.row)).map(item=>item.name))];
+    const portionNames=[...new Set(snapshots.filter(item=>item.unit!=='g'&&!productPortionEntry(item.name,item.unit)).map(item=>item.name))];
+    if(nutritionNames.length) await loadReferenceDataForNames(nutritionNames,{nutrition:true,portions:false});
+    if(portionNames.length) await loadReferenceDataForNames(portionNames,{nutrition:false,portions:true});
+    const lookupFailed=(nutritionNames.length&&referenceQueryFailed.nutrition)||(portionNames.length&&referenceQueryFailed.portions);
+    // Не скачиваем весь локальный справочник из-за неизвестного продукта:
+    // запасной набор нужен только при реальной недоступности запроса.
+    if(lookupFailed) await ensureLocalFoodReferences();
+    snapshots.forEach(({row,name})=>{
+      if(!row.isConnected||row.dataset.referenceVisible!=='1'||String(row.querySelector('[data-prod="name"]')?.value||'').trim()!==name) return;
+      const hasManual=['kcal','protein','fat','carbs'].some(key=>String(row.querySelector(`[data-prod="${key}"]`)?.value||'').trim()!=='')&&row.dataset.autoNutrition!=='1';
+      if(!hasManual&&productRowNeedsNutrition(row)) applyProductNutritionReference(row,{force:true});
+      else updateProductNutritionSource(row);
+    });
+    updateProductWeightHints();
+    updateKbjuPreview();
+  }finally{
+    visibleProductReferenceBatchRunning=false;
+    if(visibleProductReferenceRows.size&&!visibleProductReferenceBatchTimer) visibleProductReferenceBatchTimer=setTimeout(()=>{visibleProductReferenceBatchTimer=null;flushVisibleProductReferences();},40);
+  }
+}
+function refreshVisibleProductReference(row){
   if(!row?.isConnected||row.dataset.referenceVisible!=='1') return false;
-  const nameInput=row.querySelector('[data-prod="name"]');
-  const requestedName=String(nameInput?.value||'').trim();
-  if(!requestedName) return false;
-  await ensureLocalFoodReferences();
-  const changed=await loadReferenceDataForNames([requestedName],{nutrition:true,portions:true});
-  if(!changed||!row.isConnected||row.dataset.referenceVisible!=='1'||String(nameInput?.value||'').trim()!==requestedName) return false;
-  const hasManual=['kcal','protein','fat','carbs'].some(key=>String(row.querySelector(`[data-prod="${key}"]`)?.value||'').trim()!=='')&&row.dataset.autoNutrition!=='1';
-  if(!hasManual) applyProductNutritionReference(row,{force:true});
-  updateProductWeightHints();
-  updateKbjuPreview();
+  visibleProductReferenceRows.add(row);
+  if(!visibleProductReferenceBatchTimer) visibleProductReferenceBatchTimer=setTimeout(()=>{visibleProductReferenceBatchTimer=null;flushVisibleProductReferences();},40);
   return true;
 }
 function queueVisibleProductReference(row,delay=480){

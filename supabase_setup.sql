@@ -781,6 +781,195 @@ on conflict (canonical_name) do update set
   dataset_release=excluded.dataset_release,source_name=excluded.source_name,
   source_url=excluded.source_url,updated_at=now();
 
+-- Расширенный справочник повседневных овощей, фруктов, специй и соусов.
+-- Отрицательные fdc_id — внутренние стабильные идентификаторы. Значения указаны
+-- на 100 г как справочные средние; данные с этикетки пользователя имеют приоритет.
+insert into public.food_nutrition_reference
+  (canonical_name,aliases,kcal,protein,fat,carbs,fdc_id,data_type,dataset_release,source_name,source_url)
+values
+  ('спаржа',array['спаржа свежая','побеги спаржи']::text[],20,2.2,0.12,3.88,-3001,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('брюссельская капуста',array['капуста брюссельская','брюссельская капуста свежая']::text[],43,3.38,0.3,8.95,-3002,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('краснокочанная капуста',array['красная капуста','капуста краснокочанная']::text[],31,1.43,0.16,7.37,-3003,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('пекинская капуста',array['капуста пекинская','китайская капуста','капуста напа']::text[],16,1.2,0.2,3.23,-3004,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('кейл',array['капуста кейл','кудрявая капуста','листовая капуста кейл']::text[],35,2.92,1.49,4.42,-3005,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('мангольд',array['листовая свёкла','листовая свекла','швейцарский мангольд']::text[],19,1.8,0.2,3.74,-3006,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('кольраби',array['капуста кольраби']::text[],27,1.7,0.1,6.2,-3007,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('пастернак',array['корень пастернака']::text[],75,1.2,0.3,17.99,-3008,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('репа',array['репка','репа свежая']::text[],28,0.9,0.1,6.43,-3009,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('корень сельдерея',array['сельдерей корневой','корневой сельдерей']::text[],42,1.5,0.3,9.2,-3010,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('стручковая фасоль',array['зелёная фасоль','зеленая фасоль','спаржевая фасоль']::text[],31,1.83,0.22,6.97,-3011,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('артишок',array['артишоки','артишок свежий']::text[],47,3.27,0.15,10.51,-3012,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('окра',array['бамия','стручки окры']::text[],33,1.93,0.19,7.45,-3013,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('щавель',array['щавель свежий','листья щавеля']::text[],22,2,0.7,3.2,-3014,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('редька чёрная',array['редька черная','чёрная редька','черная редька']::text[],36,1.9,0.2,6.7,-3015,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('хрен',array['корень хрена','хрен свежий']::text[],48,1.18,0.69,11.29,-3016,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('кукуруза свежая',array['кукуруза в початках','зёрна свежей кукурузы','зерна свежей кукурузы']::text[],86,3.27,1.35,18.7,-3017,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('савойская капуста',array['капуста савойская']::text[],27,2,0.1,6.1,-3018,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('водяной каштан',array['китайский водяной каштан','водяные каштаны']::text[],97,1.4,0.1,23.94,-3019,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('сахарный горошек',array['стручки сахарного горошка','снежный горошек','горох манжту']::text[],42,2.8,0.2,7.55,-3020,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('мандарин',array['мандарины','мандарин свежий']::text[],53,0.81,0.31,13.34,-3021,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('помело',array['памела','помело свежий']::text[],38,0.76,0.04,9.62,-3022,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('папайя',array['папайя спелая','мякоть папайи']::text[],43,0.47,0.26,10.82,-3023,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('гуава',array['гуава свежая','мякоть гуавы']::text[],68,2.55,0.95,14.32,-3024,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('инжир',array['инжир свежий','фига','смоква']::text[],74,0.75,0.3,19.18,-3025,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('айва',array['айва свежая','плод айвы']::text[],57,0.4,0.1,15.3,-3026,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('фейхоа',array['фейхоа свежая']::text[],61,0.71,0.42,15.21,-3027,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('маракуйя',array['маракуя','плод страсти','мякоть маракуйи']::text[],97,2.2,0.7,23.38,-3028,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('личи',array['плоды личи','личи свежие']::text[],66,0.83,0.44,16.53,-3029,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('питахайя',array['питайя','драконий фрукт','драконов фрукт']::text[],57,1.18,0.14,12.94,-3030,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('голубика',array['голубика свежая','садовая голубика']::text[],57,0.74,0.33,14.49,-3031,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('красная смородина',array['смородина красная','красная смородина свежая']::text[],56,1.4,0.2,13.8,-3032,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('белая смородина',array['смородина белая','белая смородина свежая']::text[],56,1.4,0.2,13.8,-3033,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('брусника',array['брусника свежая','ягоды брусники']::text[],46,0.7,0.5,8.2,-3034,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('облепиха',array['облепиха свежая','ягоды облепихи']::text[],82,1.2,5.4,5.7,-3035,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('шелковица',array['тутовник','ягоды шелковицы']::text[],43,1.44,0.39,9.8,-3036,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('физалис',array['физалис свежий','перуанская вишня']::text[],53,1.9,0.7,11.2,-3037,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('кумкват',array['кумкваты','кумкват свежий']::text[],71,1.88,0.86,15.9,-3038,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('рамбутан',array['рамбутаны','рамбутан свежий']::text[],82,0.65,0.21,20.87,-3039,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('алыча свежая',array['алыча','слива алыча']::text[],34,0.2,0.1,7.9,-3040,'Reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('базилик свежий',array['базилик','листья базилика','зелёный базилик','зеленый базилик']::text[],23,3.15,0.64,2.65,-3041,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('базилик сушёный',array['сушеный базилик','сухой базилик']::text[],233,22.98,4.07,47.75,-3042,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('кардамон',array['кардамон молотый','зёрна кардамона','зерна кардамона']::text[],311,10.76,6.7,68.47,-3043,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('гвоздика',array['гвоздика молотая','бутоны гвоздики']::text[],274,5.97,13,65.53,-3044,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('шафран',array['нити шафрана','шафран сушёный','шафран сушеный']::text[],310,11.43,5.85,65.37,-3045,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('порошок карри',array['карри','карри молотый','смесь карри']::text[],325,14.29,14.01,55.83,-3046,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('паприка сладкая',array['паприка','паприка молотая','сладкая паприка']::text[],282,14.14,12.89,53.99,-3047,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('кайенский перец',array['перец кайенский','кайенский перец молотый']::text[],318,12.01,17.27,56.63,-3048,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('семена горчицы',array['горчичные семена','горчица семена']::text[],508,26.08,36.24,28.09,-3049,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('семена фенхеля',array['фенхель семена','семя фенхеля']::text[],345,15.8,14.87,52.29,-3050,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('имбирь молотый',array['сушёный имбирь','сушеный имбирь','порошок имбиря']::text[],335,8.98,4.24,71.62,-3051,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('луковый порошок',array['сушёный лук молотый','сушеный лук молотый','порошок лука']::text[],341,10.41,1.04,79.12,-3052,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('душистый перец',array['перец душистый','ямайский перец']::text[],263,6.09,8.69,72.12,-3053,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('семена аниса',array['анис','анисовые семена']::text[],337,17.6,15.9,50.02,-3054,'USDA reference average','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('соус терияки',array['терияки','соус терияки готовый']::text[],89,5.93,0.02,15.56,-3055,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('соус шрирача',array['шрирача','острый соус шрирача']::text[],93,1.93,0.93,19.16,-3056,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('сладкий соус чили',array['соус сладкий чили','тайский сладкий чили']::text[],214,0.6,0.4,52,-3057,'Generic label average','2026-04-30','Среднее по маркировкам',''),
+  ('соус барбекю',array['барбекю соус','соус bbq','bbq соус']::text[],172,0.82,0.63,40.77,-3058,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('вустерширский соус',array['ворчестерский соус','вустерский соус','соус ворчестер','соус вустер']::text[],78,0,0,19.46,-3059,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('соус песто',array['песто','песто дженовезе','зелёный песто','зеленый песто']::text[],384,5.1,36.3,6.2,-3060,'Generic label average','2026-04-30','Среднее по маркировкам',''),
+  ('соус наршараб',array['наршараб','гранатовый соус']::text[],270,0.5,0.2,67,-3061,'Generic label average','2026-04-30','Среднее по маркировкам',''),
+  ('сливовый соус',array['соус сливовый','китайский сливовый соус']::text[],184,0.89,0.7,42.81,-3062,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('соус табаско',array['табаско','острый соус табаско']::text[],12,1.29,0.76,0.8,-3063,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('бальзамический уксус',array['уксус бальзамический','бальзамик']::text[],88,0.49,0,17.03,-3064,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('соус сальса',array['сальса','томатная сальса']::text[],36,1.5,0.2,7,-3065,'USDA generic reference','2026-04-30','USDA FoodData Central','https://fdc.nal.usda.gov/'),
+  ('соус понзу',array['понзу','цитрусовый соевый соус']::text[],45,3.2,0.1,8.4,-3066,'Generic label average','2026-04-30','Среднее по маркировкам','')
+on conflict (canonical_name) do update set
+  aliases=excluded.aliases,kcal=excluded.kcal,protein=excluded.protein,fat=excluded.fat,
+  carbs=excluded.carbs,fdc_id=excluded.fdc_id,data_type=excluded.data_type,
+  dataset_release=excluded.dataset_release,source_name=excluded.source_name,
+  source_url=excluded.source_url,updated_at=now();
+
+-- Обычная паприка относится к сладкой, а копчёная остаётся отдельным продуктом.
+update public.food_nutrition_reference
+set aliases=array_remove(array_remove(aliases,'паприка'),'паприка молотая'), updated_at=now()
+where canonical_name='копчёная паприка';
+
+update public.food_nutrition_reference
+set aliases=(select array_agg(distinct value order by value) from unnest(aliases || array['гранат','плод граната']::text[]) value), updated_at=now()
+where canonical_name='гранатовые зёрна';
+
+-- Нормализованный индекс синонимов позволяет искать только видимые продукты
+-- одним коротким запросом, не скачивая весь справочник в браузер.
+create table if not exists public.food_nutrition_alias_lookup (
+  alias_key text primary key,
+  alias_label text not null,
+  canonical_name text not null references public.food_nutrition_reference(canonical_name) on update cascade on delete cascade,
+  updated_at timestamptz not null default now(),
+  constraint food_nutrition_alias_key_not_blank check (length(btrim(alias_key)) > 0)
+);
+
+create index if not exists food_nutrition_alias_lookup_canonical_idx
+on public.food_nutrition_alias_lookup (canonical_name);
+
+alter table public.food_nutrition_alias_lookup enable row level security;
+revoke all on table public.food_nutrition_alias_lookup from public, anon, authenticated;
+grant select on table public.food_nutrition_alias_lookup to anon, authenticated;
+drop policy if exists "Anyone can read food nutrition aliases" on public.food_nutrition_alias_lookup;
+create policy "Anyone can read food nutrition aliases"
+on public.food_nutrition_alias_lookup for select to anon, authenticated using (true);
+
+insert into public.food_nutrition_alias_lookup (alias_key,alias_label,canonical_name)
+select distinct on (alias_key) alias_key,alias_label,canonical_name
+from (
+  select
+    btrim(regexp_replace(replace(lower(value),'ё','е'),'[^a-zа-я0-9-]+',' ','g')) as alias_key,
+    value as alias_label,
+    food.canonical_name
+  from public.food_nutrition_reference food
+  cross join lateral unnest(array_prepend(food.canonical_name,food.aliases)) value
+) aliases
+where alias_key <> ''
+order by alias_key,canonical_name
+on conflict (alias_key) do update set
+  alias_label=excluded.alias_label,
+  canonical_name=excluded.canonical_name,
+  updated_at=now();
+
+create schema if not exists private;
+
+create or replace function private.sync_food_nutrition_alias_lookup()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+declare
+  value text;
+  normalized text;
+  occupied_by text;
+begin
+  if tg_op in ('UPDATE','DELETE') then
+    delete from public.food_nutrition_alias_lookup where canonical_name=old.canonical_name;
+  end if;
+  if tg_op in ('INSERT','UPDATE') then
+    foreach value in array array_prepend(new.canonical_name,new.aliases) loop
+      normalized:=btrim(regexp_replace(replace(lower(value),'ё','е'),'[^a-zа-я0-9-]+',' ','g'));
+      if normalized<>'' then
+        select canonical_name into occupied_by from public.food_nutrition_alias_lookup where alias_key=normalized;
+        if occupied_by is not null and occupied_by<>new.canonical_name then
+          raise exception 'Nutrition alias % already belongs to %',value,occupied_by;
+        end if;
+        insert into public.food_nutrition_alias_lookup(alias_key,alias_label,canonical_name)
+        values(normalized,value,new.canonical_name)
+        on conflict(alias_key) do update set alias_label=excluded.alias_label,canonical_name=excluded.canonical_name,updated_at=now();
+      end if;
+    end loop;
+    return new;
+  end if;
+  return old;
+end;
+$$;
+
+revoke all on function private.sync_food_nutrition_alias_lookup() from public, anon, authenticated;
+
+drop trigger if exists sync_food_nutrition_alias_lookup on public.food_nutrition_reference;
+create trigger sync_food_nutrition_alias_lookup
+after insert or update of canonical_name,aliases or delete
+on public.food_nutrition_reference
+for each row execute function private.sync_food_nutrition_alias_lookup();
+
+create or replace view public.food_nutrition_lookup
+with (security_invoker=true)
+as
+select
+  lookup.alias_key,
+  food.canonical_name,
+  food.aliases,
+  food.kcal,
+  food.protein,
+  food.fat,
+  food.carbs,
+  food.fdc_id,
+  food.data_type,
+  food.dataset_release,
+  food.source_name,
+  food.source_url
+from public.food_nutrition_alias_lookup lookup
+join public.food_nutrition_reference food using (canonical_name);
+
+revoke all on table public.food_nutrition_lookup from public, anon, authenticated;
+grant select on table public.food_nutrition_lookup to anon, authenticated;
+
 create table if not exists public.food_storage_reference (
   canonical_name text primary key,
   aliases text[] not null default '{}'::text[],

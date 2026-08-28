@@ -41,8 +41,12 @@ const setupSql=fs.readFileSync(new URL('../supabase_setup.sql',import.meta.url),
 const seedBlocks=[...setupSql.matchAll(/insert into public\.food_nutrition_reference[\s\S]*?values([\s\S]*?)on conflict \(canonical_name\)/gimu)];
 if(!seedBlocks.length) throw new Error('Supabase nutrition seed section was not found');
 const seededNames=seedBlocks.flatMap(block=>[...block[1].matchAll(/^\s*\('((?:''|[^'])+)'/gmu)].map(match=>match[1].replaceAll("''","'")));
-if(seededNames.length!==baseRows.length||new Set(seededNames).size!==baseRows.length) throw new Error('Supabase setup seed must contain the same number of unique products as the core web fallback');
+if(new Set(seededNames).size!==seededNames.length) throw new Error('Supabase nutrition seed contains duplicate canonical products');
+if(seededNames.length<baseRows.length+60) throw new Error('Supabase nutrition seed must include the core fallback and the extended online-only catalog');
 for(const row of baseRows) if(!seededNames.includes(row.canonical_name)) throw new Error(`Supabase nutrition seed is missing: ${row.canonical_name}`);
+for(const marker of ['food_nutrition_alias_lookup','food_nutrition_lookup','security_invoker=true']){
+  if(!setupSql.includes(marker)) throw new Error(`Supabase synonym lookup is missing marker: ${marker}`);
+}
 
 const required={
   'подсолнечное масло':{kcal:884,protein:0,fat:100,carbs:0,fdc_id:171017},
@@ -66,4 +70,4 @@ for(const [name,expected] of Object.entries(required)){
   }
 }
 
-console.log(`OK: ${rows.length} unique nutrition products and aliases; ${portionRows.length} unique household weights; ${baseRows.length} core products match the Supabase setup seed.`);
+console.log(`OK: ${rows.length} offline nutrition products and aliases; ${portionRows.length} household weights; ${seededNames.length} Supabase seed products include all ${baseRows.length} core fallback products.`);
