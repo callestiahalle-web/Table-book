@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(root, 'www');
-const directories = ['assets', 'css', 'js'];
+const directories = ['assets', 'css', 'js', 'data'];
 const requiredFiles = ['index.html', 'site.webmanifest'];
 
 await rm(output, { recursive: true, force: true });

@@ -5384,7 +5384,7 @@ body.dark #countryGrid.cuisine-carousel .country-slide {
   opacity: .58 !important;
   filter: none !important;
   transition: transform .22s cubic-bezier(.2,.8,.2,1), opacity .18s ease !important;
-  will-change: transform !important;
+  will-change: auto !important;
   contain: layout paint style !important;
   backface-visibility: hidden !important;
 }

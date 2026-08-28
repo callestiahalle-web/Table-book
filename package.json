@@ -1,10 +1,11 @@
 {
   "name": "table-book",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "private": true,
   "description": "Table book web and Android application",
   "scripts": {
-    "web:prepare": "node scripts/prepare-mobile.mjs",
+    "recipes:build": "node scripts/build-recipe-catalog.mjs",
+    "web:prepare": "node scripts/build-recipe-catalog.mjs && node scripts/prepare-mobile.mjs",
     "android:sync": "node scripts/prepare-mobile.mjs && cap sync android",
     "android:apk": "node scripts/prepare-mobile.mjs && cap sync android && cd android && gradlew.bat assembleDebug",
     "audit:chef": "node scripts/audit-chef-recipes.mjs",

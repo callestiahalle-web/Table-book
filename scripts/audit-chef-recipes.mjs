@@ -3,24 +3,10 @@ import path from 'node:path';
 import vm from 'node:vm';
 
 const root=path.resolve(import.meta.dirname,'..');
-const appSource=fs.readFileSync(path.join(root,'js','app.js'),'utf8');
-const start=appSource.indexOf('const recipes = ');
-const end=appSource.indexOf('\n];',start);
-if(start<0||end<0) throw new Error('Не удалось найти каталог recipes в app.js');
-const recipes=JSON.parse(appSource.slice(start+'const recipes = '.length,end+2));
-
 const sandbox={window:{},console,structuredClone:globalThis.structuredClone};
 vm.createContext(sandbox);
-const modifierFiles=[
-  'recipe-quality.js','caucasus-recipes.js','detailed-recipes.js','mediterranean-recipes.js',
-  'thai-recipes.js','japanese-recipes.js','korean-recipes.js','russian-recipes.js','sous-vide-recipes.js','chef-review-recipes.js'
-];
-for(const file of modifierFiles) vm.runInContext(fs.readFileSync(path.join(root,'js',file),'utf8'),sandbox,{filename:file});
-for(const key of [
-  'TABLE_BOOK_RECIPE_QUALITY','TABLE_BOOK_CAUCASUS_RECIPES','TABLE_BOOK_DETAILED_RECIPES',
-  'TABLE_BOOK_MEDITERRANEAN_RECIPES','TABLE_BOOK_THAI_RECIPES','TABLE_BOOK_JAPANESE_RECIPES',
-  'TABLE_BOOK_KOREAN_RECIPES','TABLE_BOOK_RUSSIAN_RECIPES','TABLE_BOOK_SOUS_VIDE_RECIPES','TABLE_BOOK_CHEF_REVIEW'
-]) sandbox.window[key]?.apply?.(recipes);
+vm.runInContext(fs.readFileSync(path.join(root,'js','recipe-catalog.js'),'utf8'),sandbox,{filename:'recipe-catalog.js'});
+const recipes=(sandbox.window.TABLE_BOOK_RECIPES||[]).map(recipe=>Object.assign({},recipe,JSON.parse(fs.readFileSync(path.join(root,'data','recipes',`${recipe.id}.json`),'utf8'))));
 vm.runInContext(fs.readFileSync(path.join(root,'js','food-reference.js'),'utf8'),sandbox,{filename:'food-reference.js'});
 vm.runInContext(fs.readFileSync(path.join(root,'js','product-portions.js'),'utf8'),sandbox,{filename:'product-portions.js'});
 vm.runInContext(fs.readFileSync(path.join(root,'js','chef-food-reference.js'),'utf8'),sandbox,{filename:'chef-food-reference.js'});
