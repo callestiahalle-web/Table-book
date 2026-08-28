@@ -27,6 +27,8 @@ const parseNutritionAmount=line=>{
   const source=String(line||'').replace(/½/g,'1/2').replace(/¼/g,'1/4').replace(/¾/g,'3/4');
   const amountText=source.split(/\s+[—–]\s+/u).slice(1).join(' — ')||source;
   const number=value=>{const raw=String(value||'').replace(',','.').trim(); if(raw.includes('/')){const [a,b]=raw.split('/').map(Number); return b?a/b:0;} return Number(raw)||0;};
+  const multipliedWeight=amountText.match(/(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?)\s*(?:шт\.?|штук(?:а|и)?|куск(?:а|ов)?|ломтик(?:а|ов)?|медальон(?:а|ов)?|филе)\s*(?:по|[×x*])\s*(\d+(?:[.,]\d+)?)\s*г(?![а-яё])/iu);
+  if(multipliedWeight) return {amount:number(multipliedWeight[1])*number(multipliedWeight[2]),unit:'g'};
   const embeddedWeight=amountText.match(/(?:около|весом|массой)\s*(\d+(?:[.,]\d+)?)(?:\s*[–—-]\s*(\d+(?:[.,]\d+)?))?\s*г(?![а-яё])/iu);
   if(embeddedWeight){const low=number(embeddedWeight[1]),high=number(embeddedWeight[2]||embeddedWeight[1]);return {amount:(low+high)/2,unit:'g'};}
   const match=amountText.match(/(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?)(?:\s*[–—-]\s*(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?))?\s*(кг|мг|г\.?|мл\.?|шт\.?|ст\.?\s*л\.?|ч\.?\s*л\.?|зубчик(?:а|ов)?|ломтик(?:а|ов)?|дольк(?:а|и|ек)|пуч(?:ок|ка|ков)|лист(?:а|ов)?|стеб(?:ель|ля|лей)|пер(?:о|а|ьев)|палочк(?:а|и|ек)|полоск(?:а|и|ок)|л\.?)(?![а-яё])/iu);

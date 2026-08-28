@@ -123,6 +123,7 @@ const STORAGE_PERSONAL_KEY_PREFIX="tableBookPersonalState:";
 const SUPABASE_URL="https://qshwxcxhxkchpdjaecdk.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzaHd4Y3hoeGtjaHBkamFlY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjM3NTYsImV4cCI6MjA5OTA5OTc1Nn0.aQM03By8cL4VkFsI4NiVugWtSKU1bcZkHfErK_4PMB4";
 const CLOUD_TABLE="user_app_state";
+const CLOUD_USER_RECIPE_TABLE="user_recipes";
 const CLOUD_MEAL_TABLE="user_meal_days";
 const CLOUD_RECIPE_OVERRIDE_TABLE="user_recipe_overrides";
 const CLOUD_PRODUCT_PORTION_TABLE="product_portion_weights";
@@ -239,9 +240,18 @@ function createCloudClient(){
 }
 function createRestCloudClient(){
   let session=safeJson(localStorage.getItem(CLOUD_SESSION_KEY),null);
+  const authListeners=new Set();
   const base=SUPABASE_URL.replace(/\/+$/,'');
   function now(){return Math.floor(Date.now()/1000)}
-  function saveSession(next){session=next||null; try{session?localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(session)):localStorage.removeItem(CLOUD_SESSION_KEY)}catch(e){console.warn('Session save failed',e)}}
+  function emitAuth(event,next=session){authListeners.forEach(callback=>queueMicrotask(()=>{try{callback(event,next)}catch(error){console.warn('Auth listener failed',error)}}));}
+  function saveSession(next,event=null){const hadSession=Boolean(session?.access_token); session=next||null; try{session?localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(session)):localStorage.removeItem(CLOUD_SESSION_KEY)}catch(e){console.warn('Session save failed',e)} if(event) emitAuth(event,session); else if(hadSession&&!session) emitAuth('SIGNED_OUT',null);}
+  window.addEventListener('storage',event=>{
+    if(event.key!==CLOUD_SESSION_KEY) return;
+    const previousUserId=session?.user?.id||null;
+    session=safeJson(event.newValue,null);
+    const nextUserId=session?.user?.id||null;
+    emitAuth(!session?'SIGNED_OUT':previousUserId===nextUserId?'TOKEN_REFRESHED':'SIGNED_IN',session);
+  });
   function normalizeSession(payload){
     if(!payload) return null;
     const expiresAt=payload.expires_at || (payload.expires_in?now()+Number(payload.expires_in):null);
@@ -254,7 +264,7 @@ function createRestCloudClient(){
     if(!accessToken || !refreshToken) return null;
     const payload={access_token:accessToken,refresh_token:refreshToken,token_type:hash.get('token_type')||query.get('token_type')||'bearer',expires_in:Number(hash.get('expires_in')||query.get('expires_in')||3600)};
     const next=normalizeSession(payload);
-    saveSession(next);
+    saveSession(next,'SIGNED_IN');
     cleanAuthUrl();
     localStorage.removeItem(CLOUD_PENDING_CONFIRM_KEY);
     return next;
@@ -270,7 +280,7 @@ function createRestCloudClient(){
     if(!session?.refresh_token) return session;
     if(session.expires_at && session.expires_at-now()>45) return session;
     const payload=await request('/auth/v1/token?grant_type=refresh_token',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({refresh_token:session.refresh_token})});
-    const next=normalizeSession(payload); saveSession(next); return next;
+    const next=normalizeSession(payload); saveSession(next,'TOKEN_REFRESHED'); return next;
   }
   function restFrom(table){
     const query={selectCols:null,head:false,count:null,filters:[],limitN:null,orderBy:null,action:'select'};
@@ -325,14 +335,14 @@ function createRestCloudClient(){
   return {
     auth:{
       async getSession(){try{readUrlSession();await refreshSession();if(session?.access_token && (!session.user || !session.user.id)){try{const user=await request('/auth/v1/user',{method:'GET',token:session.access_token});session.user=user;saveSession(session);}catch(e){console.warn('REST user fetch failed',e)}}return {data:{session:session},error:null}}catch(error){saveSession(null);return {data:{session:null},error}}},
-      async signInWithPassword({email,password}){try{const payload=await request('/auth/v1/token?grant_type=password',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password})}); const next=normalizeSession(payload); saveSession(next); if(next?.access_token && (!next.user || !next.user.id)){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});saveSession(next);}catch(e){console.warn('REST login user fetch failed',e)}} return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
-      async signUp({email,password,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const path='/auth/v1/signup?redirect_to='+encodeURIComponent(redirect); const payload=await request(path,{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password,data:options.data||{},options:{email_redirect_to:redirect}})}); const next=payload.access_token?normalizeSession(payload):null; if(next) saveSession(next); return {data:{session:next,user:next?.user||payload.user||payload},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async signInWithPassword({email,password}){try{const payload=await request('/auth/v1/token?grant_type=password',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password})}); const next=normalizeSession(payload); if(next?.access_token && (!next.user || !next.user.id)){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});}catch(e){console.warn('REST login user fetch failed',e)}} saveSession(next,'SIGNED_IN'); return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async signUp({email,password,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const path='/auth/v1/signup?redirect_to='+encodeURIComponent(redirect); const payload=await request(path,{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({email,password,data:options.data||{},options:{email_redirect_to:redirect}})}); const next=payload.access_token?normalizeSession(payload):null; if(next) saveSession(next,'SIGNED_IN'); return {data:{session:next,user:next?.user||payload.user||payload},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async resend({type,email,options={}}){try{const redirect=options.emailRedirectTo||options.redirectTo||getAuthRedirectUrl(); const payload=await request('/auth/v1/resend',{method:'POST',token:SUPABASE_ANON_KEY,body:JSON.stringify({type,email,options:{email_redirect_to:redirect}})}); return {data:payload,error:null}}catch(error){return {data:null,error}}},
-      async signOut({scope='local'}={}){try{if(session?.access_token) await request(`/auth/v1/logout?scope=${encodeURIComponent(scope)}`,{method:'POST',token:session.access_token,body:'{}'})}catch(e){} saveSession(null); return {error:null}},
-      async updateUser(payload){try{await refreshSession(); const data=await request('/auth/v1/user',{method:'PUT',token:session?.access_token,body:JSON.stringify(payload)}); if(session){session.user=data; saveSession(session)} return {data:{user:data},error:null}}catch(error){return {data:{user:null},error}}},
-      async setSession(tokens){try{const next=normalizeSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token,expires_in:tokens.expires_in||3600,token_type:'bearer'}); saveSession(next); if(next?.access_token){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});saveSession(next);}catch(e){console.warn('REST setSession user fetch failed',e)}} return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
+      async signOut({scope='local'}={}){try{if(session?.access_token) await request(`/auth/v1/logout?scope=${encodeURIComponent(scope)}`,{method:'POST',token:session.access_token,body:'{}'})}catch(e){} saveSession(null,'SIGNED_OUT'); return {error:null}},
+      async updateUser(payload){try{await refreshSession(); const data=await request('/auth/v1/user',{method:'PUT',token:session?.access_token,body:JSON.stringify(payload)}); if(session){session.user=data; saveSession(session,'USER_UPDATED')} return {data:{user:data},error:null}}catch(error){return {data:{user:null},error}}},
+      async setSession(tokens){try{const next=normalizeSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token,expires_in:tokens.expires_in||3600,token_type:'bearer'}); if(next?.access_token){try{next.user=await request('/auth/v1/user',{method:'GET',token:next.access_token});}catch(e){console.warn('REST setSession user fetch failed',e)}} saveSession(next,'SIGNED_IN'); return {data:{session:next,user:next.user},error:null}}catch(error){return {data:{session:null,user:null},error}}},
       async exchangeCodeForSession(){return {data:{session:null,user:null},error:new Error('Для ссылки с code нужен Supabase SDK. Перезагрузите страницу с интернетом или запросите новое письмо подтверждения.')}} ,
-      onAuthStateChange(){return {data:{subscription:{unsubscribe(){}}}}}
+      onAuthStateChange(callback){if(typeof callback==='function'){authListeners.add(callback);queueMicrotask(()=>callback('INITIAL_SESSION',session));} return {data:{subscription:{unsubscribe(){authListeners.delete(callback)}}}}}
     },
     from:restFrom,
     rpc:restRpc
@@ -350,9 +360,12 @@ let recipeOverrides={};
 const baseRecipeIndex=new Map(recipes.map(recipe=>[String(recipe.id),recipe]));
 let catalogRecipeCache=null;
 let catalogCountryCache=null;
-const RECIPE_DETAILS_VERSION='20260827-targeted-load';
+const RECIPE_DETAILS_VERSION='20260828-lazy-details';
+const RECIPE_SEARCH_VERSION='20260828-lazy-index';
 const recipeDetailCache=new Map();
 const recipeDetailLoads=new Map();
+let recipeSearchIndexLoad=null;
+let recipeSearchIndexLoaded=false;
 async function loadBaseRecipeDetails(recipeId){
   const id=canonicalRecipeId(recipeId,'base');
   if(recipeDetailCache.has(id)) return recipeDetailCache.get(id);
@@ -370,6 +383,24 @@ async function loadBaseRecipeDetails(recipeId){
   })().finally(()=>recipeDetailLoads.delete(id));
   recipeDetailLoads.set(id,task);
   return task;
+}
+async function ensureRecipeSearchIndex(){
+  if(recipeSearchIndexLoaded) return true;
+  if(recipeSearchIndexLoad) return recipeSearchIndexLoad;
+  recipeSearchIndexLoad=(async()=>{
+    const response=await fetch(`./data/recipe-search-index.json?v=${RECIPE_SEARCH_VERSION}`,{cache:'force-cache'});
+    if(!response.ok) throw new Error(`Не удалось загрузить индекс ингредиентов (${response.status})`);
+    const index=await response.json();
+    if(!index||typeof index!=='object'||Array.isArray(index)) throw new Error('Некорректный индекс ингредиентов');
+    Object.entries(index).forEach(([id,terms])=>{
+      const recipe=baseRecipeIndex.get(String(id));
+      if(recipe) recipe.ingredientSearch=Array.isArray(terms)?terms.map(String).filter(Boolean):[];
+    });
+    recipeSearchIndexLoaded=true;
+    invalidateCatalogRecipeCache();
+    return true;
+  })().catch(error=>{console.warn('Recipe search index load failed',error);return false;}).finally(()=>{recipeSearchIndexLoad=null;});
+  return recipeSearchIndexLoad;
 }
 let legacyMealPlanPending={};
 let localPersonalHydratedForUser=null;
@@ -564,7 +595,7 @@ function saveState({sync=true,personal=false}={}){
     }
   }catch(e){console.warn("State save failed",e)}
 }
-function saveMyRecipes(){try{myRecipes=withoutLegacyDuplicateRecipes(myRecipes);if(cloudUser){queuePersonalCacheSave();queueBackupSave();}updateBackupStatus(cloudUser?"Автосохранение выполнено.":"Войдите, чтобы рецепты сохранялись после закрытия приложения.");if(!cloudSyncApplying) queueCloudSave()}catch(e){updateBackupStatus("Не удалось сохранить данные.");console.warn("Recipe save failed",e)} updateHomeMeta();}
+function saveMyRecipes(){try{myRecipes=withoutLegacyDuplicateRecipes(myRecipes);if(cloudUser){queuePersonalCacheSave();queueBackupSave();}updateBackupStatus(cloudUser?"Автосохранение выполнено.":"Войдите, чтобы рецепты сохранялись после закрытия приложения.");}catch(e){updateBackupStatus("Не удалось сохранить данные.");console.warn("Recipe save failed",e)} updateHomeMeta();}
 function defaultUserState(themeValue=state?.theme||"light"){
   return {theme:themeValue||"light",route:"home",country:null,filterCat:null,editingId:null,mealPlan:{},mealPlanUpdatedAt:null,mealMonth:monthKeyFromDate(new Date()),selectedMealDate:null,mealEditorOpen:false,myCat:null,likedRecipes:[],encyTab:"Все",mealStorageVersion:2,mealDirtyDays:[],pantryTags:[],shoppingWeekStart:null};
 }
@@ -1112,7 +1143,7 @@ function renderCountries(){
   const previousCountry=g.dataset.activeCountry||'';
   g.innerHTML='';
   uniqueCountries().forEach(c=>{
-    const th=theme(c), list=catalogRecipesForCountry(c), cats=orderedCategories(list).length;
+    const th=theme(c), list=catalogRecipesForCountry(c), cats=orderedCountryCategories(list).length;
     const b=document.createElement('button');
     b.className='country-card country-card-uniform country-slide';
     b.style.setProperty('--country-bg', th.bg);
@@ -1177,12 +1208,13 @@ const productTagSystem=window.TABLE_BOOK_PRODUCT_TAGS||null;
 function normalizePantryTags(tags){return [...new Set((Array.isArray(tags)?tags:[]).flatMap(value=>String(value||'').split(/[,;\n]+/)).map(value=>productTagSystem?.resolve(value)||normalizePortionName(value)).filter(value=>value.length>1))].slice(0,12);}
 function pantryRecipeScore(recipe,tags){
   if(productTagSystem){const result=productTagSystem.recipeMatches(recipe,tags); return {matched:result.matched.length,all:result.all,tags:result.tags};}
-  const ingredients=[...(Array.isArray(recipe?.ingredients)?recipe.ingredients:[]),...(Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition.map(item=>item?.name||''):[])].map(normalizePortionName);
+  const ingredients=[...(Array.isArray(recipe?.ingredientSearch)?recipe.ingredientSearch:[]),...(Array.isArray(recipe?.ingredients)?recipe.ingredients:[]),...(Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition.map(item=>item?.name||''):[])].map(normalizePortionName);
   const matched=tags.filter(tag=>ingredients.some(name=>name===tag));
   return {matched:matched.length,all:tags.length>0&&matched.length===tags.length};
 }
 function addPantryTags(value){const next=normalizePantryTags([...(state.pantryTags||[]),value]); state.pantryTags=next; const input=$('#pantryInput'); if(input) input.value=''; saveState({sync:false}); renderPantryFinder();}
-function renderPantryFinder(){const tagsBox=$('#pantryTags'),results=$('#pantryResults'),note=$('#pantryNote'); if(!tagsBox||!results) return; const tags=normalizePantryTags(state.pantryTags); state.pantryTags=tags; tagsBox.hidden=!tags.length; results.hidden=!tags.length; if(note) note.hidden=!tags.length; tagsBox.innerHTML=tags.map(tag=>`<button class="pantry-tag" type="button" data-remove-pantry="${esc(tag)}"><span>${esc(tag)}</span><b aria-hidden="true">×</b></button>`).join(''); tagsBox.querySelectorAll('[data-remove-pantry]').forEach(btn=>btn.onclick=()=>{state.pantryTags=tags.filter(tag=>tag!==btn.dataset.removePantry);saveState({sync:false});renderPantryFinder();}); if(!tags.length){results.innerHTML='';if(note) note.textContent='';return;} const ranked=allRecipeOptions().map(recipe=>({recipe,...pantryRecipeScore(recipe,tags)})).filter(item=>item.matched>0).sort((a,b)=>Number(b.all)-Number(a.all)||b.matched-a.matched||(a.recipe.title||'').localeCompare(b.recipe.title||'','ru')); const exact=ranked.filter(item=>item.all),shown=(exact.length?exact:ranked).slice(0,12); if(note) note.textContent=exact.length?`Найдено ${exact.length} ${plural(exact.length,['блюдо','блюда','блюд'])} со всеми выбранными продуктами.`:ranked.length?'Точного совпадения нет — показаны ближайшие варианты.':'По выбранным продуктам совпадений пока нет.'; results.innerHTML=shown.map(item=>recipeCard(item.recipe)).join(''); renderRecipeInteractions(results);}
+let pantryRenderSequence=0;
+async function renderPantryFinder(){const sequence=++pantryRenderSequence; const tagsBox=$('#pantryTags'),results=$('#pantryResults'),note=$('#pantryNote'); if(!tagsBox||!results) return; const tags=normalizePantryTags(state.pantryTags); state.pantryTags=tags; tagsBox.hidden=!tags.length; results.hidden=!tags.length; if(note) note.hidden=!tags.length; tagsBox.innerHTML=tags.map(tag=>`<button class="pantry-tag" type="button" data-remove-pantry="${esc(tag)}"><span>${esc(tag)}</span><b aria-hidden="true">×</b></button>`).join(''); tagsBox.querySelectorAll('[data-remove-pantry]').forEach(btn=>btn.onclick=()=>{state.pantryTags=tags.filter(tag=>tag!==btn.dataset.removePantry);saveState({sync:false});renderPantryFinder();}); if(!tags.length){results.innerHTML='';if(note) note.textContent='';return;} await ensureRecipeSearchIndex(); if(sequence!==pantryRenderSequence) return; const ranked=allRecipeOptions().map(recipe=>({recipe,...pantryRecipeScore(recipe,tags)})).filter(item=>item.matched>0).sort((a,b)=>Number(b.all)-Number(a.all)||b.matched-a.matched||(a.recipe.title||'').localeCompare(b.recipe.title||'','ru')); const exact=ranked.filter(item=>item.all),shown=(exact.length?exact:ranked).slice(0,12); if(note) note.textContent=exact.length?`Найдено ${exact.length} ${plural(exact.length,['блюдо','блюда','блюд'])} со всеми выбранными продуктами.`:ranked.length?'Точного совпадения нет — показаны ближайшие варианты.':'По выбранным продуктам совпадений пока нет.'; results.innerHTML=shown.map(item=>recipeCard(item.recipe)).join(''); renderRecipeInteractions(results);}
 function normalizePantryFinderMarkup(){let finder=$('#pantryFinder'); if(finder?.tagName==='DETAILS'){const section=document.createElement('section'),body=finder.querySelector('.pantry-finder-body'); section.className='pantry-finder'; section.id='pantryFinder'; section.setAttribute('aria-label','Что приготовить из продуктов'); ['.pantry-entry','#pantryTags','#pantryNote','#pantryResults'].forEach(selector=>{const node=body?.querySelector(selector);if(node)section.appendChild(node);}); finder.replaceWith(section); finder=section;} const input=$('#pantryInput'); if(input){input.removeAttribute('list');input.type='text';input.inputMode='search';input.autocomplete='off';input.setAttribute('aria-autocomplete','none');} $('#pantryProductTagOptions')?.remove(); return finder;}
 function bindPantryFinder(){normalizePantryFinderMarkup(); const input=$('#pantryInput'),add=$('#pantryAdd'); if(add){add.textContent='Найти';add.onclick=()=>addPantryTags(input?.value||'');} if(input) input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addPantryTags(input.value);}}; renderPantryFinder();}
 function ingredientGroupedRecipeCards(items){return recipesByIngredientGroup(items).map(({group,recipes:groupRecipes})=>`<section class="ingredient-group-block"><div class="ingredient-group-head"><h3>${esc(group)}</h3><span>${groupRecipes.length} ${plural(groupRecipes.length,['блюдо','блюда','блюд'])}</span></div><div class="recipe-grid">${groupRecipes.map(recipeCard).join('')}</div></section>`).join('');}
@@ -1671,7 +1703,7 @@ function normalizeMealSearch(value){return String(value||'').normalize('NFKC').t
 function mealRecipeMatches(recipe,q){
   const words=normalizeMealSearch(q).split(/\s+/).filter(Boolean);
   if(!words.length) return true;
-  const hay=normalizeMealSearch([recipe.title,...(Array.isArray(recipe.ingredients)?recipe.ingredients:[])].join(' '));
+  const hay=normalizeMealSearch([recipe.title,...(Array.isArray(recipe.ingredientSearch)?recipe.ingredientSearch:[]),...(Array.isArray(recipe.ingredients)?recipe.ingredients:[])].join(' '));
   return words.every(word=>hay.includes(word));
 }
 function mealTypeList(slot){
@@ -1721,7 +1753,9 @@ function mealPickerBackToCountries(){
   }
   renderMealDishPicker();
 }
-function renderMealDishPicker(){
+let mealPickerRenderSequence=0;
+async function renderMealDishPicker(){
+  const sequence=++mealPickerRenderSequence;
   const {slot,category,country,step,query=''}=mealPickerDialog;
   const modal=$('#mealPickerModal'), grid=$('#mealPickerGrid'), title=$('#mealPickerTitle'), slotLabel=$('#mealPickerSlotLabel'), note=$('#mealPickerNote'), back=$('#mealPickerBack'), search=$('#mealPickerSearch');
   if(!modal||modal.hidden||!grid||!slot) return;
@@ -1729,6 +1763,8 @@ function renderMealDishPicker(){
   const selected=new Set((mealDraft?.[slot]||[]).map(item=>item.source+':'+item.id));
   if(search&&search.value!==query) search.value=query;
   if(normalizeMealSearch(query)){
+    await ensureRecipeSearchIndex();
+    if(sequence!==mealPickerRenderSequence||modal.hidden||mealPickerDialog.query!==query) return;
     const all=allRecipeOptions()
       .filter(r=>!selected.has((r.source==='custom'?'custom':'base')+':'+r.id))
       .filter(r=>mealRecipeMatches(r,query))
@@ -1935,6 +1971,12 @@ function parseIngredientAmount(line){
   const normalized=source.replace(/½/g,'1/2').replace(/¼/g,'1/4').replace(/¾/g,'3/4');
   const divided=normalized.match(/^(.*?)(?:\s*[—–]\s*|\s+-\s+)(.+)$/);
   const amountText=divided?.[2]||normalized;
+  const multipliedWeight=amountText.match(/(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?)\s*(?:шт\.?|штук(?:а|и)?|куск(?:а|ов)?|ломтик(?:а|ов)?|медальон(?:а|ов)?|филе)\s*(?:по|[×x*])\s*(\d+(?:[.,]\d+)?)\s*г(?:р|рамм(?:а|ов)?)?(?![а-яё])/i);
+  if(multipliedWeight){
+    const count=ingredientNumber(multipliedWeight[1]),each=ingredientNumber(multipliedWeight[2]);
+    const name=cleanShoppingProductName(divided?.[1]||normalized.slice(0,Math.max(0,multipliedWeight.index||0))||source);
+    return {name,amount:count*each,unit:'g',explicit:true};
+  }
   const embeddedWeight=amountText.match(/(?:около|весом|массой)\s*(\d+(?:[.,]\d+)?)(?:\s*[–—-]\s*(\d+(?:[.,]\d+)?))?\s*г(?:р|рамм(?:а|ов)?)?(?![а-яё])/i);
   if(embeddedWeight){
     const low=ingredientNumber(embeddedWeight[1]),high=ingredientNumber(embeddedWeight[2]||embeddedWeight[1]);
@@ -1962,12 +2004,28 @@ function parseIngredientAmount(line){
   return {name,amount,unit,explicit:true};
 }
 function shoppingIngredientRows(recipe,selectedServings=1){if(recipe?.skipShopping) return []; const recipeServings=Math.max(1,Number(recipe?.servings)||1),requested=Math.max(1,Math.min(12,Math.round(Number(selectedServings)||1))),scale=recipe?.preparedForNextDay?Math.max(1,requested/recipeServings):requested/recipeServings; const rows=[],calculatedNames=new Set(),skippedLines=new Set((Array.isArray(recipe?.skipShoppingLines)?recipe.skipShoppingLines:[]).map(line=>String(line).trim())); (Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition:[]).forEach(product=>{const amount=Number(product?.amount??product?.quantity)||0,unit=product?.unit||'g',name=String(product?.name||'').trim(); const resolved=Number(product?.weight)||productWeightFor(name,amount,unit).weight; const key=normalizePortionName(canonicalShoppingName(name)); if(key) calculatedNames.add(key); if(resolved>0) rows.push({name,amount:resolved*scale,unit:'g'}); else if(amount>0) rows.push({name,amount:amount*scale,unit});}); if(recipe?.shoppingFromNutritionOnly) return rows; (Array.isArray(recipe?.ingredients)?recipe.ingredients:[]).forEach(line=>{if(skippedLines.has(String(line).trim())) return; const parsed=parseIngredientAmount(line); const key=normalizePortionName(canonicalShoppingName(parsed.name)); if(!key||!calculatedNames.has(key)) rows.push(parsed.amount>0?Object.assign({},parsed,{amount:parsed.amount*scale}):parsed);}); return rows;}
+async function ensureWeekRecipeDetails(plan,weekStart){
+  const ids=new Set();
+  for(let dayIndex=0;dayIndex<7;dayIndex++){
+    const dateKey=localDateKey(addCalendarDays(weekStart,dayIndex));
+    const day=normalizeMealDay(plan?.[dateKey]);
+    MEAL_SLOTS.forEach(([slot])=>(day[slot]||[]).forEach(ref=>{
+      if(ref?.source!=='custom'&&ref?.id){
+        const id=canonicalRecipeId(ref.id,'base');
+        const recipe=baseRecipeIndex.get(id);
+        if(recipe&&!Array.isArray(recipe.ingredients)) ids.add(id);
+      }
+    }));
+  }
+  if(!ids.size) return;
+  await Promise.allSettled([...ids].map(id=>loadBaseRecipeDetails(id)));
+}
 function aggregateWeekShopping(plan,weekStart){const items=new Map(); for(let dayIndex=0;dayIndex<7;dayIndex++){const date=addCalendarDays(weekStart,dayIndex),dateKey=localDateKey(date),day=normalizeMealDay(plan[dateKey]); MEAL_SLOTS.forEach(([slot])=>(day[slot]||[]).forEach(ref=>{if(ref?.skipShopping) return; const recipe=getRecipeByRef(ref); if(!recipe) return; shoppingIngredientRows(recipe,ref.servings).forEach(row=>{if(!row.name) return; const name=canonicalShoppingName(row.name),key=normalizePortionName(name); if(!key) return; const entry=items.get(key)||{name,quantities:{},texts:new Set(),earliestDay:dayIndex,uses:0,storage:foodStorageEntry(name)}; entry.earliestDay=Math.min(entry.earliestDay,dayIndex); entry.uses+=1; if(row.amount>0&&row.unit!=='text'){const resolved=productWeightFor(name,row.amount,row.unit); if(row.unit!=='g'&&resolved.weight>0) entry.quantities.g=(entry.quantities.g||0)+resolved.weight; else entry.quantities[row.unit]=(entry.quantities[row.unit]||0)+row.amount;} else if(row.text) entry.texts.add(row.text); items.set(key,entry);});}));} return [...items.values()].sort((a,b)=>a.name.localeCompare(b.name,'ru'));}
 function shoppingQuantityText(item){const labels={g:'г',milliliter:'мл',piece:'шт.',tablespoon:'ст. л.',teaspoon:'ч. л.',slice:'ломт.',wedge:'дольк.',clove:'зубч.',bunch:'пуч.'}; const amounts=Object.entries(item.quantities).filter(([,value])=>value>0).map(([unit,value])=>`${fmt(value)} ${labels[unit]||unit}`); const texts=[...item.texts].filter(Boolean); return [...amounts,...texts].join(' + ')||'уточнить по рецепту';}
 function shoppingPurchaseDate(item,weekStart){const max=Number(item.storage?.fridge_days_max)||0; if(!max||item.earliestDay<max) return weekStart; return addCalendarDays(weekStart,Math.max(0,item.earliestDay-Math.max(1,max-1)));}
 function shoppingItemHtml(item,weekStart){const purchase=shoppingPurchaseDate(item,weekStart),later=localDateKey(purchase)!==localDateKey(weekStart); const storage=item.storage?`Холодильник: ${item.storage.fridge_days_min}–${item.storage.fridge_days_max} дн.`:''; return `<label class="shopping-item${later?' shopping-item-later':''}"><input type="checkbox"><span><b>${esc(item.name)}</b><small>${esc(shoppingQuantityText(item))}${storage?` · ${esc(storage)}`:''}</small></span>${later?`<em>${esc(purchase.toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'short'}))}</em>`:''}</label>`;}
 let shoppingRenderSequence=0;
-async function renderShoppingList(){const box=$('#shoppingList'),panel=$('#shoppingPanel'),title=$('#shoppingWeekTitle'),summary=$('#shoppingSummary'); if(!box||!title) return; const sequence=++shoppingRenderSequence; await ensureLocalFoodReferences(); if(sequence!==shoppingRenderSequence) return; const weekStart=shoppingWeekStartDate(),weekEnd=addCalendarDays(weekStart,6); title.textContent=`${weekStart.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})} — ${weekEnd.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}`; const monthKeys=[...new Set([monthKeyFromDate(weekStart),monthKeyFromDate(weekEnd)])]; if(cloudUser) await Promise.all(monthKeys.map(key=>loadMealMonth(key))); if(sequence!==shoppingRenderSequence) return; const items=aggregateWeekShopping(ensureMealPlan(),weekStart); const early=items.filter(item=>localDateKey(shoppingPurchaseDate(item,weekStart))===localDateKey(weekStart)),later=items.filter(item=>!early.includes(item)); const section=(heading,list)=>list.length?`<section class="shopping-group${list.length>4?' shopping-group-wide':''}"><h4>${heading}</h4><div class="shopping-group-items">${list.map(item=>shoppingItemHtml(item,weekStart)).join('')}</div></section>`:''; if(panel) panel.classList.toggle('shopping-panel-wide',items.length>4); box.classList.toggle('shopping-list-split',Boolean(early.length&&later.length)); box.innerHTML=items.length?section('Купить в начале недели',early)+section('Докупить ближе к приготовлению',later):'<div class="meal-empty">Добавьте блюда в календарь этой недели — продукты появятся здесь автоматически.</div>'; if(summary) summary.textContent=items.length?`${items.length} ${plural(items.length,['позиция','позиции','позиций'])} · ${later.length} ${plural(later.length,['позиция','позиции','позиций'])} лучше купить позже`:'Список пока пуст'; box.dataset.copyText=items.map(item=>`${localDateKey(shoppingPurchaseDate(item,weekStart))===localDateKey(weekStart)?'В начале недели':shoppingPurchaseDate(item,weekStart).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'})}: ${item.name} — ${shoppingQuantityText(item)}`).join('\n');}
+async function renderShoppingList(){const box=$('#shoppingList'),panel=$('#shoppingPanel'),title=$('#shoppingWeekTitle'),summary=$('#shoppingSummary'); if(!box||!title) return; const sequence=++shoppingRenderSequence; const weekStart=shoppingWeekStartDate(),weekEnd=addCalendarDays(weekStart,6); title.textContent=`${weekStart.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})} — ${weekEnd.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}`; const monthKeys=[...new Set([monthKeyFromDate(weekStart),monthKeyFromDate(weekEnd)])]; if(cloudUser) await Promise.all(monthKeys.map(key=>loadMealMonth(key))); if(sequence!==shoppingRenderSequence) return; const plan=ensureMealPlan(); await Promise.all([ensureLocalFoodReferences(),ensureWeekRecipeDetails(plan,weekStart)]); if(sequence!==shoppingRenderSequence) return; const items=aggregateWeekShopping(plan,weekStart); const early=items.filter(item=>localDateKey(shoppingPurchaseDate(item,weekStart))===localDateKey(weekStart)),later=items.filter(item=>!early.includes(item)); const section=(heading,list)=>list.length?`<section class="shopping-group${list.length>4?' shopping-group-wide':''}"><h4>${heading}</h4><div class="shopping-group-items">${list.map(item=>shoppingItemHtml(item,weekStart)).join('')}</div></section>`:''; if(panel) panel.classList.toggle('shopping-panel-wide',items.length>4); box.classList.toggle('shopping-list-split',Boolean(early.length&&later.length)); box.innerHTML=items.length?section('Купить в начале недели',early)+section('Докупить ближе к приготовлению',later):'<div class="meal-empty">Добавьте блюда в календарь этой недели — продукты появятся здесь автоматически.</div>'; if(summary) summary.textContent=items.length?`${items.length} ${plural(items.length,['позиция','позиции','позиций'])} · ${later.length} ${plural(later.length,['позиция','позиции','позиций'])} лучше купить позже`:'Список пока пуст'; box.dataset.copyText=items.map(item=>`${localDateKey(shoppingPurchaseDate(item,weekStart))===localDateKey(weekStart)?'В начале недели':shoppingPurchaseDate(item,weekStart).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'})}: ${item.name} — ${shoppingQuantityText(item)}`).join('\n');}
 async function copyWeeklyShoppingList(){const box=$('#shoppingList'); const text=box?.dataset.copyText||''; if(!text){mealDayStatus('Список покупок пока пуст.');return;} const ok=await copyText(text); mealDayStatus(ok?'Список покупок скопирован.':'Не удалось скопировать список.'); vibe(8);}
 
 function exportUserData(){
@@ -2002,6 +2060,7 @@ function importUserData(file){
       }
       saveState();
       saveMyRecipes();
+      if(cloudUser) syncUserRecipeLibraryToCloud(myRecipes,{removeMissing:true}).catch(error=>console.warn('Imported recipe sync failed',error));
       setTheme();
       updateStats();
       renderCountries();
@@ -2362,6 +2421,55 @@ function mergeRecipeLists(localList,cloudList){
   return withoutLegacyDuplicateRecipes(Array.from(map.values())).sort((a,b)=>recipeStamp(b)-recipeStamp(a));
 }
 function recipeListsSignature(list){return JSON.stringify((Array.isArray(list)?list:[]).map(r=>[r.id,r.updatedAt||'',r.title||'']));}
+function userRecipesFromCloudRows(rows){
+  return withoutLegacyDuplicateRecipes((Array.isArray(rows)?rows:[]).map(row=>{
+    if(!row?.recipe_data||typeof row.recipe_data!=='object') return null;
+    return Object.assign({},row.recipe_data,{id:String(row.recipe_id||row.recipe_data.id||''),updatedAt:row.recipe_data.updatedAt||row.updated_at||null});
+  }).filter(recipe=>recipe?.id));
+}
+async function loadUserRecipesFromCloud(){
+  if(!cloud||!cloudUser) return [];
+  const {data,error}=await cloud.from(CLOUD_USER_RECIPE_TABLE)
+    .select('recipe_id,recipe_data,updated_at')
+    .eq('user_id',cloudUser.id)
+    .order('updated_at',{ascending:false});
+  if(error) throw error;
+  return userRecipesFromCloudRows(data);
+}
+async function saveUserRecipeToCloud(recipe,{silent=false}={}){
+  if(!cloud||!cloudUser||!recipe?.id) return false;
+  try{
+    const row={user_id:cloudUser.id,recipe_id:String(recipe.id),recipe_data:recipe,updated_at:recipe.updatedAt||new Date().toISOString()};
+    const {error}=await cloud.from(CLOUD_USER_RECIPE_TABLE).upsert(row,{onConflict:'user_id,recipe_id'});
+    if(error) throw error;
+    if(!silent) cloudStatus('Рецепт сохранён в облаке.');
+    return true;
+  }catch(error){console.warn('User recipe save failed',error);if(!silent) cloudStatus('Не удалось сохранить рецепт: '+cloudErrorMessage(error));return false;}
+}
+async function deleteUserRecipeFromCloud(recipeId,{silent=false}={}){
+  if(!cloud||!cloudUser||!recipeId) return false;
+  try{
+    const {error}=await cloud.from(CLOUD_USER_RECIPE_TABLE).delete().eq('user_id',cloudUser.id).eq('recipe_id',String(recipeId));
+    if(error) throw error;
+    if(!silent) cloudStatus('Рецепт удалён из облака.');
+    return true;
+  }catch(error){console.warn('User recipe delete failed',error);if(!silent) cloudStatus('Не удалось удалить рецепт: '+cloudErrorMessage(error));return false;}
+}
+async function syncUserRecipeLibraryToCloud(recipes,{removeMissing=false}={}){
+  if(!cloud||!cloudUser) return false;
+  const list=withoutLegacyDuplicateRecipes(recipes);
+  const rows=list.map(recipe=>({user_id:cloudUser.id,recipe_id:String(recipe.id),recipe_data:recipe,updated_at:recipe.updatedAt||new Date().toISOString()}));
+  for(let offset=0;offset<rows.length;offset+=40){
+    const {error}=await cloud.from(CLOUD_USER_RECIPE_TABLE).upsert(rows.slice(offset,offset+40),{onConflict:'user_id,recipe_id'});
+    if(error) throw error;
+  }
+  if(removeMissing){
+    const current=await loadUserRecipesFromCloud();
+    const keep=new Set(list.map(recipe=>String(recipe.id)));
+    await Promise.all(current.filter(recipe=>!keep.has(String(recipe.id))).map(recipe=>deleteUserRecipeFromCloud(recipe.id,{silent:true})));
+  }
+  return true;
+}
 const recipeOverrideCloudLoaded=new Set();
 const recipeOverrideCloudLoads=new Map();
 function recipeOverrideCloudKey(recipeId){return `${cloudUser?.id||'guest'}:${canonicalRecipeId(recipeId,'base')}`;}
@@ -2526,23 +2634,40 @@ async function syncCloudShellAfterLogin({silent=true}={}){
 async function runCloudDataAfterLogin({silent=true,reason='login'}={}){
   if(!cloud || !cloudUser) return false;
   try{
-    const {data,error}=await cloud.from(CLOUD_TABLE).select('app_state,my_recipes,updated_at').eq('user_id',cloudUser.id).maybeSingle();
+    const [{data,error},rowRecipes]=await Promise.all([
+      cloud.from(CLOUD_TABLE).select('app_state,my_recipes,updated_at').eq('user_id',cloudUser.id).maybeSingle(),
+      loadUserRecipesFromCloud()
+    ]);
     if(error) throw error;
+    if(!data&&rowRecipes.length){
+      await saveCloudData({silent:true});
+      const result=applyCloudPayload({app_state:{},my_recipes:rowRecipes,updated_at:null},{replace:false,silent});
+      await migrateLegacyMealPlan();
+      await flushDirtyMealDays();
+      mealMonthCache.clear();
+      if(!silent) cloudStatus(`Загружено из облака: ${result.localCount} ${plural(result.localCount,['рецепт','рецепта','рецептов'])}.`);
+      return true;
+    }
     if(!data){
       await saveCloudData({silent:true});
+      await syncUserRecipeLibraryToCloud(myRecipes);
       await migrateLegacyMealPlan();
       await flushDirtyMealDays();
       mealMonthCache.clear();
       if(!silent) cloudStatus(myRecipes.length?'Локальные рецепты сохранены в облако для этого аккаунта.':'Облачных рецептов для этого аккаунта пока нет.');
       return false;
     }
-    const result=applyCloudPayload(data,{replace:false,silent});
+    const legacyRecipes=withoutLegacyDuplicateRecipes(data.my_recipes);
+    const cloudRecipes=mergeRecipeLists(rowRecipes,legacyRecipes);
+    const result=applyCloudPayload(Object.assign({},data,{my_recipes:cloudRecipes}),{replace:false,silent});
+    if(!rowRecipes.length&&legacyRecipes.length) await syncUserRecipeLibraryToCloud(legacyRecipes);
     await migrateLegacyMealPlan();
     await flushDirtyMealDays();
     mealMonthCache.clear();
     if(result.changed){
       if(!silent) cloudStatus(`Синхронизация выполнена: на устройстве ${result.localCount} ${plural(result.localCount,['рецепт','рецепта','рецептов'])}.`);
-      saveCloudData({silent:true}).catch(e=>console.warn('Merged cloud save failed',e));
+      syncUserRecipeLibraryToCloud(myRecipes).catch(e=>console.warn('Merged recipe sync failed',e));
+      saveCloudData({silent:true}).catch(e=>console.warn('Merged settings save failed',e));
     }else if(!silent){
       cloudStatus(result.cloudCount?`Синхронизация проверена: ${result.cloudCount} ${plural(result.cloudCount,['рецепт','рецепта','рецептов'])} уже на устройстве.`:'В облаке пока нет сохранённых рецептов.');
     }
@@ -2569,7 +2694,7 @@ async function fetchCloudProfile({silent=true}={}){
 async function ensureCloudRow(){
   if(!cloud || !cloudUser) return false;
   const snap=cloudSnapshot();
-  const row={user_id:cloudUser.id,app_state:snap.state,my_recipes:snap.myRecipes,updated_at:new Date().toISOString()};
+  const row={user_id:cloudUser.id,app_state:snap.state,updated_at:new Date().toISOString()};
   const {error}=await cloud.from(CLOUD_TABLE).upsert(row,{onConflict:'user_id'});
   if(error) throw error;
   return true;
@@ -2584,6 +2709,8 @@ async function checkCloudConnection(){
     if(activeUser) setCloudUser(activeUser);
     const {error:tableError}=await cloud.from(CLOUD_TABLE).select('user_id',{head:true,count:'exact'}).limit(1);
     if(tableError) throw tableError;
+    const {error:recipeTableError}=await cloud.from(CLOUD_USER_RECIPE_TABLE).select('recipe_id',{head:true,count:'exact'}).limit(1);
+    if(recipeTableError) throw recipeTableError;
     const {error:mealTableError}=await cloud.from(CLOUD_MEAL_TABLE).select('meal_date',{head:true,count:'exact'}).limit(1);
     if(mealTableError) throw mealTableError;
     const {error:overrideTableError}=await cloud.from(CLOUD_RECIPE_OVERRIDE_TABLE).select('recipe_id',{head:true,count:'exact'}).limit(1);
@@ -2600,7 +2727,7 @@ async function saveCloudData({silent=false}={}){
   try{
     if(!silent) setCloudBusy(true,'Сохраняю данные в облако...');
     const snap=cloudSnapshot();
-    const {error}=await cloud.from(CLOUD_TABLE).upsert({user_id:cloudUser.id,app_state:snap.state,my_recipes:snap.myRecipes,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    const {error}=await cloud.from(CLOUD_TABLE).upsert({user_id:cloudUser.id,app_state:snap.state,updated_at:new Date().toISOString()},{onConflict:'user_id'});
     if(error) throw error;
     if(!silent) cloudStatus(`Сохранено в облако: ${new Date().toLocaleString('ru-RU')}.`);
     return true;
@@ -2611,19 +2738,23 @@ async function loadCloudData({silent=false}={}){
   if(!cloud || !cloudUser){if(!silent) cloudStatus('Сначала войдите в аккаунт.'); return false;}
   try{
     if(!silent) setCloudBusy(true,'Загружаю данные из облака...');
-    const {data,error}=await cloud.from(CLOUD_TABLE).select('app_state,my_recipes,updated_at').eq('user_id',cloudUser.id).maybeSingle();
+    const [{data,error},rowRecipes]=await Promise.all([
+      cloud.from(CLOUD_TABLE).select('app_state,my_recipes,updated_at').eq('user_id',cloudUser.id).maybeSingle(),
+      loadUserRecipesFromCloud()
+    ]);
     if(error) throw error;
-    if(!data){cloudStatus('В облаке пока нет сохранённых данных. Новые данные будут синхронизироваться автоматически.'); return false;}
-    const count=Array.isArray(data.my_recipes)?data.my_recipes.length:0;
+    if(!data&&!rowRecipes.length){cloudStatus('В облаке пока нет сохранённых данных. Новые данные будут синхронизироваться автоматически.'); return false;}
+    const cloudRecipes=mergeRecipeLists(rowRecipes,data?.my_recipes);
+    const count=cloudRecipes.length;
     if(!silent){
-      const when=data.updated_at?new Date(data.updated_at).toLocaleString('ru-RU'):'без даты';
+      const when=data?.updated_at?new Date(data.updated_at).toLocaleString('ru-RU'):'без даты';
       const ok=confirm(`Загрузить данные из облака? Текущие пользовательские рецепты на этом устройстве будут заменены. В облаке: ${count} ${plural(count,['рецепт','рецепта','рецептов'])}. Обновлено: ${when}.`);
       if(!ok){cloudStatus('Загрузка из облака отменена.'); return false;}
     }
     cloudSyncApplying=true;
     try{
-      myRecipes=withoutLegacyDuplicateRecipes(data.my_recipes);
-      if(data.app_state && typeof data.app_state==='object'){
+      myRecipes=withoutLegacyDuplicateRecipes(cloudRecipes);
+      if(data?.app_state && typeof data.app_state==='object'){
         const incomingState=Object.assign({},data.app_state);
         if(incomingState.mealPlan && typeof incomingState.mealPlan==='object') legacyMealPlanPending=mergeMealPlans(legacyMealPlanPending,incomingState.mealPlan);
         delete incomingState.mealPlan;
@@ -2638,9 +2769,9 @@ async function loadCloudData({silent=false}={}){
         state.editingId=null;
       }
       localStorage.setItem(STORAGE_STATE_KEY,JSON.stringify(publicStateForStorage()));
-        queuePersonalCacheSave();
+      queuePersonalCacheSave();
       persistBackup();
-      if(data.updated_at) rememberCloudSyncedAt(data.updated_at);
+      if(data?.updated_at) rememberCloudSyncedAt(data.updated_at);
     }finally{cloudSyncApplying=false;}
     await migrateLegacyMealPlan();
     await flushDirtyMealDays();
@@ -3272,6 +3403,40 @@ async function hydrateRecipeNutritionReferences(recipe){
   });
   return changed?{recipe:reconcileCustomRecipeNutrition(Object.assign({},recipe,{ingredientNutrition:products})),changed:true}:{recipe,changed:false};
 }
+function recipeIngredientReferenceNames(recipe){
+  return [...new Set((Array.isArray(recipe?.ingredients)?recipe.ingredients:[])
+    .map(line=>parseIngredientAmount(line)?.name||'')
+    .map(name=>String(name).trim())
+    .filter(Boolean))];
+}
+async function hydrateVisibleRecipeNutrition(recipe,{calculateFromIngredients=false}={}){
+  if(!recipe) return {recipe,changed:false};
+  const missing=recipeNutritionRowsMissingReference(recipe);
+  if(missing.length) return hydrateRecipeNutritionReferences(recipe);
+  if(!calculateFromIngredients||!Array.isArray(recipe.ingredients)||!recipe.ingredients.length) return {recipe,changed:false};
+
+  const names=recipeIngredientReferenceNames(recipe);
+  if(!names.length) return {recipe,changed:false};
+  await loadReferenceDataForNames(names,{nutrition:true,portions:true});
+
+  const calculate=()=>{
+    const next=Object.assign({},recipe,{ingredientNutrition:[]});
+    delete next.nutrition;
+    delete next.nutritionTotal;
+    delete next.nutritionEstimated;
+    const nutrition=catalogNutritionFromIngredients(next);
+    if(!nutrition) return null;
+    next.nutrition=nutrition;
+    next.nutritionEstimated=false;
+    return next;
+  };
+  let next=calculate();
+  if(!next){
+    await ensureLocalFoodReferences();
+    next=calculate();
+  }
+  return next?{recipe:next,changed:true}:{recipe,changed:false};
+}
 function calcFromProducts(){const products=getProductRows(); const used=products.filter(p=>p.name && p.weight>0).map(product=>({...product,total:nutritionForProduct(product)})); if(!used.length) return null; const inputWeight=used.reduce((sum,product)=>sum+product.weight,0); if(inputWeight<=0) return null; const total=used.reduce((sum,product)=>addNutrition(sum,product.total),{kcal:0,protein:0,fat:0,carbs:0}); return {inputWeight,total,products:used};}
 function scrollToMyRecipeListStart(){
   requestAnimationFrame(()=>{
@@ -3335,7 +3500,7 @@ function renderMyRecipes(){
   updateHomeMeta();
 }
 function editMyRecipe(id){const r=myRecipes.find(x=>x.id===id); if(!r) return; const lib=$('#myLibrary'), editor=$('#myRecipeEditor'); if(lib) lib.hidden=true; if(editor) editor.hidden=false; state.editingId=id; state.myCat=r.category||state.myCat||'Горячие блюда'; saveState(); $('#formTitle').textContent='Редактировать'; $('#myTitle').value=r.title||''; $('#myCategory').value=r.category||'Горячие блюда'; $('#myTime').value=r.time||''; $('#myServings').value=r.servings||''; $('#myCountry').value=r.country||''; $('#myDifficulty').value=r.difficulty||'легко'; const weightInput=$('#myWeight'); weightInput.value=r.weight||''; weightInput.dataset.autoEstimate=r.weightEstimated?'1':'0'; $('#myKcal100').value=r.nutrition100?.kcal??''; $('#myProtein100').value=r.nutrition100?.protein??''; $('#myFat100').value=r.nutrition100?.fat??''; $('#myCarbs100').value=r.nutrition100?.carbs??''; renderProductRows((r.ingredientNutrition&&r.ingredientNutrition.length)?r.ingredientNutrition:[{}]); $('#myIngredients').value=(r.ingredients||r.extraIngredients||[]).join('\n'); synchronizeProductsFromIngredients({force:true}); $('#mySteps').value=(r.steps||[]).join('\n'); $('#myTips').value=r.tips||''; updateKbjuPreview(); window.scrollTo({top:0,behavior:'smooth'}); vibe(10);}
-function deleteMyRecipe(id){myRecipes=myRecipes.filter(x=>x.id!==id); state.likedRecipes=normalizeLikedRecipes(state.likedRecipes).filter(item=>recipeKey(item.id,item.source)!==recipeKey(id,'custom')); saveMyRecipes(); persistLikedRecipes({sync:false}); if(cloudUser) saveCloudData({silent:true}).catch(e=>console.warn('Immediate delete sync failed',e)); renderMyRecipes(); if(state.editingId===id) resetMyForm(); vibe(10);}
+function deleteMyRecipe(id){myRecipes=myRecipes.filter(x=>x.id!==id); state.likedRecipes=normalizeLikedRecipes(state.likedRecipes).filter(item=>recipeKey(item.id,item.source)!==recipeKey(id,'custom')); saveMyRecipes(); persistLikedRecipes({sync:false}); if(cloudUser) deleteUserRecipeFromCloud(id,{silent:true}).catch(e=>console.warn('Immediate delete sync failed',e)); renderMyRecipes(); if(state.editingId===id) resetMyForm(); vibe(10);}
 function getCustomNutrition(){const servings=Math.max(1,Number($('#myServings').value)||1); const weight=Number($('#myWeight').value)||0; const productCalc=calcFromProducts(); if(productCalc){if(weight<=0) return {...productCalc,weight:0,nutrition100:null,nutrition:null,source:'products',requiresWeight:true}; const n100={kcal:productCalc.total.kcal/weight*100,protein:productCalc.total.protein/weight*100,fat:productCalc.total.fat/weight*100,carbs:productCalc.total.carbs/weight*100}; return {...productCalc,weight,nutrition100:n100,nutrition:{kcal:productCalc.total.kcal/servings,protein:productCalc.total.protein/servings,fat:productCalc.total.fat/servings,carbs:productCalc.total.carbs/servings},source:'products',requiresWeight:false};} const n100={kcal:Number($('#myKcal100').value)||0,protein:Number($('#myProtein100').value)||0,fat:Number($('#myFat100').value)||0,carbs:Number($('#myCarbs100').value)||0}; const hasManual=Object.values(n100).some(v=>v>0); if(!hasManual) return {weight:0,inputWeight:0,nutrition100:null,nutrition:null,total:null,products:[],source:null,requiresWeight:false}; if(weight<=0) return {weight:0,inputWeight:0,nutrition100:n100,nutrition:null,total:null,products:[],source:'manual',requiresWeight:true}; const total={kcal:n100.kcal*weight/100,protein:n100.protein*weight/100,fat:n100.fat*weight/100,carbs:n100.carbs*weight/100}; return {weight,inputWeight:0,nutrition100:n100,total,nutrition:{kcal:total.kcal/servings,protein:total.protein/servings,fat:total.fat/servings,carbs:total.carbs/servings},products:[],source:'manual',requiresWeight:false};}
 function nutritionLine(label,n){return `<div class="kbju-summary-section"><strong>${label}</strong><span><b>${fmt(n.kcal)} ккал</b> • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</span></div>`;}
 function compactNutritionText(value){return `${fmt(value.kcal)} ккал · Б ${fmt(value.protein)} · Ж ${fmt(value.fat)} · У ${fmt(value.carbs)}`;}
@@ -3397,7 +3562,7 @@ function saveCustomRecipe(){
   state.editingId=null;
   saveState();
   saveMyRecipes();
-  if(cloudUser) saveCloudData({silent:true}).catch(e=>console.warn('Immediate recipe sync failed',e));
+  if(cloudUser) saveUserRecipeToCloud(rec,{silent:true}).catch(e=>console.warn('Immediate recipe sync failed',e));
   resetMyForm(false);
   showMyLibrary();
   renderMyRecipes();
@@ -3689,7 +3854,7 @@ function fodmapIngredientMark(value){
   return `<i class="fodmap-dot ${result.level}" title="${esc(result.label)}" aria-label="FODMAP: ${esc(result.short)}"></i>`;
 }
 function fodmapLegendHtml(){return '<div class="fodmap-legend" aria-label="Подсказка FODMAP"><span><i class="fodmap-dot green"></i>низкий</span><span><i class="fodmap-dot yellow"></i>зависит от порции</span><span><i class="fodmap-dot red"></i>высокий</span><small>Ориентир: переносимость и размер порции индивидуальны.</small></div>';}
-async function openRecipe(id,source='base',recipeOverride=null,{skipCloud=false}={}){
+async function openRecipe(id,source='base',recipeOverride=null,{skipCloud=false,skipNutrition=false}={}){
   clearRecipeStepTimers();
   const normalizedSource=source==='custom'?'custom':source==='shared'?'shared':'base';
   const canonicalId=normalizedSource==='shared'?String(id||'shared'):canonicalRecipeId(id,normalizedSource);
@@ -3712,25 +3877,14 @@ async function openRecipe(id,source='base',recipeOverride=null,{skipCloud=false}
     r=recipeOverride||effectiveBaseRecipe(canonicalId);
     if(!r) return false;
   }
-  const hydrated=await hydrateRecipeNutritionReferences(r);
-  if(hydrated.changed){
-    r=hydrated.recipe;
-    if(normalizedSource==='custom'){
-      const index=myRecipes.findIndex(recipe=>recipe.id===canonicalId);
-      if(index>-1){
-        myRecipes[index]=r;
-        saveMyRecipes();
-      }
-    }
-  }
   activeSharedRecipe=normalizedSource==='shared'?r:null;
   const likeAction=normalizedSource==='shared'?'':likeButtonHtml(r.id,normalizedSource,'');
   const menuTags=`${r.preparedAhead?'<span class="tag green">Приготовлено заранее</span>':''}${r.batchLabel?`<span class="tag">${esc(r.batchLabel)}</span>`:''}`;
   $('#modalTags').innerHTML=`<span class="tag">${esc(r.country||'Мои рецепты')}</span><span class="tag">${esc(r.category||'Без категории')}</span>${r.healthy?'<span class="tag green">Полезный</span>':''}${menuTags}${likeAction}${shareButtonHtml(r.id||canonicalId,normalizedSource)}${revokeShareButtonHtml(r.id||canonicalId,normalizedSource)}`;
   $('#modalTitle').innerHTML=`<span>${esc(r.title)}</span>${originLabel(r)?`<small>${esc(originLabel(r))}</small>`:''}`;
-  const nut=r.nutrition||nutritionOf(r);
+  let nut=r.nutrition||nutritionOf(r);
   const baseServings=r.servings||1;
-  const nutritionProducts=Array.isArray(r.ingredientNutrition)?r.ingredientNutrition:[];
+  let nutritionProducts=Array.isArray(r.ingredientNutrition)?r.ingredientNutrition:[];
   const ingredients=(list,m)=>(Array.isArray(list)?list:[]).map(x=>`<li>${fodmapIngredientMark(x)}<span>${esc(scaledIngredientText(x,m))}</span></li>`).join('');
   const nutritionHtml=(n,s)=>`<div class="nutrition-total-label">На всё блюдо · ${s} ${plural(s,['порция','порции','порций'])}</div><div class="nutrition"><div class="ncard"><strong>${fmt(n.kcal*s)}</strong><span>ккал</span></div><div class="ncard"><strong>${fmt(n.protein*s)} г</strong><span>белки</span></div><div class="ncard"><strong>${fmt(n.fat*s)} г</strong><span>жиры</span></div><div class="ncard"><strong>${fmt(n.carbs*s)} г</strong><span>углеводы</span></div></div><div class="nnote">На 1 порцию: ${fmt(n.kcal)} ккал • Б ${fmt(n.protein)} г • Ж ${fmt(n.fat)} г • У ${fmt(n.carbs)} г</div>`;
   const stepsHtml=(r.steps||[]).map(step=>{const sec=extractStepTimerSeconds(step); return `<div class="step"><label class="checkline"><input type="checkbox" data-check><span>${esc(step)}</span></label>${sec?timerHtml(sec):''}</div>`;}).join('');
@@ -3739,7 +3893,7 @@ async function openRecipe(id,source='base',recipeOverride=null,{skipCloud=false}
   const recipeSources=Array.isArray(r.recipeSources)?r.recipeSources.filter(source=>source&&source.url&&source.label):[];
   const sourcesHtml=recipeSources.length?`<div class="recipe-sources"><strong>Источники проверки</strong><div>${recipeSources.map(source=>`<a href="${esc(source.url)}" target="_blank" rel="noopener noreferrer">${esc(source.label)}</a>`).join('')}</div></div>`:'';
   const cookedWeightNote=r.nutrition100?`<div class="nnote">Расчёт из КБЖУ на 100 г и ${r.weightEstimated?'оценочного':'взвешенного'} веса готового блюда ${r.weightEstimated?'≈ ':''}${r.weight||0} г.${!r.weightEstimated&&r.estimatedWeight&&Math.abs(Number(r.estimatedWeight)-Number(r.weight||0))>Math.max(10,Number(r.weight||0)*.05)?` Расчётный ориентир по продуктам ≈ ${fmt(r.estimatedWeight)} г.`:''}</div>`:'';
-  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div>${timingHtml}<h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul>${fodmapLegendHtml()}<div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div>${nutritionProducts.length?`<div id="productNutritionBreakdown">${productNutritionDetailsHtml(nutritionProducts,{servings:baseServings})}</div>`:''}${cookedWeightNote}</aside><section class="panel"><h3>Приготовление</h3>${historyHtml}<div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}${sourcesHtml}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>${normalizedSource==='base'?recipeVersionActionsHtml(canonicalId):''}`;
+  $('#modalBody').innerHTML=`<div class="recipe-cols"><aside class="panel"><h3>Порции</h3><div class="portion-box"><div class="portion-label">Калькулятор</div><div class="stepper"><button id="portionMinus">−</button><input id="portionInput" type="number" min="1" step="1" value="${baseServings}"><button id="portionPlus">+</button></div><div class="portion-label">База: ${baseServings}</div></div>${timingHtml}<h3>Ингредиенты</h3><ul class="ingredients" id="ingredientsList">${ingredients(r.ingredients,1)}</ul>${fodmapLegendHtml()}<div class="nnote" id="ingredientsNote">Граммовки и количества показаны для ${baseServings} ${plural(baseServings,['порции','порций','порций'])}.</div><div id="nutritionBox">${nutritionHtml(nut,baseServings)}</div><div id="productNutritionBreakdown">${nutritionProducts.length?productNutritionDetailsHtml(nutritionProducts,{servings:baseServings}):''}</div>${cookedWeightNote}</aside><section class="panel"><h3>Приготовление</h3>${historyHtml}<div class="progress" id="progressText">Отмечено 0 из ${(r.steps||[]).length}</div><div class="steps">${stepsHtml}</div>${r.tips?`<div class="tip"><strong>Заметка:</strong> ${esc(r.tips)}</div>`:''}${sourcesHtml}<div class="swipe-close">Потяните верхнюю ручку вниз, чтобы закрыть</div></section></div>${normalizedSource==='base'?recipeVersionActionsHtml(canonicalId):''}`;
   function rerender(){
     const raw=Number($('#portionInput').value); const s=Number.isFinite(raw)&&raw>0?raw:baseServings;
     $('#portionInput').value=s;
@@ -3755,6 +3909,28 @@ async function openRecipe(id,source='base',recipeOverride=null,{skipCloud=false}
   $('#portionInput').oninput=rerender;
   $$('[data-check]').forEach(c=>c.onchange=()=>{progress(); vibe(8); handleStepCheckChange(c);});
   progress(); initStepTimers(); renderRecipeInteractions($('#modal')); openModal(); vibe(12);
+  const needsVisibleNutrition=normalizedSource==='base'
+    ? Boolean(r.nutritionEstimated||!Array.isArray(r.ingredientNutrition)||!r.ingredientNutrition.length)
+    : recipeNutritionRowsMissingReference(r).length>0;
+  if(!skipNutrition&&needsVisibleNutrition){
+    const modalKey=activeRecipeModalKey;
+    requestAnimationFrame(()=>hydrateVisibleRecipeNutrition(r,{calculateFromIngredients:normalizedSource==='base'}).then(hydrated=>{
+      if(!hydrated.changed||activeRecipeModalKey!==modalKey||!$('#modal')?.classList.contains('open')) return;
+      r=hydrated.recipe;
+      if(normalizedSource==='base'){
+        baseRecipeIndex.set(canonicalId,r);
+        recipeDetailCache.set(canonicalId,r);
+        invalidateCatalogRecipeCache();
+      }
+      nut=r.nutrition||nutritionOf(r);
+      nutritionProducts=Array.isArray(r.ingredientNutrition)?r.ingredientNutrition:[];
+      if(normalizedSource==='custom'){
+        const index=myRecipes.findIndex(recipe=>recipe.id===canonicalId);
+        if(index>-1){myRecipes[index]=r;saveMyRecipes();saveUserRecipeToCloud(r,{silent:true}).catch(error=>console.warn('Hydrated recipe sync failed',error));}
+      }
+      rerender();
+    }).catch(error=>console.warn('Recipe nutrition hydration failed',error)));
+  }
   if(normalizedSource==='base'&&!skipCloud&&cloudUser){
     const modalKey=activeRecipeModalKey;
     requestAnimationFrame(()=>loadRecipeOverrideFromCloud(canonicalId).then(changed=>{

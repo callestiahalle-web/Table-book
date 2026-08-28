@@ -6,7 +6,11 @@ const root=path.resolve(import.meta.dirname,'..');
 const sandbox={window:{},console,structuredClone:globalThis.structuredClone};
 vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(root,'js','recipe-catalog.js'),'utf8'),sandbox,{filename:'recipe-catalog.js'});
-const recipes=sandbox.window.TABLE_BOOK_RECIPES||[];
+const recipes=(sandbox.window.TABLE_BOOK_RECIPES||[]).map(recipe=>Object.assign(
+  {},
+  recipe,
+  JSON.parse(fs.readFileSync(path.join(root,'data','recipes',`${recipe.id}.json`),'utf8'))
+));
 vm.runInContext(fs.readFileSync(path.join(root,'js','product-tags.js'),'utf8'),sandbox,{filename:'product-tags.js'});
 const tags=sandbox.window.TABLE_BOOK_PRODUCT_TAGS;
 if(!tags) throw new Error('Справочник продуктовых тегов не загрузился');

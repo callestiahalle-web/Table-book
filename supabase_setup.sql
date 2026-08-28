@@ -35,6 +35,60 @@ to authenticated
 using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);
 
+-- User-created recipes are stored as individual rows. This prevents every
+-- recipe edit from rewriting the user's complete recipe library and gives
+-- concurrent devices an independent conflict boundary per recipe.
+create table if not exists public.user_recipes (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  recipe_id text not null,
+  recipe_data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, recipe_id),
+  constraint user_recipes_recipe_id_not_blank check (length(btrim(recipe_id)) > 0),
+  constraint user_recipes_recipe_data_object check (jsonb_typeof(recipe_data) = 'object')
+);
+
+alter table public.user_recipes enable row level security;
+revoke all on table public.user_recipes from anon, authenticated;
+grant select, insert, update, delete on table public.user_recipes to authenticated;
+
+drop policy if exists "Users can read own recipes" on public.user_recipes;
+drop policy if exists "Users can insert own recipes" on public.user_recipes;
+drop policy if exists "Users can update own recipes" on public.user_recipes;
+drop policy if exists "Users can delete own recipes" on public.user_recipes;
+
+create policy "Users can read own recipes"
+on public.user_recipes for select to authenticated
+using ((select auth.uid()) = user_id);
+
+create policy "Users can insert own recipes"
+on public.user_recipes for insert to authenticated
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can update own recipes"
+on public.user_recipes for update to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can delete own recipes"
+on public.user_recipes for delete to authenticated
+using ((select auth.uid()) = user_id);
+
+-- Idempotent compatibility migration from the previous JSON array. The legacy
+-- value is intentionally retained for one release so older installed clients
+-- can still read their existing data while the web application moves to rows.
+insert into public.user_recipes (user_id, recipe_id, recipe_data, updated_at)
+select state.user_id, recipe.value ->> 'id', recipe.value, state.updated_at
+from public.user_app_state as state
+cross join lateral jsonb_array_elements(
+  case when jsonb_typeof(state.my_recipes) = 'array' then state.my_recipes else '[]'::jsonb end
+) as recipe(value)
+where length(btrim(recipe.value ->> 'id')) > 0
+  and jsonb_typeof(recipe.value) = 'object'
+on conflict (user_id, recipe_id) do update
+set recipe_data = excluded.recipe_data,
+    updated_at = greatest(public.user_recipes.updated_at, excluded.updated_at);
+
 -- Calendar days are stored separately from the profile snapshot.
 -- The client loads only the month that the user opens, so old months stay
 -- available without being transferred on every sign-in or profile update.

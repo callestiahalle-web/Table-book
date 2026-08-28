@@ -86,7 +86,15 @@ for(const date of expectedDates){
       carbs+=Number(recipe.nutrition.carbs)||0;
     }
   }
-  report.push({date,kcal:Math.round(kcal),protein:Math.round(protein*10)/10,fat:Math.round(fat*10)/10,carbs:Math.round(carbs*10)/10,target:kcal>=1500&&kcal<=1600});
+  report.push({
+    date,
+    kcal:Math.round(kcal),
+    protein:Math.round(protein*10)/10,
+    fat:Math.round(fat*10)/10,
+    carbs:Math.round(carbs*10)/10,
+    target:kcal>=1500&&kcal<=1600,
+    acceptable:kcal>=1450&&kcal<=1700
+  });
 }
 
 const assertText=(id,pattern,message)=>{
@@ -109,4 +117,10 @@ const tuesdayLunch=data.mealPlan['2026-08-25'].lunch[0];
 if(tuesdayLunch.id!=='week-20260824-dinner-chicken-bowl-batch'||!tuesdayLunch.skipShopping||!tuesdayLunch.workday) throw new Error('25 August lunch must reuse the Monday batch without duplicating shopping');
 
 console.table(report);
-console.log(`OK: ${actualDates.length} days, ${data.recipes.length} unique recipe cards, ${report.filter(day=>day.target).length}/7 days within the 1500–1600 kcal guide.`);
+const outsideSafetyRange=report.filter(day=>!day.acceptable);
+if(outsideSafetyRange.length){
+  throw new Error(`Daily energy is outside the 1450–1700 kcal safety range: ${outsideSafetyRange.map(day=>`${day.date} (${day.kcal} kcal)`).join(', ')}`);
+}
+const targetDays=report.filter(day=>day.target).length;
+console.log(`OK: ${actualDates.length} days, ${data.recipes.length} unique recipe cards, every day is within the 1450–1700 kcal validation range.`);
+console.log(`NOTICE: ${targetDays}/7 days are within the narrower 1500–1600 kcal guide; the remaining days stay within the allowed validation tolerance.`);

@@ -144,6 +144,7 @@
     return candidates[0]?.item.tag||key;
   };
   const ingredientNames=recipe=>[
+    ...(Array.isArray(recipe?.ingredientSearch)?recipe.ingredientSearch:[]),
     ...(Array.isArray(recipe?.ingredients)?recipe.ingredients:[]),
     ...(Array.isArray(recipe?.ingredientNutrition)?recipe.ingredientNutrition.map(item=>item?.name||''):[])
   ].map(value=>String(value||'').split(/\s+[—–-]\s+/)[0].trim()).filter(Boolean);

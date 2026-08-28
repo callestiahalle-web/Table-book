@@ -12,7 +12,9 @@
     "audit:tags": "node scripts/audit-recipe-tags.mjs",
     "audit:weekly-menu": "node scripts/audit-weekly-menu.mjs",
     "audit:personal-recipes": "node scripts/audit-personal-recipes.mjs",
-    "audit:food-reference": "node scripts/audit-food-reference.mjs"
+    "audit:food-reference": "node scripts/audit-food-reference.mjs",
+    "audit:runtime": "node scripts/audit-runtime-architecture.mjs",
+    "check": "node --check js/app.js && node --check js/product-tags.js && node scripts/audit-runtime-architecture.mjs && node scripts/audit-chef-recipes.mjs && node scripts/audit-recipe-tags.mjs && node scripts/audit-weekly-menu.mjs && node scripts/audit-personal-recipes.mjs && node scripts/audit-food-reference.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.4.1",
